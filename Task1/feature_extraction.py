@@ -27,7 +27,7 @@ class FeatureExtraction:
         return sift_data
 
     def fourier_transform(self) -> list:
-        img = cv2.imread('messi5.jpg', 0)
+        img = cv2.imread("messi5.jpg", 0)
 
         # Apply DFT and shift the zero frequency component to center
         fourier_data = []

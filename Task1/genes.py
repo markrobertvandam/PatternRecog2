@@ -14,8 +14,10 @@ class Genes:
     def load_data(self) -> None:
         filename_samples = f"data/Genes/data.csv"
         filename_labels = f"data/Genes/labels.csv"
-        labels = {"PRAD":0, "LUAD":1, "BRCA":2, "KIRC":3, "COAD":4}
-        with open(filename_samples, "r") as samples_csv, open(filename_labels) as labels_csv:
+        labels = {"PRAD": 0, "LUAD": 1, "BRCA": 2, "KIRC": 3, "COAD": 4}
+        with open(filename_samples, "r") as samples_csv, open(
+            filename_labels
+        ) as labels_csv:
             samples_csv_reader = csv.reader(samples_csv)
             labels_csv_reader = csv.reader(labels_csv)
             next(samples_csv_reader, None)

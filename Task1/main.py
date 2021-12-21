@@ -28,6 +28,7 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.classification()
     cats.clustering()
 
+
 def main():
 
     args = parse_args()
