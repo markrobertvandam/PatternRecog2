@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import cv2
-import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -18,11 +17,13 @@ class FeatureExtraction:
 
     def sift(self) -> list:
         # sift
-        sift = cv2.xfeatures2d.SIFT_create()
+        sift = cv2.SIFT_create(240)
         sift_data = []
 
         for image in self.gray_images:
-            sift_data.append(sift.detectAndCompute(image, None))
+
+            # only keeps the descriptors
+            sift_data.append(sift.detectAndCompute(image, None)[1][:240])
 
         return sift_data
 
