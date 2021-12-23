@@ -4,39 +4,30 @@ import numpy as np
 
 
 class FeatureExtraction:
-    def __init__(self, x: list, y: list, dataset: str) -> None:
+    def __init__(self, x: np.ndarray, y: list, dataset: str) -> None:
         self.data = x
         self.labels = y
-        if dataset == "cats":
 
-            # convert to grayscale
-            self.gray_images = []
-            for img in self.data:
-                grayscale_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-                self.gray_images.append(grayscale_img)
-
-    def sift(self) -> list:
+    def sift(self) -> np.ndarray:
         # sift
-        sift = cv2.SIFT_create(240)
+        sift = cv2.SIFT_create(200)
         sift_data = []
 
-        for image in self.gray_images:
+        for image in self.data:
+            # only keeps the descriptors of best 200 keypoints
+            kp, des = sift.detectAndCompute(image, None)
+            sift_data.append(des[:200])
 
-            # only keeps the descriptors
-            sift_data.append(sift.detectAndCompute(image, None)[1][:240])
+        return np.array(sift_data, dtype="object")
 
-        return sift_data
-
-    def fourier_transform(self) -> list:
-        img = cv2.imread("messi5.jpg", 0)
-
+    def fourier_transform(self) -> np.ndarray:
         # Apply DFT and shift the zero frequency component to center
         fourier_data = []
 
-        for img in self.gray_images:
+        for img in self.data:
             f = np.fft.fft2(img)
             f_shift = np.fft.fftshift(f)
             magnitude_spectrum = 20 * np.log(np.abs(f_shift))
             fourier_data.append(magnitude_spectrum)
 
-        return fourier_data
+        return np.array(fourier_data, dtype="object")

@@ -13,26 +13,36 @@ def parse_args() -> argparse.Namespace:
 
 
 def genes_pipeline(args: argparse.Namespace) -> None:
-    print(args)
-    print("genes")
     genes = Genes()
     genes.load_data()
 
 
 def cats_pipeline(args: argparse.Namespace) -> None:
-    print(args)
-    print("cats")
     cats = Cats()
     cats.load_data()
     cats.feature_extraction()
-    cats.classification()
+
+    # Classify original dataset
+    print("Original performance: \n")
+    cats.classification(cats.gray_images)
+    print("--------------")
+
+    # Classify sift dataset
+    print("Sift performance: \n")
+    cats.classification(cats.sift_data)
+    print("--------------")
+
+    # Classify fourier dataset
+    print("Fourier performance: \n")
+    cats.classification(cats.fourier_data)
+    print("--------------")
+
     cats.clustering()
 
 
 def main():
 
     args = parse_args()
-    print(args)
     if args.command == "genes":
         genes_pipeline(args)
     elif args.command == "cats":
