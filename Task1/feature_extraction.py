@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import cv2
 import numpy as np
+from sklearn.decomposition import PCA
 
 
 class FeatureExtraction:
@@ -31,3 +32,22 @@ class FeatureExtraction:
             fourier_data.append(magnitude_spectrum)
 
         return np.array(fourier_data, dtype="object")
+
+    def pca(self, min_variance) -> np.ndarray:
+        # Apply PCA to dataset
+        pca = PCA()
+        pca.fit(self.data)
+
+        total_variance = 0
+        n_components = 0
+        for var in pca.explained_variance_ratio_:
+            total_variance += var
+            n_components += 1
+            if total_variance >= min_variance:
+                break
+
+        pca_reduction = PCA(n_components=n_components)
+        data_reduced = pca_reduction.fit_transform(self.data)
+
+        return np.array(data_reduced, dtype="object")
+
