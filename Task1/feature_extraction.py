@@ -11,14 +11,13 @@ class FeatureExtraction:
 
     def sift(self) -> np.ndarray:
         # sift
-        sift = cv2.SIFT_create(200)
+        sift = cv2.SIFT_create(90)
         sift_data = []
 
         for image in self.data:
             # only keeps the descriptors of best 200 keypoints
             kp, des = sift.detectAndCompute(image, None)
-            sift_data.append(des[:200])
-
+            sift_data.append(des[:90])
         return np.array(sift_data, dtype="object")
 
     def fourier_transform(self) -> np.ndarray:

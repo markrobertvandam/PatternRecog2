@@ -24,7 +24,7 @@ class Cats:
         for animal in animals:
             for img in glob.glob(f"data/BigCats/{animal}/*.jp*g"):
                 image = cv2.imread(img)
-                resized_image = cv2.resize(image, (500, 300))
+                resized_image = cv2.resize(image, (250, 250))
                 grayscale_img = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
                 self.images.append(resized_image)
                 self.gray_images.append(grayscale_img)
@@ -37,16 +37,21 @@ class Cats:
         self.feature_extractor = FeatureExtraction(self.gray_images, self.labels, "cats")
         self.fourier_data = self.feature_extractor.fourier_transform()
 
-        # shape (170, 240, 128), 170 images, 200 keypoints, 128 length of descriptor
-        # reshaped to (170, 25600) to be 2D for classification in sklearn
+        # shape (170, 240, 128), 170 images, 200 keypoints, 128 length of descriptors
         self.sift_data = self.feature_extractor.sift()
 
     def k_means_classify(self, x_train, x_test, y_train, y_test, k=5):
         # cross-val using KNN means
         k_means_classifier = KNeighborsClassifier(k)
         cross_val_scores = cross_val_score(k_means_classifier, x_train, y_train, cv=5)
-
         print("Cross-val scores: ", cross_val_scores)
+
+        # one validation run
+        x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=42)
+        k_means_classifier.fit(x_train, y_train)
+        y_pred = k_means_classifier.predict(x_val)
+        conf_matrix = sklearn.metrics.confusion_matrix(y_val, y_pred)
+        print(conf_matrix)
         # full train with final test using KNN means
         # k_means_classifier.fit(x_train, y_train)
         # k_means_classifier.score(x_test, y_test)
