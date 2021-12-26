@@ -28,7 +28,9 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     # Classify original dataset
     print("Original performance: \n")
     old_shape = cats.images.shape
-    flattened_original = cats.images.reshape(old_shape[0], old_shape[1]*old_shape[2]*old_shape[3])
+    flattened_original = cats.images.reshape(
+        old_shape[0], old_shape[1] * old_shape[2] * old_shape[3]
+    )
     cats.classification(flattened_original)
     print("--------------")
 

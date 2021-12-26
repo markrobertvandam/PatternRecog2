@@ -34,7 +34,9 @@ class Cats:
         self.gray_images = np.asarray(self.gray_images)
 
     def feature_extraction(self) -> None:
-        self.feature_extractor = FeatureExtraction(self.gray_images, self.labels, "cats")
+        self.feature_extractor = FeatureExtraction(
+            self.gray_images, self.labels, "cats"
+        )
         self.fourier_data = self.feature_extractor.fourier_transform()
 
         # shape (170, 240, 128), 170 images, 200 keypoints, 128 length of descriptors
@@ -47,7 +49,9 @@ class Cats:
         print("Cross-val scores: ", cross_val_scores)
 
         # one validation run
-        x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=42)
+        x_train, x_val, y_train, y_val = train_test_split(
+            x_train, y_train, test_size=0.2, random_state=42
+        )
         k_means_classifier.fit(x_train, y_train)
         y_pred = k_means_classifier.predict(x_val)
         conf_matrix = sklearn.metrics.confusion_matrix(y_val, y_pred)
@@ -63,7 +67,9 @@ class Cats:
         print("Data shape: ", x.shape)
 
         # Split the data for classification:
-        x_train, x_test, y_train, y_test = train_test_split(x, self.labels, test_size=0.2, random_state=42)
+        x_train, x_test, y_train, y_test = train_test_split(
+            x, self.labels, test_size=0.2, random_state=42
+        )
         self.k_means_classify(x_train, x_test, y_train, y_test)
 
         # classify using method1

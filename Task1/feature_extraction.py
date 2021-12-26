@@ -49,4 +49,3 @@ class FeatureExtraction:
         data_reduced = pca_reduction.fit_transform(self.data)
 
         return np.array(data_reduced, dtype="object")
-

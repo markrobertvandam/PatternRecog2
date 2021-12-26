@@ -18,7 +18,9 @@ class Genes:
 
     def load_data(self) -> None:
         filename_samples = f"data/Genes/data.csv"
-        self.samples = np.loadtxt(filename_samples, delimiter=',', skiprows=1, usecols=range(1, 1024))
+        self.samples = np.loadtxt(
+            filename_samples, delimiter=",", skiprows=1, usecols=range(1, 1024)
+        )
 
         filename_labels = f"data/Genes/labels.csv"
         labels = {"PRAD": 0, "LUAD": 1, "BRCA": 2, "KIRC": 3, "COAD": 4}
@@ -31,4 +33,3 @@ class Genes:
     def feature_extraction(self) -> None:
         self.feature_extractor = FeatureExtraction(self.samples, self.labels, "genes")
         self.pca_data = self.feature_extractor.pca(self.pca_min_variance)
-
