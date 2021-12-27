@@ -4,6 +4,7 @@ import numpy as np
 
 from scipy.cluster.vq import kmeans, vq
 from sklearn.decomposition import PCA
+from sklearn.feature_selection import mutual_info_classif as MIC
 
 
 class FeatureExtraction:
@@ -61,5 +62,16 @@ class FeatureExtraction:
 
         pca_reduction = PCA(n_components=n_components)
         data_reduced = pca_reduction.fit_transform(self.data)
+
+        return np.array(data_reduced, dtype="object")
+
+    def mutual_information(self, min_information) -> np.ndarray:
+        mi_values = MIC(self.data, self.labels)
+
+        low_information_features = []
+        for i in range(np.size(self.data, 1)):
+            if mi_values[i] < min_information:
+                low_information_features.append(i)
+        data_reduced = np.delete(self.data, low_information_features, axis=1)
 
         return np.array(data_reduced, dtype="object")
