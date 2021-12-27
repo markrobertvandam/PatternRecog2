@@ -8,13 +8,14 @@ from feature_extraction import FeatureExtraction
 
 
 class Genes:
-    def __init__(self, pca_min_variance=0.95):
+    def __init__(self, pca_min_variance=0.95, mi_min_information=0.2):
         self.samples = []
         self.labels = []
         self.feature_extractor = None
         self.pca_data = None
-        self.sift_data = None
+        self.mi_data = None
         self.pca_min_variance = pca_min_variance
+        self.mi_min_information = mi_min_information
 
     def load_data(self) -> None:
         filename_samples = f"data/Genes/data.csv"
@@ -33,3 +34,4 @@ class Genes:
     def feature_extraction(self) -> None:
         self.feature_extractor = FeatureExtraction(self.samples, self.labels, "genes")
         self.pca_data = self.feature_extractor.pca(self.pca_min_variance)
+        self.mi_data = self.feature_extractor.mutual_information(self.mi_min_information)
