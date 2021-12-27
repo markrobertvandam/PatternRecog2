@@ -37,7 +37,7 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     # Classify sift dataset
     print("Sift performance: \n")
     cats.classification(cats.sift_data)
-    print("--------------")
+    print("--------------\n")
 
     # Classify fourier dataset
     print("Fourier performance: \n")

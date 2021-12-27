@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import cv2
 import numpy as np
+
+from scipy.cluster.vq import kmeans, vq
 from sklearn.decomposition import PCA
 
 
@@ -18,7 +20,19 @@ class FeatureExtraction:
             # only keeps the descriptors of best 200 keypoints
             kp, des = sift.detectAndCompute(image, None)
             sift_data.append(des[:90])
-        return np.array(sift_data, dtype="object")
+
+        final_descriptors = np.array(sift_data, dtype="object")
+        descriptors_float = final_descriptors.astype(float).reshape((170*90, 128))
+        voc, variance = kmeans(descriptors_float, 200, 1, seed=7)
+
+        # Create histograms of visual bow
+        bow_visual = np.zeros((len(sift_data), 200))
+        for i in range(len(sift_data)):
+            words, distance = vq(sift_data[i], voc)
+            for w in words:
+                bow_visual[i][w] += 1
+
+        return bow_visual
 
     def fourier_transform(self) -> np.ndarray:
         # Apply DFT and shift the zero frequency component to center
