@@ -45,8 +45,6 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.classification(cats.fourier_data)
     print("--------------")
 
-    cats.clustering()
-
 
 def main():
 

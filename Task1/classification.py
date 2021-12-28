@@ -24,7 +24,7 @@ class Classification:
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
-        conf_matrix = metrics.confusion_matrix(self.y_val, self.y_pred)
+        conf_matrix = metrics.confusion_matrix(self.y_val, y_pred)
         print(conf_matrix)
 
     def k_means_classify(self, k=5) -> None:

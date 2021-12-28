@@ -54,7 +54,7 @@ class Cats:
 
         # classify using method1
         if x.shape[1] < 1000:
-            classifiers.svm_classify()
+            classifiers.svm_classify(80000)
 
         # classify using method2
         classifiers.nb_classify()
