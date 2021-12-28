@@ -23,7 +23,7 @@ class FeatureExtraction:
             sift_data.append(des[:90])
 
         final_descriptors = np.array(sift_data, dtype="object")
-        descriptors_float = final_descriptors.astype(float).reshape((170*90, 128))
+        descriptors_float = final_descriptors.astype(float).reshape((170 * 90, 128))
         voc, variance = kmeans(descriptors_float, 200, 1, seed=7)
 
         # Create histograms of visual bow

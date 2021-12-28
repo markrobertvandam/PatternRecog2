@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 import numpy as np
 import csv
-import sklearn
 
-from sklearn.model_selection import train_test_split
 from feature_extraction import FeatureExtraction
 from classification import Classification
 
 
 class Genes:
     def __init__(self, pca_min_variance=0.95, mi_min_information=0.2):
-        self.samples = []
+        self.samples = None
         self.labels = []
         self.feature_extractor = None
         self.pca_data = None
@@ -34,21 +32,24 @@ class Genes:
             next(labels_csv_reader, None)
             for row in labels_csv_reader:
                 self.labels.append(labels[row[1]])
+        self.labels = np.asarray(self.labels)
 
     def feature_extraction(self) -> None:
         self.feature_extractor = FeatureExtraction(self.samples, self.labels, "genes")
         self.pca_data = self.feature_extractor.pca(self.pca_min_variance)
-        self.mi_data = self.feature_extractor.mutual_information(self.mi_min_information)
+        self.mi_data = self.feature_extractor.mutual_information(
+            self.mi_min_information
+        )
 
     def classification(self) -> None:
-        self.normal_classifier = Classification(self.samples, self.labels, 100)
+        self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.random_forest()
-        self.normal_classifier.naive_bayes()
+        self.normal_classifier.nb_classify()
 
-        self.pca_classifier = Classification(self.pca_data, self.labels, 100)
+        self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.random_forest()
-        self.pca_classifier.naive_bayes()
+        self.pca_classifier.nb_classify()
 
-        self.mi_classifier = Classification(self.mi_data, self.labels, 100)
+        self.mi_classifier = Classification(self.mi_data, self.labels)
         self.mi_classifier.random_forest()
-        self.mi_classifier.naive_bayes()
+        self.mi_classifier.nb_classify()
