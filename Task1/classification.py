@@ -45,5 +45,5 @@ class Classification:
 
     def random_forest(self, n_trees=100):
         print("Random Forest classifier:\n -----------------")
-        clf = RandomForestClassifier(self.n_trees)
+        clf = RandomForestClassifier(n_trees)
         self.general_classify(clf)
