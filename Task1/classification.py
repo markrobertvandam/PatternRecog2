@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 import numpy as np
-from sklearn.model_selection import train_test_split, cross_val_score
+
+from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
-from sklearn import metrics
 
 
 class Classification:
@@ -33,9 +35,9 @@ class Classification:
         clf = KNeighborsClassifier(k)
         self.general_classify(clf)
 
-    def svm_classify(self, max_iter=800) -> None:
-        print("Linear SVC classifier:\n -----------------")
-        clf = LinearSVC(max_iter=max_iter)
+    def logistic_regression(self):
+        print("Logistic Regression classifier:\n -----------------")
+        clf = LogisticRegression(random_state=42)
         self.general_classify(clf)
 
     def nb_classify(self) -> None:
@@ -45,5 +47,10 @@ class Classification:
 
     def random_forest(self, n_trees=100):
         print("Random Forest classifier:\n -----------------")
-        clf = RandomForestClassifier(n_trees)
+        clf = RandomForestClassifier(n_trees, random_state=42)
+        self.general_classify(clf)
+
+    def svm_classify(self, max_iter=800) -> None:
+        print("Linear SVC classifier:\n -----------------")
+        clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.general_classify(clf)

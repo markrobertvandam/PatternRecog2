@@ -27,7 +27,7 @@ class Cats:
                 self.images.append(resized_image)
                 self.gray_images.append(grayscale_img)
                 self.labels.append(animal)
-        # images shape is (170, 300, 500, 3)
+        # images shape is (170, 250, 250, 3)
         self.images = np.asarray(self.images)
         self.gray_images = np.asarray(self.gray_images)
         self.labels = np.asarray(self.labels)
@@ -58,3 +58,4 @@ class Cats:
 
         # classify using method2
         classifiers.nb_classify()
+        classifiers.random_forest()
