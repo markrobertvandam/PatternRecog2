@@ -18,6 +18,7 @@ def genes_pipeline(args: argparse.Namespace) -> None:
     genes = Genes(0.98, 0.2)
     genes.load_data()
     genes.feature_extraction()
+    genes.classification()
 
 
 def cats_pipeline(args: argparse.Namespace) -> None:

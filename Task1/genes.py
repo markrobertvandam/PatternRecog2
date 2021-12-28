@@ -5,6 +5,7 @@ import sklearn
 
 from sklearn.model_selection import train_test_split
 from feature_extraction import FeatureExtraction
+from classification import Classification
 
 
 class Genes:
@@ -16,6 +17,9 @@ class Genes:
         self.mi_data = None
         self.pca_min_variance = pca_min_variance
         self.mi_min_information = mi_min_information
+        self.normal_classifier = None
+        self.pca_classifier = None
+        self.mi_classifier = None
 
     def load_data(self) -> None:
         filename_samples = f"data/Genes/data.csv"
@@ -35,3 +39,16 @@ class Genes:
         self.feature_extractor = FeatureExtraction(self.samples, self.labels, "genes")
         self.pca_data = self.feature_extractor.pca(self.pca_min_variance)
         self.mi_data = self.feature_extractor.mutual_information(self.mi_min_information)
+
+    def classification(self) -> None:
+        self.normal_classifier = Classification(self.samples, self.labels, 100)
+        self.normal_classifier.random_forest()
+        self.normal_classifier.naive_bayes()
+
+        self.pca_classifier = Classification(self.pca_data, self.labels, 100)
+        self.pca_classifier.random_forest()
+        self.pca_classifier.naive_bayes()
+
+        self.mi_classifier = Classification(self.mi_data, self.labels, 100)
+        self.mi_classifier.random_forest()
+        self.mi_classifier.naive_bayes()
