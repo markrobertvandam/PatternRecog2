@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import numpy as np
-
 from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -19,7 +18,7 @@ class Classification:
             self.x_train, self.y_train, test_size=0.2, random_state=42
         )
 
-    def general_classify(self, clf):
+    def general_classify(self, clf) -> None:
         cross_val_scores = cross_val_score(clf, self.x_train, self.y_train, cv=5)
         print("cross-val scores: ", cross_val_scores)
 
@@ -29,13 +28,13 @@ class Classification:
         conf_matrix = metrics.confusion_matrix(self.y_val, y_pred)
         print(conf_matrix)
 
-    def k_means_classify(self, k=5) -> None:
+    def knn_classify(self, k=5) -> None:
         # cross-val using KNN means
-        print("K-means classifier:\n -----------------")
+        print("KNN classifier:\n -----------------")
         clf = KNeighborsClassifier(k)
         self.general_classify(clf)
 
-    def logistic_regression(self):
+    def logistic_regression(self) -> None:
         print("Logistic Regression classifier:\n -----------------")
         clf = LogisticRegression(random_state=42)
         self.general_classify(clf)
@@ -45,7 +44,7 @@ class Classification:
         clf = GaussianNB()
         self.general_classify(clf)
 
-    def random_forest(self, n_trees=100):
+    def random_forest(self, n_trees=100) -> None:
         print("Random Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.general_classify(clf)

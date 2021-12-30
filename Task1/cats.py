@@ -16,6 +16,9 @@ class Cats:
         self.feature_extractor = None
         self.fourier_data = None
         self.sift_data = None
+        self.normal_classifier = None
+        self.sift_classifier = None
+        self.fourier_classifier = None
 
     def load_data(self) -> None:
         animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
@@ -41,21 +44,31 @@ class Cats:
         # shape (170, 240, 128), 170 images, 200 keypoints, 128 length of descriptors
         self.sift_data = self.feature_extractor.sift()
 
-    def classification(self, x) -> None:
-        # resize to 2d if data is 3d
-        if len(x.shape) == 3:
-            x = x.reshape(x.shape[0], x.shape[1] * x.shape[2])
-        print("Data shape: ", x.shape)
+    def classification(self) -> None:
+        print("Original performance: \n")
+        flattened_original = self.images.reshape(
+            self.images.shape[0], self.images.shape[1] * self.images.shape[2] * self.images.shape[3]
+        )
 
-        classifiers = Classification(x, self.labels)
+        self.normal_classifier = Classification(flattened_original, self.labels)
+        self.normal_classifier.knn_classify()
+        self.normal_classifier.nb_classify()
+        self.normal_classifier.random_forest()
+        print("--------------")
 
-        # classify using k_means
-        classifiers.k_means_classify()
+        # Classify sift dataset
+        print("Sift performance: \n")
+        self.sift_classifier = Classification(self.sift_data, self.labels)
+        self.sift_classifier.knn_classify()
+        self.sift_classifier.nb_classify()
+        self.sift_classifier.random_forest()
+        print("--------------\n")
 
-        # classify using method1
-        if x.shape[1] < 1000:
-            classifiers.svm_classify(80000)
-
-        # classify using method2
-        classifiers.nb_classify()
-        classifiers.random_forest()
+        # Classify fourier dataset
+        print("Fourier performance: \n")
+        flattened_fourier = self.fourier_data.reshape(self.fourier_data.shape[0], self.fourier_data.shape[1] * self.fourier_data.shape[2])
+        self.fourier_classifier = Classification(flattened_fourier, self.labels)
+        self.fourier_classifier.knn_classify()
+        self.fourier_classifier.nb_classify()
+        self.fourier_classifier.random_forest()
+        print("--------------")

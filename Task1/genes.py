@@ -4,6 +4,7 @@ import csv
 
 from feature_extraction import FeatureExtraction
 from classification import Classification
+from clustering import Clustering
 
 
 class Genes:
@@ -18,6 +19,9 @@ class Genes:
         self.normal_classifier = None
         self.pca_classifier = None
         self.mi_classifier = None
+        self.normal_clustering = None
+        self.pca_clustering = None
+        self.mi_clustering = None
 
     def load_data(self) -> None:
         filename_samples = f"data/Genes/data.csv"
@@ -42,14 +46,45 @@ class Genes:
         )
 
     def classification(self) -> None:
+        print("Classification: \n")
+        print("Original performance: \n")
         self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.random_forest()
         self.normal_classifier.nb_classify()
+        print("--------------\n")
 
+        print("PCA performance: \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.random_forest()
         self.pca_classifier.nb_classify()
+        print("--------------\n")
 
+        print("Mutual Information performance: \n")
         self.mi_classifier = Classification(self.mi_data, self.labels)
         self.mi_classifier.random_forest()
         self.mi_classifier.nb_classify()
+        print("--------------\n")
+
+    def clustering(self) -> None:
+        print("Clustering: \n")
+        print("Original performance: \n")
+        self.normal_clustering = Clustering(self.samples)
+        self.normal_clustering.k_means()
+        self.normal_clustering.dbscan(eps=50, min_samples=2)
+        self.normal_clustering.fuzzy_c_means()
+        print("--------------\n")
+
+        print("PCA performance: \n")
+        self.pca_clustering = Clustering(self.pca_data)
+        self.pca_clustering.k_means()
+        self.pca_clustering.dbscan(eps=50, min_samples=2)
+        self.pca_clustering.fuzzy_c_means()
+        print("--------------\n")
+
+        print("Mutual Information performance: \n")
+        self.mi_clustering = Clustering(self.mi_data)
+        self.mi_clustering.k_means()
+        self.mi_clustering.dbscan(eps=50, min_samples=2)
+        self.mi_clustering.fuzzy_c_means()
+        print("--------------\n")
+
