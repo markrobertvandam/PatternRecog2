@@ -44,10 +44,11 @@ class Cats:
         # shape (170, 240, 128), 170 images, 200 keypoints, 128 length of descriptors
         self.sift_data = self.feature_extractor.sift()
 
-    def classification(self) -> None:
+    def train_validation(self) -> None:
         print("Original performance: \n")
         flattened_original = self.images.reshape(
-            self.images.shape[0], self.images.shape[1] * self.images.shape[2] * self.images.shape[3]
+            self.images.shape[0],
+            self.images.shape[1] * self.images.shape[2] * self.images.shape[3],
         )
 
         self.normal_classifier = Classification(flattened_original, self.labels)
@@ -66,7 +67,10 @@ class Cats:
 
         # Classify fourier dataset
         print("Fourier performance: \n")
-        flattened_fourier = self.fourier_data.reshape(self.fourier_data.shape[0], self.fourier_data.shape[1] * self.fourier_data.shape[2])
+        flattened_fourier = self.fourier_data.reshape(
+            self.fourier_data.shape[0],
+            self.fourier_data.shape[1] * self.fourier_data.shape[2],
+        )
         self.fourier_classifier = Classification(flattened_fourier, self.labels)
         self.fourier_classifier.knn_classify()
         self.fourier_classifier.nb_classify()

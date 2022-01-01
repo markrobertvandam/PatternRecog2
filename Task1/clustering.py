@@ -35,4 +35,4 @@ class Clustering:
         self.x = self.x.astype(float)
         cluster = FCM(n_clusters=n_clusters)
         self.general_clustering(cluster, sklearn=False)
-        self.x =copy_x
+        self.x = copy_x

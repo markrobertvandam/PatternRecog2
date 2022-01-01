@@ -34,9 +34,9 @@ class Classification:
         clf = KNeighborsClassifier(k)
         self.general_classify(clf)
 
-    def logistic_regression(self) -> None:
+    def logistic_regression(self, max_iter=10000) -> None:
         print("Logistic Regression classifier:\n -----------------")
-        clf = LogisticRegression(random_state=42)
+        clf = LogisticRegression(max_iter=max_iter, random_state=42)
         self.general_classify(clf)
 
     def nb_classify(self) -> None:
@@ -49,7 +49,7 @@ class Classification:
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.general_classify(clf)
 
-    def svm_classify(self, max_iter=800) -> None:
+    def svm_classify(self, max_iter=10000) -> None:
         print("Linear SVC classifier:\n -----------------")
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.general_classify(clf)

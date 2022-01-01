@@ -18,15 +18,15 @@ def genes_pipeline(args: argparse.Namespace) -> None:
     genes = Genes(0.98, 0.2)
     genes.load_data()
     genes.feature_extraction()
-    # genes.classification()
-    genes.clustering()
+    genes.train_validation()
+    # genes.clustering()
 
 
 def cats_pipeline(args: argparse.Namespace) -> None:
     cats = Cats()
     cats.load_data()
     cats.feature_extraction()
-    cats.classification()
+    cats.train_validation()
 
 
 def main():

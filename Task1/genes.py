@@ -45,24 +45,27 @@ class Genes:
             self.mi_min_information
         )
 
-    def classification(self) -> None:
+    def train_validation(self) -> None:
         print("Classification: \n")
-        print("Original performance: \n")
+        print(f"Original performance (shape: {self.samples.shape}): \n")
         self.normal_classifier = Classification(self.samples, self.labels)
-        self.normal_classifier.random_forest()
-        self.normal_classifier.nb_classify()
+        self.normal_classifier.knn_classify()
+        self.normal_classifier.svm_classify()
+        self.normal_classifier.logistic_regression()
         print("--------------\n")
 
-        print("PCA performance: \n")
+        print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
-        self.pca_classifier.random_forest()
-        self.pca_classifier.nb_classify()
+        self.normal_classifier.knn_classify()
+        self.normal_classifier.svm_classify()
+        self.normal_classifier.logistic_regression()
         print("--------------\n")
 
-        print("Mutual Information performance: \n")
+        print(f"Mutual Information performance (shape: {self.mi_data.shape}): \n")
         self.mi_classifier = Classification(self.mi_data, self.labels)
-        self.mi_classifier.random_forest()
-        self.mi_classifier.nb_classify()
+        self.normal_classifier.knn_classify()
+        self.normal_classifier.svm_classify()
+        self.normal_classifier.logistic_regression()
         print("--------------\n")
 
     def clustering(self) -> None:
@@ -87,4 +90,3 @@ class Genes:
         self.mi_clustering.dbscan(eps=50, min_samples=2)
         self.mi_clustering.fuzzy_c_means()
         print("--------------\n")
-
