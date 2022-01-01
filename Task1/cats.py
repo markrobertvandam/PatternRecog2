@@ -45,11 +45,12 @@ class Cats:
         self.sift_data = self.feature_extractor.sift()
 
     def train_validation(self) -> None:
-        print("Original performance: \n")
         flattened_original = self.images.reshape(
             self.images.shape[0],
             self.images.shape[1] * self.images.shape[2] * self.images.shape[3],
         )
+
+        print(f"Original performance (shape: {flattened_original.shape}): \n")
 
         self.normal_classifier = Classification(flattened_original, self.labels)
         self.normal_classifier.knn_classify()
@@ -58,7 +59,7 @@ class Cats:
         print("--------------")
 
         # Classify sift dataset
-        print("Sift performance: \n")
+        print(f"Sift performance (shape: {self.sift_data.shape}): \n")
         self.sift_classifier = Classification(self.sift_data, self.labels)
         self.sift_classifier.knn_classify()
         self.sift_classifier.nb_classify()
@@ -66,13 +67,17 @@ class Cats:
         print("--------------\n")
 
         # Classify fourier dataset
-        print("Fourier performance: \n")
         flattened_fourier = self.fourier_data.reshape(
             self.fourier_data.shape[0],
             self.fourier_data.shape[1] * self.fourier_data.shape[2],
         )
+        print(f"Fourier performance (shape: {flattened_fourier.shape}): \n")
+
         self.fourier_classifier = Classification(flattened_fourier, self.labels)
         self.fourier_classifier.knn_classify()
         self.fourier_classifier.nb_classify()
         self.fourier_classifier.random_forest()
         print("--------------")
+
+    def test_run(self):
+        print("\nTesting run\n")

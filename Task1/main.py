@@ -27,7 +27,7 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.load_data()
     cats.feature_extraction()
     cats.train_validation()
-
+    cats.test_run()
 
 def main():
 
