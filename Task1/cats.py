@@ -2,6 +2,7 @@
 
 import glob
 import cv2
+import matplotlib.pyplot as plt
 import numpy as np
 
 from classification import Classification
@@ -21,6 +22,7 @@ class Cats:
         self.fourier_classifier = None
 
     def load_data(self) -> None:
+        print("Loading data...")
         animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
         for animal in animals:
             for img in glob.glob(f"data/BigCats_filtered/{animal}/*.jp*g"):
@@ -35,7 +37,17 @@ class Cats:
         self.gray_images = np.asarray(self.gray_images)
         self.labels = np.asarray(self.labels)
 
+    def visualize_data(self):
+        print("Visualizing data...")
+        unique, counts = np.unique(self.labels, return_counts=True)
+        plt.bar(unique, counts, 0.4)
+        plt.title('Class Frequency')
+        plt.xlabel('Class')
+        plt.ylabel('Frequency')
+        plt.savefig("plots/cats_plot.png")
+
     def feature_extraction(self) -> None:
+        print("Doing feature extraction...")
         self.feature_extractor = FeatureExtraction(
             self.gray_images, self.labels, "cats"
         )

@@ -25,6 +25,7 @@ def genes_pipeline(args: argparse.Namespace) -> None:
 def cats_pipeline(args: argparse.Namespace) -> None:
     cats = Cats()
     cats.load_data()
+    cats.visualize_data()
     cats.feature_extraction()
     cats.train_validation()
     cats.test_run()
