@@ -27,8 +27,15 @@ class Classification:
         self.n_trees = None
 
     def general_classify(self, clf) -> None:
-        cross_val_scores = cross_val_score(clf, self.x_train, self.y_train, cv=5)
-        print("cross-val scores: ", cross_val_scores)
+        cross_val_scores = cross_val_score(
+            clf, self.x_train_full, self.y_train_full, cv=5
+        )
+        print(
+            "cross-val scores: ",
+            cross_val_scores,
+            " Average: ",
+            np.average(cross_val_scores),
+        )
 
         # one validation run
         clf.fit(self.x_train, self.y_train)
@@ -54,7 +61,7 @@ class Classification:
         clf = GaussianNB()
         self.general_classify(clf)
 
-    def random_forest(self, n_trees=200) -> None:
+    def random_forest(self, n_trees=300) -> None:
         print("Random Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees

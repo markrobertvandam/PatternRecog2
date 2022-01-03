@@ -29,6 +29,7 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.train_validation()
     cats.test_run()
 
+
 def main():
 
     args = parse_args()

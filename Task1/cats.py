@@ -23,7 +23,7 @@ class Cats:
     def load_data(self) -> None:
         animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
         for animal in animals:
-            for img in glob.glob(f"data/BigCats/{animal}/*.jp*g"):
+            for img in glob.glob(f"data/BigCats_filtered/{animal}/*.jp*g"):
                 image = cv2.imread(img)
                 resized_image = cv2.resize(image, (250, 250))
                 grayscale_img = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)

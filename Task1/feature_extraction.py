@@ -14,20 +14,23 @@ class FeatureExtraction:
 
     def sift(self) -> np.ndarray:
         # sift
-        sift = cv2.SIFT_create(90)
+        max_keypoints = 300
+        sift = cv2.SIFT_create(max_keypoints)
         sift_data = []
 
         for image in self.data:
-            # only keeps the descriptors of best 200 keypoints
+            # only keeps the descriptors of best keypoints
             kp, des = sift.detectAndCompute(image, None)
-            sift_data.append(des[:90])
+            sift_data.append(des[:max_keypoints])
 
         final_descriptors = np.array(sift_data, dtype="object")
-        descriptors_float = final_descriptors.astype(float).reshape((170 * 90, 128))
-        voc, variance = kmeans(descriptors_float, 200, 1, seed=7)
+        descriptors_float = final_descriptors.astype(float).reshape(
+            (len(sift_data) * max_keypoints, 128)
+        )
+        voc, variance = kmeans(descriptors_float, max_keypoints, 1, seed=42)
 
         # Create histograms of visual bow
-        bow_visual = np.zeros((len(sift_data), 200))
+        bow_visual = np.zeros((len(sift_data), max_keypoints))
         for i in range(len(sift_data)):
             words, distance = vq(sift_data[i], voc)
             for w in words:
