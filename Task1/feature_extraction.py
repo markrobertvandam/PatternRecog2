@@ -75,6 +75,7 @@ class FeatureExtraction:
         for i in range(np.size(self.data, 1)):
             if mi_values[i] < min_information:
                 low_information_features.append(i)
+
         data_reduced = np.delete(self.data, low_information_features, axis=1)
 
         return np.array(data_reduced, dtype="object")

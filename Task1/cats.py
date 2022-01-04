@@ -41,10 +41,10 @@ class Cats:
         print("Visualizing data...")
         unique, counts = np.unique(self.labels, return_counts=True)
         plt.bar(unique, counts, 0.4)
-        plt.title('Class Frequency')
-        plt.xlabel('Class')
-        plt.ylabel('Frequency')
-        plt.savefig("plots/cats_plot.png")
+        plt.title("Class Frequency")
+        plt.xlabel("Class")
+        plt.ylabel("Frequency")
+        plt.savefig("plots/cats_histo.png")
 
     def feature_extraction(self) -> None:
         print("Doing feature extraction...")

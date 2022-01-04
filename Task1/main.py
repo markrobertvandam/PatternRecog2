@@ -15,9 +15,10 @@ def parse_args() -> argparse.Namespace:
 
 
 def genes_pipeline(args: argparse.Namespace) -> None:
-    genes = Genes(0.98, 0.2)
+    genes = Genes()
     genes.load_data()
     genes.feature_extraction()
+    genes.visualize_data()
     genes.train_validation()
     # genes.clustering()
 
@@ -25,8 +26,8 @@ def genes_pipeline(args: argparse.Namespace) -> None:
 def cats_pipeline(args: argparse.Namespace) -> None:
     cats = Cats()
     cats.load_data()
-    cats.visualize_data()
     cats.feature_extraction()
+    cats.visualize_data()
     cats.train_validation()
     cats.test_run()
 
