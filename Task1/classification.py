@@ -26,15 +26,27 @@ class Classification:
         self.iter_log = None
         self.n_trees = None
 
+        self.models = []
+        self.max_cv_score = 0
+        self.best_model = 0
+
+    def save_model(self, score, model):
+        self.models.append(model)
+        if score > self.max_cv_score:
+            self.max_cv_score = score
+            self.best_model = len(self.models) - 1
+            print(len(self.models))
+
     def general_classify(self, clf) -> None:
         cross_val_scores = cross_val_score(
             clf, self.x_train_full, self.y_train_full, cv=5
         )
+        average_cross_val_score = np.average(cross_val_scores)
         print(
             "cross-val scores: ",
             cross_val_scores,
             " Average: ",
-            np.average(cross_val_scores),
+            average_cross_val_score
         )
 
         # one validation run
@@ -42,6 +54,8 @@ class Classification:
         y_pred = clf.predict(self.x_val)
         conf_matrix = metrics.confusion_matrix(self.y_val, y_pred)
         print(conf_matrix)
+        self.save_model(average_cross_val_score, clf)
+        return clf
 
     def knn_classify(self, k=5) -> None:
         # cross-val using KNN means
@@ -72,3 +86,27 @@ class Classification:
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.iter_svc = max_iter
         self.general_classify(clf)
+
+    # Only works for 3 ensembles
+    def ensemble(self) -> None:
+        print("Ensemble:\n -----------------")
+        model_predictions = []
+        ensemble_predictions = []
+        for model in self.models:
+            model_predictions.append(model.predict(self.x_val))
+        print(len(model_predictions), len(model_predictions[0]))
+        for i in range(len(model_predictions[0])):
+            if model_predictions[0][i] is model_predictions[1][i] or model_predictions[2][i]:
+                ensemble_predictions.append(model_predictions[0][i])
+            elif model_predictions[1][i] is model_predictions[2][i]:
+                ensemble_predictions.append(model_predictions[1][i])
+            else:
+                ensemble_predictions.append(model_predictions[self.best_model][i])
+        conf_matrix = metrics.confusion_matrix(self.y_val, ensemble_predictions)
+        print(conf_matrix)
+
+
+
+
+
+
