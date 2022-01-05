@@ -81,7 +81,7 @@ class Classification:
         self.n_trees = n_trees
         self.general_classify(clf)
 
-    def svm_classify(self, max_iter=10000) -> None:
+    def svm_classify(self, max_iter=100000) -> None:
         print("Linear SVC classifier:\n -----------------")
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.iter_svc = max_iter
