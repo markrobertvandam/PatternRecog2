@@ -19,8 +19,8 @@ def genes_pipeline(args: argparse.Namespace) -> None:
     genes.load_data()
     genes.feature_extraction()
     genes.visualize_data()
-    genes.train_validation()
-    # genes.clustering()
+    # genes.train_validation()
+    genes.clustering()
 
 
 def cats_pipeline(args: argparse.Namespace) -> None:
@@ -29,7 +29,8 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.feature_extraction()
     cats.visualize_data()
     cats.train_validation()
-    cats.test_run()
+    # cats.clustering()
+    # cats.test_run()
 
 
 def main():

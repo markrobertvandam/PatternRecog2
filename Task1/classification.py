@@ -61,7 +61,7 @@ class Classification:
         clf = GaussianNB()
         self.general_classify(clf)
 
-    def random_forest(self, n_trees=300) -> None:
+    def random_forest(self, n_trees=200) -> None:
         print("Random Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees
