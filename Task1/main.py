@@ -29,7 +29,7 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.feature_extraction()
     cats.visualize_data()
     cats.train_validation()
-    # cats.clustering()
+    cats.clustering()
     # cats.test_run()
 
 

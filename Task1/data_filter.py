@@ -15,7 +15,12 @@ def main(argv):
     os.mkdir(dir)
     print(f"New clean dir made at {dir}")
 
-    animals = ["Cheetah", "Jaguar", "Leopard", "Panther", "Tiger"]
+    if not os.path.exists("data/cats_projekat/Lion"):
+        os.mkdir("data/cats_projekat/Lion")
+        for img in glob.glob("data/BigCats/Lion/*"):
+            shutil.copy(img, "data/cats_projekat/Lion/")
+
+    animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
     bad_jag_images = [
         "fg4_5398_c_f-g_grandin_mnhn",
         "hqdefault",
@@ -46,13 +51,6 @@ def main(argv):
         "Yala National Park 01113",
         "update_snowleopard_winter2019",
     ]
-    bad_panth_images = [
-        "Black-Panther-1140x541",
-        "black-panther-attack-8-east2west-news",
-        "carolina-panther-extinct",
-        "mithun-og",
-        "shutterstock_707199295-1024x683",
-    ]
     bad_tiger_images = [
         "hqdefault",
         "hwn4d-GH8W9HM1PCC-Full-Image_GalleryCover-en-US-1508348134678._UY500_UX667_RI_VxijV5YqtdCYfF8fPoweD5sNk1Snr3J_TTW_",
@@ -74,8 +72,6 @@ def main(argv):
             if animal == "Jaguar" and no_extension in bad_jag_images:
                 continue
             if animal == "Leopard" and no_extension in bad_leop_images:
-                continue
-            if animal == "Panther" and no_extension in bad_panth_images:
                 continue
             if animal == "Tiger" and no_extension in bad_tiger_images:
                 continue

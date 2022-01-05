@@ -26,7 +26,7 @@ class Cats:
 
     def load_data(self) -> None:
         print("Loading data...")
-        animals = ["Cheetah", "Jaguar", "Leopard", "Panther", "Tiger"]
+        animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
         for animal in animals:
             for img in glob.glob(f"data/cats_projekat_filtered/{animal}/*.jp*g"):
                 self.file_names.append(img)
