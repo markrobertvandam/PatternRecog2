@@ -50,7 +50,6 @@ class Classification:
         self.evaluate(self.y_test, y_pred)
 
     def cross_val_run(self, clf) -> None:
-        print("Running 5-fold cross-val...\n")
         cross_val_scores = cross_validate(
             clf, self.x, self.y, scoring=["f1_macro", "accuracy"]
         )

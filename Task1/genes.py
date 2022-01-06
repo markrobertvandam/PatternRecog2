@@ -91,31 +91,55 @@ class Genes:
             self.mi_min_information
         )
 
-    def train_validation(self) -> None:
-        print("Classification: \n")
+    def classification(self, command="tuning") -> None:
+        """
+        function to run grid-search/test-run depending on command
+        """
         print(f"Original performance (shape: {self.samples.shape}): \n")
-        self.normal_classifier = Classification(self.samples, self.labels)
-        self.normal_classifier.knn_classify()
-        self.normal_classifier.svm_classify()
-        self.normal_classifier.logistic_regression()
-        self.normal_classifier.ensemble()
-        print("--------------\n")
 
+        self.normal_classifier = Classification(self.samples, self.labels)
+        self.normal_classifier.knn_classify(command=command)
+        self.normal_classifier.nb_classify(command=command)
+        self.normal_classifier.random_forest(command=command)
+        print("--------------")
+
+        # Classify PCA dataset
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
-        self.pca_classifier.knn_classify()
-        self.pca_classifier.svm_classify()
-        self.pca_classifier.logistic_regression()
-        self.pca_classifier.ensemble()
+        self.pca_classifier.knn_classify(command=command)
+        self.pca_classifier.nb_classify(command=command)
+        self.pca_classifier.random_forest(command=command)
         print("--------------\n")
 
-        print(f"Mutual Information performance (shape: {self.mi_data.shape}): \n")
+        # Classify Mutual Information dataset
+
+        print(f"MI performance (shape: {self.mi_data.shape}): \n")
+
         self.mi_classifier = Classification(self.mi_data, self.labels)
-        self.mi_classifier.knn_classify()
-        self.mi_classifier.svm_classify()
-        self.mi_classifier.logistic_regression()
-        self.mi_classifier.ensemble()
-        print("--------------\n")
+        self.mi_classifier.knn_classify(command=command)
+        self.mi_classifier.nb_classify(command=command)
+        self.mi_classifier.random_forest(command=command)
+        print("--------------")
+
+    def cross_val(self) -> None:
+        """
+        function to run cross-val with full data with best pipelines
+        """
+        print(f"Original performance (shape: {self.samples.shape}): \n")
+
+        self.normal_classifier = Classification(self.samples, self.labels)
+        self.normal_classifier.knn_classify(command="cross-val")
+        self.normal_classifier.nb_classify(command="cross-val")
+        self.normal_classifier.random_forest(command="cross-val")
+        print("--------------")
+
+        # Classify PCA dataset
+        print(f"PCA performance (shape: {self.pca_data.shape}): \n")
+        self.pca_classifier = Classification(self.pca_data, self.labels)
+        self.pca_classifier.knn_classify(command="cross-val")
+        self.pca_classifier.nb_classify(command="cross-val")
+        self.pca_classifier.random_forest(command="cross-val")
+        print("--------------")
 
     def clustering(self) -> None:
         print("Clustering: \n")

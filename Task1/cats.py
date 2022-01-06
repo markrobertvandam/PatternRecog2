@@ -101,7 +101,7 @@ class Cats:
 
     def cross_val(self) -> None:
         """
-        function to run cross-val with full data with best pipelines
+        function to run cross-val with full data with best pipeliness
         """
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 

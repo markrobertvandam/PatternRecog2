@@ -23,15 +23,19 @@ def genes_pipeline(args: argparse.Namespace) -> None:
     genes.load_data()
     genes.feature_extraction()
     genes.visualize_data()
-    genes.train_validation()
-    # genes.clustering()
+    if args.command == "cross-val":
+        genes.cross_val()
+    elif args.command == "cluster":
+        genes.clustering()
+    else:
+        genes.classification(command=args.command)
 
 
 def cats_pipeline(args: argparse.Namespace) -> None:
     cats = Cats()
     cats.load_data()
     cats.feature_extraction()
-    # cats.visualize_data()
+    cats.visualize_data()
     if args.command == "cross-val":
         cats.cross_val()
     elif args.command == "cluster":
