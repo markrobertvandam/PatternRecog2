@@ -69,22 +69,24 @@ class Cats:
 
         self.sift_data = self.feature_extractor.sift()
 
-    def train_validation(self) -> None:
-
+    def classification(self, command="tuning") -> None:
+        """
+        function to run grid-search/test-run depending on command
+        """
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
         self.normal_classifier = Classification(self.flattened_original, self.labels)
-        self.normal_classifier.knn_classify()
-        self.normal_classifier.nb_classify()
-        self.normal_classifier.random_forest()
+        self.normal_classifier.knn_classify(command=command)
+        self.normal_classifier.nb_classify(command=command)
+        self.normal_classifier.random_forest(command=command)
         print("--------------")
 
         # Classify sift dataset
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
         self.sift_classifier = Classification(self.sift_data, self.labels)
-        self.sift_classifier.knn_classify()
-        self.sift_classifier.nb_classify()
-        self.sift_classifier.random_forest()
+        self.sift_classifier.knn_classify(command=command)
+        self.sift_classifier.nb_classify(command=command)
+        self.sift_classifier.random_forest(command=command)
         print("--------------\n")
 
         # Classify fourier dataset
@@ -92,13 +94,29 @@ class Cats:
         print(f"Fourier performance (shape: {self.fourier_data.shape}): \n")
 
         self.fourier_classifier = Classification(self.fourier_data, self.labels)
-        self.fourier_classifier.knn_classify()
-        self.fourier_classifier.nb_classify()
-        self.fourier_classifier.random_forest()
+        self.fourier_classifier.knn_classify(command=command)
+        self.fourier_classifier.nb_classify(command=command)
+        self.fourier_classifier.random_forest(command=command)
         print("--------------")
 
-    def test_run(self):
-        print("\nTesting run\n")
+    def cross_val(self) -> None:
+        """
+        function to run cross-val with full data with best pipelines
+        """
+        print(f"Original performance (shape: {self.flattened_original.shape}): \n")
+
+        self.normal_classifier = Classification(self.flattened_original, self.labels)
+        self.normal_classifier.nb_classify(command="cross-val")
+        self.normal_classifier.random_forest(command="cross-val")
+        print("--------------")
+
+        # Classify sift dataset
+        print(f"Sift performance (shape: {self.sift_data.shape}): \n")
+        self.sift_classifier = Classification(self.sift_data, self.labels)
+        self.sift_classifier.nb_classify(command="cross-val")
+        self.sift_classifier.random_forest(command="cross-val")
+
+        print("--------------")
 
     def clustering(self) -> None:
         print("Clustering: \n")
