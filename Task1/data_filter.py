@@ -18,6 +18,7 @@ def main():
         for img in glob.glob("data/BigCats/Lion/*"):
             shutil.copy(img, "data/cats_projekat/Lion/")
 
+    old_folders = ["cheetahs", "jaguars", "leopards", "Lion", "tigers"]
     animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
     bad_jag_images = [
         "fg4_5398_c_f-g_grandin_mnhn",
@@ -56,9 +57,10 @@ def main():
     ]
     sift = cv2.SIFT_create()
 
-    for animal in animals:
+    for i in range(5):
+        animal = animals[i]
         os.mkdir(f"{dir}/{animal}")
-        for img in glob.glob(f"{path}{animal}/*.jp*g"):
+        for img in glob.glob(f"{path}{old_folders[i]}/*.jp*g"):
             filename = img.split("\\")[-1]
             image = cv2.imread(img)
             size = image.shape
