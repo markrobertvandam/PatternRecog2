@@ -2,7 +2,7 @@
 import numpy as np
 from sklearn import metrics
 
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, f1_score, make_scorer
 from sklearn.model_selection import train_test_split, cross_validate
@@ -31,6 +31,8 @@ class Classification:
         self.max_cv_score = 0
         self.best_model = 0
 
+        self.models_dict = {}
+
     def evaluate(self, y_true, y_pred):
         conf_matrix = metrics.confusion_matrix(y_true, y_pred)
         print(conf_matrix)
@@ -44,10 +46,11 @@ class Classification:
         y_pred = clf.predict(self.x_val)
         self.evaluate(self.y_val, y_pred)
 
-    def test_run(self, clf) -> None:
+    def test_run(self, clf):
         clf.fit(self.x_train_full, self.y_train_full)
         y_pred = clf.predict(self.x_test)
         self.evaluate(self.y_test, y_pred)
+        return clf
 
     def cross_val_run(self, clf) -> None:
         cross_val_scores = cross_validate(
@@ -66,7 +69,7 @@ class Classification:
 
     def knn_classify(self, k=5, command="tune") -> None:
         # cross-val using KNN means
-        print("KNN classifier:\n -----------------")
+        print("\nKNN classifier:\n -----------------")
         clf = KNeighborsClassifier(k)
         self.k = k
         if command == "tune":
@@ -77,7 +80,7 @@ class Classification:
             self.cross_val_run(clf)
 
     def logistic_regression(self, max_iter=10000, command="tune") -> None:
-        print("Logistic Regression classifier:\n -----------------")
+        print("\nLogistic Regression classifier:\n -----------------")
         clf = LogisticRegression(max_iter=max_iter, random_state=42)
         self.iter_log = max_iter
         if command == "tune":
@@ -88,7 +91,7 @@ class Classification:
             self.cross_val_run(clf)
 
     def nb_classify(self, command="tune") -> None:
-        print("Naive-Bayes classifier:\n -----------------")
+        print("\nNaive-Bayes classifier:\n -----------------")
         clf = GaussianNB()
         if command == "tune":
             self.grid_search(clf)
@@ -98,7 +101,7 @@ class Classification:
             self.cross_val_run(clf)
 
     def random_forest(self, n_trees=200, command="tune") -> None:
-        print("Random Forest classifier:\n -----------------")
+        print("\nRandom Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees
         if command == "tune":
@@ -109,7 +112,7 @@ class Classification:
             self.cross_val_run(clf)
 
     def svm_classify(self, max_iter=100000, command="tune") -> None:
-        print("Linear SVC classifier:\n -----------------")
+        print("\nLinear SVC classifier:\n -----------------")
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.iter_svc = max_iter
         if command == "tune":
@@ -127,7 +130,7 @@ class Classification:
             print(len(self.models))
 
     # Only works for 3 ensembles
-    def ensemble(self) -> None:
+    def old_ensemble(self) -> None:
         print("Ensemble:\n -----------------")
         model_predictions = []
         ensemble_predictions = []
@@ -146,3 +149,10 @@ class Classification:
                 ensemble_predictions.append(model_predictions[self.best_model][i])
         conf_matrix = metrics.confusion_matrix(self.y_val, ensemble_predictions)
         print(conf_matrix)
+
+    def ensemble(self, model1, model2, model3=None) -> None:
+        estimators = [("model1", model1), ("model2", model2)]
+        if model3 is not None:
+            estimators.append(("model3", model3))
+        ensemble_model = VotingClassifier(estimators=estimators, voting="soft")
+        self.test_run(ensemble_model)

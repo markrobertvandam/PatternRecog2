@@ -12,7 +12,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("pipeline", help="options are cats and genes")
     parser.add_argument(
         "command",
-        help="options are tune, test, cross-val (for classification) and cluster (for clustering)",
+        help="options are tune, test, cross-val, ensemble (for classification) and cluster (for clustering)",
     )
 
     return parser.parse_args()
@@ -38,6 +38,8 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.visualize_data()
     if args.command == "cross-val":
         cats.cross_val()
+    elif args.command == "ensemble":
+        cats.ensemble()
     elif args.command == "cluster":
         cats.clustering()
     else:

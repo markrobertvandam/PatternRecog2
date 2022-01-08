@@ -9,6 +9,10 @@ from classification import Classification
 from clustering import Clustering
 from feature_extraction import FeatureExtraction
 
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+
 
 class Cats:
     def __init__(self):
@@ -53,6 +57,7 @@ class Cats:
         plt.xlabel("Class")
         plt.ylabel("Frequency")
         plt.savefig("plots/cats_histo.png")
+        plt.close()
 
     def feature_extraction(self) -> None:
         print("Doing feature extraction...")
@@ -118,6 +123,37 @@ class Cats:
 
         print("--------------")
 
+    def ensemble(self) -> None:
+        """
+        function to run all possible ensembles with full data
+        """
+        # Classify sift dataset
+        print(f"Sift performance (shape: {self.sift_data.shape}): \n")
+        self.sift_classifier = Classification(self.sift_data, self.labels)
+        self.sift_classifier.nb_classify(command="test")
+        self.sift_classifier.random_forest(command="test")
+        self.sift_classifier.knn_classify(command="test")
+
+        print("\nEnsemble using Naive Bayes and Random Forest:")
+        print("--------------")
+        self.sift_classifier.ensemble(GaussianNB(), RandomForestClassifier())
+
+        print("\nEnsemble using Naive Bayes and KNN:")
+        print("--------------")
+        self.sift_classifier.ensemble(GaussianNB(), KNeighborsClassifier())
+
+        print("\nEnsemble using KNN and Random Forest:")
+        print("--------------")
+        self.sift_classifier.ensemble(KNeighborsClassifier(), RandomForestClassifier())
+
+        print("\nEnsemble using KNN, Naive Bayes and Random Forest:")
+        print("--------------")
+        self.sift_classifier.ensemble(
+            KNeighborsClassifier(), GaussianNB(), RandomForestClassifier()
+        )
+
+        print("--------------")
+
     def clustering(self) -> None:
         print("Clustering: \n")
         print("Original performance: \n")
@@ -127,6 +163,8 @@ class Cats:
 
         print("SIFT performance: \n")
         sift_clustering = Clustering(self.sift_data)
+        sift_clustering.cluster_with_plots()
+        exit()
         sift_cluster_labels = sift_clustering.k_means(n_clusters=5)
         # holds the cluster id and the images { id: [images] }
         # groups = {}
