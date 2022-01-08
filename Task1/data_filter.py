@@ -61,7 +61,7 @@ def main():
         animal = animals[i]
         os.mkdir(f"{dir}/{animal}")
         for img in glob.glob(f"{path}{old_folders[i]}/*.jp*g"):
-            filename = img.split("\\")[-1]
+            filename = os.path.basename(img)
             image = cv2.imread(img)
             size = image.shape
 
