@@ -3,11 +3,9 @@ import cv2
 import glob
 import os
 import shutil
-import sys
 
-
-def main(argv):
-    path = argv[1]
+def main():
+    path = "data/cats_projekat/"
     dir = f"{path[:-1]}_filtered"
     if os.path.exists(dir):
         print("Removing old filtered data")
@@ -87,4 +85,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv)
+    main()
