@@ -5,18 +5,20 @@ import os
 import shutil
 
 def main():
-    path = "data/cats_projekat/"
-    dir = f"{path[:-1]}_filtered"
+    path = os.path.join("data", "cats_projekat")
+    dir = os.path.join("data", "cats_projekat_filtered")
     if os.path.exists(dir):
         print("Removing old filtered data")
         shutil.rmtree(dir)
     os.mkdir(dir)
     print(f"New clean dir made at {dir}")
 
-    if not os.path.exists("data/cats_projekat/Lion"):
-        os.mkdir("data/cats_projekat/Lion")
-        for img in glob.glob("data/BigCats/Lion/*"):
-            shutil.copy(img, "data/cats_projekat/Lion/")
+    lion_path = os.path.join(path, "Lion")
+    old_lion_path = os.path.join("data", "bigCats", "Lion")
+    if not os.path.exists(lion_path):
+        os.mkdir(lion_path)
+        for img in glob.glob(os.path.join(old_lion_path, '*')):
+            shutil.copy(img, lion_path)
 
     old_folders = ["cheetahs", "jaguars", "leopards", "Lion", "tigers"]
     animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
@@ -59,8 +61,8 @@ def main():
 
     for i in range(5):
         animal = animals[i]
-        os.mkdir(f"{dir}/{animal}")
-        for img in glob.glob(f"{path}{old_folders[i]}/*.jp*g"):
+        os.mkdir(os.path.join(dir, animal))
+        for img in glob.glob(os.path.join(path, old_folders[i], "*.jp*g")):
             filename = os.path.basename(img)
             image = cv2.imread(img)
             size = image.shape
@@ -83,7 +85,7 @@ def main():
             image = cv2.resize(image, (250, 250))
             kp, des = sift.detectAndCompute(image, None)
             if len(des) >= 300:
-                shutil.copy(img, f"{dir}/{animal}/{filename}")
+                shutil.copy(img, os.path.join(dir,animal, filename))
 
 
 if __name__ == "__main__":
