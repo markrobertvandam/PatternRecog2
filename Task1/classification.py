@@ -65,12 +65,6 @@ class Classification:
             f" (Avg: {np.average(cross_val_scores['test_accuracy'])})",
         )
 
-    def knn_classify(self, k=5, command="tune") -> None:
-        # cross-val using KNN means
-        print("\nKNN classifier:\n -----------------")
-        clf = KNeighborsClassifier(k)
-        self.k = k
-
     def save_classifier(self, clf):
         clf.fit(self.x_train, self.y_train)
         self.models.append(clf)
