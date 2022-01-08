@@ -27,6 +27,8 @@ def genes_pipeline(args: argparse.Namespace) -> None:
         genes.cross_val()
     elif args.command == "cluster":
         genes.clustering()
+    elif args.command == "ensemble":
+        genes.ensemble()
     else:
         genes.classification(command=args.command)
 

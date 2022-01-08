@@ -157,3 +157,7 @@ class Genes:
         mi_clustering = Clustering(self.mi_data)
         mi_clustering.k_means(n_clusters=4)
         print("--------------\n")
+
+    def ensemble(self) -> None:
+        self.pca_classifier = Classification(self.pca_data, self.labels)
+        self.pca_classifier.ensemble()

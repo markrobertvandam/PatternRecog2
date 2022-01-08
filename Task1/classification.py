@@ -28,8 +28,6 @@ class Classification:
         self.n_trees = None
 
         self.models = []
-        self.max_cv_score = 0
-        self.best_model = 0
 
         self.models_dict = {}
 
@@ -72,83 +70,82 @@ class Classification:
         print("\nKNN classifier:\n -----------------")
         clf = KNeighborsClassifier(k)
         self.k = k
+
+    def save_classifier(self, clf):
+        clf.fit(self.x_train, self.y_train)
+        self.models.append(clf)
+
+    def select_command_action(self, clf, command="tune"):
         if command == "tune":
             self.grid_search(clf)
         elif command == "test":
             self.test_run(clf)
         elif command == "cross-val":
             self.cross_val_run(clf)
+        elif command == "save classifier":
+            self.save_classifier(clf)
+
+    def knn_classify(self, k=5, command="tune") -> None:
+        # cross-val using KNN means
+        print("KNN classifier:\n -----------------")
+        clf = KNeighborsClassifier(k)
+        self.k = k
+        self.select_command_action(clf, command)
 
     def logistic_regression(self, max_iter=10000, command="tune") -> None:
         print("\nLogistic Regression classifier:\n -----------------")
         clf = LogisticRegression(max_iter=max_iter, random_state=42)
         self.iter_log = max_iter
-        if command == "tune":
-            self.grid_search(clf)
-        elif command == "test":
-            self.test_run(clf)
-        elif command == "cross-val":
-            self.cross_val_run(clf)
+        self.select_command_action(clf, command)
 
     def nb_classify(self, command="tune") -> None:
         print("\nNaive-Bayes classifier:\n -----------------")
         clf = GaussianNB()
-        if command == "tune":
-            self.grid_search(clf)
-        elif command == "test":
-            self.test_run(clf)
-        elif command == "cross-val":
-            self.cross_val_run(clf)
+        self.select_command_action(clf, command)
 
     def random_forest(self, n_trees=200, command="tune") -> None:
         print("\nRandom Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees
-        if command == "tune":
-            self.grid_search(clf)
-        elif command == "test":
-            self.test_run(clf)
-        elif command == "cross-val":
-            self.cross_val_run(clf)
+        self.select_command_action(clf, command)
 
     def svm_classify(self, max_iter=100000, command="tune") -> None:
         print("\nLinear SVC classifier:\n -----------------")
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.iter_svc = max_iter
-        if command == "tune":
-            self.grid_search(clf)
-        elif command == "test":
-            self.test_run(clf)
-        elif command == "cross-val":
-            self.cross_val_run(clf)
+        self.select_command_action(clf, command)
 
-    def save_model(self, score, model):
-        self.models.append(model)
-        if score > self.max_cv_score:
-            self.max_cv_score = score
-            self.best_model = len(self.models) - 1
-            print(len(self.models))
+    def train_ensemble_classifiers(self, clf1="KNN", param1=5, clf2="NB", param2=None,
+                                   clf3="RF", param3=200) -> None:
+        params = [param1, param2, param3]
+        clfs = [clf1, clf2, clf3]
+        for i in range(3):
+            if clfs[i] == "KNN":
+                self.knn_classify(params[i], "save classifier")
+            elif clfs[i] == "LG":
+                self.logistic_regression(params[i], "save classifier")
+            elif clfs[i] == "NB":
+                self.nb_classify("save classifier")
+            elif clfs[i] == "RF":
+                self.random_forest(params[i], "save classifier")
+            elif clfs[i] == "SVM":
+                self.svm_classify(params[i], "save classifier")
 
-    # Only works for 3 ensembles
-    def old_ensemble(self) -> None:
+    # Only works for 3 ensembles, assumes classifier 1 is the best performing classifier
+    def old_ensemble(self, clf1="KNN", param1=5, clf2="NB", param2=None, clf3="RF", param3=200) -> None:
         print("Ensemble:\n -----------------")
+        self.train_ensemble_classifiers(clf1, param1, clf2, param2, clf3, param3)
         model_predictions = []
         ensemble_predictions = []
         for model in self.models:
             model_predictions.append(model.predict(self.x_val))
         print(len(model_predictions), len(model_predictions[0]))
         for i in range(len(model_predictions[0])):
-            if (
-                model_predictions[0][i] is model_predictions[1][i]
-                or model_predictions[2][i]
-            ):
-                ensemble_predictions.append(model_predictions[0][i])
-            elif model_predictions[1][i] is model_predictions[2][i]:
+            if model_predictions[1][i] == model_predictions[2][i]:
                 ensemble_predictions.append(model_predictions[1][i])
             else:
-                ensemble_predictions.append(model_predictions[self.best_model][i])
-        conf_matrix = metrics.confusion_matrix(self.y_val, ensemble_predictions)
-        print(conf_matrix)
+                ensemble_predictions.append((model_predictions[0][i]))
+        self.evaluate(self.y_val, ensemble_predictions)
 
     def ensemble(self, model1, model2, model3=None) -> None:
         estimators = [("model1", model1), ("model2", model2)]
