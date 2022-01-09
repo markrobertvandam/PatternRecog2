@@ -108,9 +108,9 @@ if __name__ == "__main__":
         q4_scores.append(s3)
     
     scores = [q2_scores, q3_scores, q4_scores]
-    titles = ["Baseline model (SVC): Epochs vs F1 score", 
+    titles = ["Baseline model (KNN): Epochs vs F1 score", 
             "Semi-supervised model (LinearPropogation): Epochs vs F1 score", 
-            "Baseline model (SVC) training with Semi-supervised model (LinearPropogation) labels: Epochs vs F1 score"]
+            "Baseline model (KNN) training with Semi-supervised model (LinearPropogation) labels: Epochs vs F1 score"]
 
     for i in range(len(scores)):
         fig, ax = plt.subplots(figsize = (15, 8))
