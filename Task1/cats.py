@@ -34,7 +34,9 @@ class Cats:
         print("Loading data...")
         animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
         for animal in animals:
-            files_path = os.path.join("data", "cats_projekat_filtered", animal, "*.jp*g")
+            files_path = os.path.join(
+                "data", "cats_projekat_filtered", animal, "*.jp*g"
+            )
             for img in glob.glob(files_path):
                 self.file_names.append(img)
                 image = cv2.imread(img)
@@ -190,9 +192,9 @@ class Cats:
                 groups[cluster].append(file)
             else:
                 groups[cluster].append(file)
-        for cluster in range(1, n_clusters+1):
-            cluster_path = os.path.join(clustering_folder, "cluster"+str(cluster))
+        for cluster in range(1, n_clusters + 1):
+            cluster_path = os.path.join(clustering_folder, "cluster" + str(cluster))
             os.mkdir(cluster_path)
-            for img in groups[cluster-1]:
+            for img in groups[cluster - 1]:
                 img_name = os.path.basename(img)
                 shutil.copy(img, os.path.join(cluster_path, img_name))

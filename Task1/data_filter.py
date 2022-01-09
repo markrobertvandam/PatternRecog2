@@ -4,6 +4,7 @@ import glob
 import os
 import shutil
 
+
 def main():
     path = os.path.join("data", "cats_projekat")
     dir = os.path.join("data", "cats_projekat_filtered")
@@ -17,7 +18,7 @@ def main():
     old_lion_path = os.path.join("data", "bigCats", "Lion")
     if not os.path.exists(lion_path):
         os.mkdir(lion_path)
-        for img in glob.glob(os.path.join(old_lion_path, '*')):
+        for img in glob.glob(os.path.join(old_lion_path, "*")):
             shutil.copy(img, lion_path)
 
     old_folders = ["cheetahs", "jaguars", "leopards", "Lion", "tigers"]
@@ -85,7 +86,7 @@ def main():
             image = cv2.resize(image, (250, 250))
             kp, des = sift.detectAndCompute(image, None)
             if len(des) >= 300:
-                shutil.copy(img, os.path.join(dir,animal, filename))
+                shutil.copy(img, os.path.join(dir, animal, filename))
 
 
 if __name__ == "__main__":
