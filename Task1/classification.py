@@ -109,8 +109,9 @@ class Classification:
         self.iter_svc = max_iter
         self.select_command_action(clf, command)
 
-    def train_ensemble_classifiers(self, clf1="KNN", param1=5, clf2="NB", param2=None,
-                                   clf3="RF", param3=200) -> None:
+    def train_ensemble_classifiers(
+        self, clf1="KNN", param1=5, clf2="NB", param2=None, clf3="RF", param3=200
+    ) -> None:
         params = [param1, param2, param3]
         clfs = [clf1, clf2, clf3]
         for i in range(3):
@@ -126,7 +127,9 @@ class Classification:
                 self.svm_classify(params[i], "save classifier")
 
     # Only works for 3 ensembles, assumes classifier 1 is the best performing classifier
-    def old_ensemble(self, clf1="KNN", param1=5, clf2="NB", param2=None, clf3="RF", param3=200) -> None:
+    def old_ensemble(
+        self, clf1="KNN", param1=5, clf2="NB", param2=None, clf3="RF", param3=200
+    ) -> None:
         print("Ensemble:\n -----------------")
         self.train_ensemble_classifiers(clf1, param1, clf2, param2, clf3, param3)
         model_predictions = []

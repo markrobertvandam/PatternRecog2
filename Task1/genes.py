@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import numpy as np
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 
 from classification import Classification
 from clustering import Clustering
@@ -99,16 +99,16 @@ class Genes:
 
         self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.knn_classify(command=command)
-        self.normal_classifier.nb_classify(command=command)
-        self.normal_classifier.random_forest(command=command)
+        self.normal_classifier.svm_classify(command=command)
+        self.normal_classifier.logistic_regression(command=command)
         print("--------------")
 
         # Classify PCA dataset
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.knn_classify(command=command)
-        self.pca_classifier.nb_classify(command=command)
-        self.pca_classifier.random_forest(command=command)
+        self.pca_classifier.svm_classify(command=command)
+        self.pca_classifier.logistic_regression(command=command)
         print("--------------\n")
 
         # Classify Mutual Information dataset
@@ -117,8 +117,8 @@ class Genes:
 
         self.mi_classifier = Classification(self.mi_data, self.labels)
         self.mi_classifier.knn_classify(command=command)
-        self.mi_classifier.nb_classify(command=command)
-        self.mi_classifier.random_forest(command=command)
+        self.mi_classifier.svm_classify(command=command)
+        self.mi_classifier.logistic_regression(command=command)
         print("--------------")
 
     def cross_val(self) -> None:
@@ -129,16 +129,16 @@ class Genes:
 
         self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.knn_classify(command="cross-val")
-        self.normal_classifier.nb_classify(command="cross-val")
-        self.normal_classifier.random_forest(command="cross-val")
+        self.normal_classifier.svm_classify(command="cross-val")
+        self.normal_classifier.logistic_regression(command="cross-val")
         print("--------------")
 
         # Classify PCA dataset
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.knn_classify(command="cross-val")
-        self.pca_classifier.nb_classify(command="cross-val")
-        self.pca_classifier.random_forest(command="cross-val")
+        self.pca_classifier.svm_classify(command="cross-val")
+        self.pca_classifier.logistic_regression(command="cross-val")
         print("--------------")
 
     def clustering(self) -> None:

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 
-import glob
 import cv2
+import glob
+import os
 import matplotlib.pyplot as plt
 import numpy as np
+import shutil
 
 from classification import Classification
 from clustering import Clustering
@@ -32,7 +34,10 @@ class Cats:
         print("Loading data...")
         animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
         for animal in animals:
-            for img in glob.glob(f"data/cats_projekat_filtered/{animal}/*.jp*g"):
+            files_path = os.path.join(
+                "data", "cats_projekat_filtered", animal, "*.jp*g"
+            )
+            for img in glob.glob(files_path):
                 self.file_names.append(img)
                 image = cv2.imread(img)
                 resized_image = cv2.resize(image, (250, 250))
@@ -56,7 +61,7 @@ class Cats:
         plt.title("Class Frequency")
         plt.xlabel("Class")
         plt.ylabel("Frequency")
-        plt.savefig("plots/cats_histo.png")
+        plt.savefig(os.path.join("plots", "cats_histo.png"))
         plt.close()
 
     def feature_extraction(self) -> None:
@@ -163,21 +168,33 @@ class Cats:
 
         print("SIFT performance: \n")
         sift_clustering = Clustering(self.sift_data)
-        sift_clustering.cluster_with_plots()
-        exit()
         sift_cluster_labels = sift_clustering.k_means(n_clusters=5)
-        # holds the cluster id and the images { id: [images] }
-        # groups = {}
-        # for file, cluster in zip(self.file_names, sift_cluster_labels):
-        #     if cluster not in groups.keys():
-        #         groups[cluster] = []
-        #         groups[cluster].append(file)
-        #     else:
-        #         groups[cluster].append(file)
-        # print(groups)
+        self.save_clustering(sift_cluster_labels, 5)
         print("--------------\n")
 
         print("Fourier performance: \n")
         fourier_clustering = Clustering(self.fourier_data)
         fourier_clustering.k_means(n_clusters=5)
         print("--------------\n")
+
+    def save_clustering(self, cluster_labels, n_clusters) -> None:
+        # holds the cluster id and the images { id: [images] }
+        clustering_folder = os.path.join("data", "clustering")
+        if os.path.exists(clustering_folder):
+            print("Removing old clustering folder...")
+            shutil.rmtree(clustering_folder)
+        os.mkdir(clustering_folder)
+        print(f"Making new clustering folder at {clustering_folder}...")
+        groups = {}
+        for file, cluster in zip(self.file_names, cluster_labels):
+            if cluster not in groups.keys():
+                groups[cluster] = []
+                groups[cluster].append(file)
+            else:
+                groups[cluster].append(file)
+        for cluster in range(1, n_clusters + 1):
+            cluster_path = os.path.join(clustering_folder, "cluster" + str(cluster))
+            os.mkdir(cluster_path)
+            for img in groups[cluster - 1]:
+                img_name = os.path.basename(img)
+                shutil.copy(img, os.path.join(cluster_path, img_name))
