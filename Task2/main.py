@@ -1,4 +1,3 @@
-import os
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -31,4 +30,4 @@ if __name__ == "__main__":
         ax.set_xlabel("Epochs")
         ax.set_ylabel("F1 score")
 
-        fig.savefig(os.path.join("results", f"q{i}.png"), bbox_inches="tight")
+        fig.savefig(f"results/q{i}.png", bbox_inches="tight")
