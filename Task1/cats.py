@@ -61,7 +61,7 @@ class Cats:
         plt.title("Class Frequency")
         plt.xlabel("Class")
         plt.ylabel("Frequency")
-        plt.savefig("plots/cats_histo.png")
+        plt.savefig(os.path.join("plots", "cats_histo.png"))
         plt.close()
 
     def feature_extraction(self) -> None:

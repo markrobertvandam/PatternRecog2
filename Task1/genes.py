@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import numpy as np
 import csv
 import matplotlib.pyplot as plt
+import numpy as np
 
 from classification import Classification
 from clustering import Clustering
@@ -9,7 +9,7 @@ from feature_extraction import FeatureExtraction
 
 
 class Genes:
-    def __init__(self, pca_min_variance=0.7, mi_min_information=0.55):
+    def __init__(self, pca_min_variance=0.6, mi_min_information=0.55):
         self.samples = None
         self.labels = []
         self.label_names = {"PRAD": 0, "LUAD": 1, "BRCA": 2, "KIRC": 3, "COAD": 4}
