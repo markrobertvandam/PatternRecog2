@@ -4,46 +4,42 @@ import matplotlib.cm as cm
 import numpy as np
 
 from sklearn import metrics
-from sklearn.cluster import KMeans, SpectralClustering, OPTICS
+from sklearn.cluster import KMeans, SpectralClustering, AgglomerativeClustering, OPTICS
 from sklearn.metrics import silhouette_samples, silhouette_score
-from fcmeans import FCM
 
 
 class Clustering:
-    def __init__(self, x: np.ndarray) -> None:
+    def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
         self.x = x
+        self.y = y
 
     def general_clustering(self, cluster, sklearn=True) -> np.ndarray:
         cluster.fit(self.x)
-        if sklearn:
-            labels = cluster.labels_
-            silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
-        else:
-            labels = cluster.predict(self.x)
-            silhouette_score = metrics.silhouette_score(self.x, labels)
+        silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
+        mutual_info_score = metrics.normalized_mutual_info_score(y, cluster.labels_)
+        print("Silhouette score = ", silhouette_score, " and normalized mutual info score = ", mutual_info_score)
+        return cluster.labels_
 
-        print(labels)
-        print("Silhouette score = ", silhouette_score)
-        return labels
-
-    def k_means(self, n_clusters=6) -> np.ndarray:
+    def k_means(self, n_clusters=4) -> np.ndarray:
         print("\nK-means clustering:\n -----------------")
-        cluster = KMeans(n_clusters=n_clusters)
+        cluster = KMeans(n_clusters=n_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def spectral(self) -> np.ndarray:
+    def spectral(self, n_clusters=5) -> np.ndarray:
         print("\nSpectral clustering:\n -----------------")
-        cluster = SpectralClustering()
+        cluster = SpectralClustering(n_clusters=n_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def fuzzy_c_means(self, n_clusters=5) -> np.ndarray:
-        print("\nFuzzy C-means  clustering:\n -----------------")
-        copy_x = self.x
-        self.x = self.x.astype(float)
-        cluster = FCM(n_clusters=n_clusters)
-        labels = self.general_clustering(cluster, sklearn=False)
-        self.x = copy_x
-        return labels
+    def agglomerative_clustering(self, n_clusters=5, linkage='ward'):
+        print("\nagglomerative clustering:\n -----------------")
+        cluster = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
+        return self.general_clustering(cluster)
+
+    def optics(self, min_samples=5):
+        print("\nOPTICS clustering:\n -----------------")
+        cluster = OPTICS(min_samples=min_samples)
+        return self.general_clustering(cluster)
+
 
     def cluster_with_plots(self, algorithm="kmeans") -> None:
         """
