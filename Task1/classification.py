@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import numpy as np
+
+from collections import Counter
 from sklearn import metrics
 
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
@@ -15,13 +17,16 @@ class Classification:
     def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
         self.x, self.y = x, y
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
-            x, y, test_size=0.2, random_state=42
+            x, y, test_size=0.2, random_state=42, stratify=self.y
         )
+
+        # x: 100%, x_train_full: 80%, x_test: 20%, x_train: 70%, x_val: 10%
         self.x_train_full = self.x_train
         self.y_train_full = self.y_train
         self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(
-            self.x_train, self.y_train, test_size=0.2, random_state=42
+            self.x_train, self.y_train, test_size=0.125, random_state=42, stratify=self.y_train
         )
+
         self.k = None
         self.iter_svc = None
         self.iter_log = None

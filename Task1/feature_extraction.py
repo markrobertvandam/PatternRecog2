@@ -67,7 +67,9 @@ class FeatureExtraction:
 
         pca_reduction = PCA(n_components=n_components)
         data_reduced = pca_reduction.fit_transform(self.data)
-        self.scree_plot(pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100)
+        self.scree_plot(
+            pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100
+        )
 
         return np.array(data_reduced, dtype="object")
 
@@ -85,17 +87,17 @@ class FeatureExtraction:
 
     def scree_plot(self, n_components, explain_var) -> None:
         pc_values = np.arange(n_components) + 1
-        plt.plot(pc_values, explain_var, 'o-')
-        plt.title('Scree Plot')
-        plt.xlabel('Principal Component (n)')
-        plt.ylabel('Variance Explained (%)')
+        plt.plot(pc_values, explain_var, "o-")
+        plt.title("Scree Plot")
+        plt.xlabel("Principal Component (n)")
+        plt.ylabel("Variance Explained (%)")
         plt.savefig(os.path.join("plots", "scree.png"))
         plt.close()
 
         pc_values = np.arange(n_components) + 1
-        plt.plot(pc_values[8:], explain_var[8:], 'o-')
-        plt.title('Scree Plot')
-        plt.xlabel('Principal Component (n)')
-        plt.ylabel('Variance Explained (%)')
+        plt.plot(pc_values[8:], explain_var[8:], "o-")
+        plt.title("Scree Plot")
+        plt.xlabel("Principal Component (n)")
+        plt.ylabel("Variance Explained (%)")
         plt.savefig(os.path.join("plots", "scree2.png"))
         plt.close()

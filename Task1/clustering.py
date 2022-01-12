@@ -6,7 +6,6 @@ import numpy as np
 from sklearn import metrics
 from sklearn.cluster import KMeans, SpectralClustering, OPTICS
 from sklearn.metrics import silhouette_samples, silhouette_score
-from fcmeans import FCM
 
 
 class Clustering:
@@ -35,15 +34,6 @@ class Clustering:
         print("\nSpectral clustering:\n -----------------")
         cluster = SpectralClustering()
         return self.general_clustering(cluster)
-
-    def fuzzy_c_means(self, n_clusters=5) -> np.ndarray:
-        print("\nFuzzy C-means  clustering:\n -----------------")
-        copy_x = self.x
-        self.x = self.x.astype(float)
-        cluster = FCM(n_clusters=n_clusters)
-        labels = self.general_clustering(cluster, sklearn=False)
-        self.x = copy_x
-        return labels
 
     def cluster_with_plots(self, algorithm="kmeans") -> None:
         """
