@@ -77,11 +77,15 @@ class FeatureExtraction:
         mi_values = MIC(self.data, self.labels)
 
         low_information_features = []
+        # sorted_mi = []
         for i in range(np.size(self.data, 1)):
+            # sorted_mi.append((i, mi_values[i]))
             if mi_values[i] < min_information:
                 low_information_features.append(i)
 
         data_reduced = np.delete(self.data, low_information_features, axis=1)
+
+        # sorted_mi.sort(key=lambda x: x[1], reverse=True)
 
         return np.array(data_reduced, dtype="object")
 
