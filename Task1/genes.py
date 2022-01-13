@@ -7,11 +7,15 @@ from classification import Classification
 from clustering import Clustering
 from feature_extraction import FeatureExtraction
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import LinearSVC
+
 
 class Genes:
     def __init__(self, pca_min_variance=0.6, mi_min_information=0.55):
         self.samples = None
-        self.labels = []
+        self.labels = None
         self.label_names = {"PRAD": 0, "LUAD": 1, "BRCA": 2, "KIRC": 3, "COAD": 4}
         self.feature_extractor = None
         self.pca_data = None
@@ -34,12 +38,13 @@ class Genes:
 
         filename_labels = f"data/Genes/labels.csv"
 
+        labels = []
         with open(filename_labels) as labels_csv:
             labels_csv_reader = csv.reader(labels_csv)
             next(labels_csv_reader, None)
             for row in labels_csv_reader:
-                self.labels.append(self.label_names[row[1]])
-        self.labels = np.asarray(self.labels)
+                labels.append(self.label_names[row[1]])
+        self.labels = np.asarray(labels, dtype=int)
 
     def biplot_helper(self, name: str, vars: str, data: np.ndarray, offset=0) -> None:
         plt.figure()
@@ -98,17 +103,17 @@ class Genes:
         print(f"Original performance (shape: {self.samples.shape}): \n")
 
         self.normal_classifier = Classification(self.samples, self.labels)
-        self.normal_classifier.knn_classify(command=command)
-        self.normal_classifier.svm_classify(command=command)
-        self.normal_classifier.logistic_regression(command=command)
+        self.normal_classifier.knn_classify(k=5, command=command)
+        self.normal_classifier.svm_classify(max_iter=100000, command=command)
+        self.normal_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------")
 
         # Classify PCA dataset
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
-        self.pca_classifier.knn_classify(command=command)
-        self.pca_classifier.svm_classify(command=command)
-        self.pca_classifier.logistic_regression(command=command)
+        self.pca_classifier.knn_classify(k=5, command=command)
+        self.pca_classifier.svm_classify(max_iter=100000, command=command)
+        self.pca_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------\n")
 
         # Classify Mutual Information dataset
@@ -116,9 +121,9 @@ class Genes:
         print(f"MI performance (shape: {self.mi_data.shape}): \n")
 
         self.mi_classifier = Classification(self.mi_data, self.labels)
-        self.mi_classifier.knn_classify(command=command)
-        self.mi_classifier.svm_classify(command=command)
-        self.mi_classifier.logistic_regression(command=command)
+        self.mi_classifier.knn_classify(k=5, command=command)
+        self.mi_classifier.svm_classify(max_iter=100000, command=command)
+        self.mi_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------")
 
     def cross_val(self) -> None:
@@ -128,36 +133,80 @@ class Genes:
         print(f"Original performance (shape: {self.samples.shape}): \n")
 
         self.normal_classifier = Classification(self.samples, self.labels)
-        self.normal_classifier.knn_classify(command="cross-val")
-        self.normal_classifier.svm_classify(command="cross-val")
-        self.normal_classifier.logistic_regression(command="cross-val")
+        self.normal_classifier.knn_classify(k=5, command="cross-val")
+        self.normal_classifier.svm_classify(max_iter=100000, command="cross-val")
+        self.normal_classifier.logistic_regression(max_iter=10000, command="cross-val")
         print("--------------")
 
         # Classify PCA dataset
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
-        self.pca_classifier.knn_classify(command="cross-val")
-        self.pca_classifier.svm_classify(command="cross-val")
-        self.pca_classifier.logistic_regression(command="cross-val")
+        self.pca_classifier.knn_classify(k=5, command="cross-val")
+        self.pca_classifier.svm_classify(max_iter=100000, command="cross-val")
+        self.pca_classifier.logistic_regression(max_iter=10000, command="cross-val")
         print("--------------")
 
     def clustering(self) -> None:
         print("Clustering: \n")
         print("Original performance: \n")
-        normal_clustering = Clustering(self.samples)
-        normal_clustering.k_means()
+        normal_clustering = Clustering(
+            self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
+        )
+        normal_clustering.spectral()
         print("--------------\n")
 
         print("PCA performance: \n")
-        pca_clustering = Clustering(self.pca_data)
-        pca_clustering.k_means()
+        pca_clustering = Clustering(
+            self.pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
+        )
+        pca_clustering.spectral()
         print("--------------\n")
 
         print("Mutual Information performance: \n")
-        mi_clustering = Clustering(self.mi_data)
-        mi_clustering.k_means(n_clusters=4)
+        mi_clustering = Clustering(
+            x=self.mi_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
+        )
+        mi_clustering.spectral()
         print("--------------\n")
 
     def ensemble(self) -> None:
+        """
+        function to run all possible ensembles with full data
+        """
+        random_state = 42  # seed
+
+        # Classify pca dataset
+        print(f"Sift performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
-        self.pca_classifier.ensemble()
+        self.pca_classifier.knn_classify(k=5, command="test")
+        self.pca_classifier.svm_classify(max_iter=100000, command="test")
+        self.pca_classifier.logistic_regression(max_iter=10000, command="test")
+
+        print("\nEnsemble using Linear SVC and Logistic Regression:")
+        print("--------------")
+        self.pca_classifier.ensemble(
+            LinearSVC(max_iter=100000),
+            LogisticRegression(max_iter=10000, random_state=random_state),
+        )
+
+        print("\nEnsemble using Linear SVC and KNN:")
+        print("--------------")
+        self.pca_classifier.ensemble(
+            LinearSVC(max_iter=100000, random_state=random_state),
+            KNeighborsClassifier(n_neighbors=5),
+        )
+
+        print("\nEnsemble using KNN and Logistic Regression:")
+        print("--------------")
+        self.pca_classifier.ensemble(
+            KNeighborsClassifier(n_neighbors=5),
+            LogisticRegression(max_iter=10000, random_state=random_state),
+        )
+
+        print("\nEnsemble using KNN, Linear SVC and Logistic Regression:")
+        print("--------------")
+        self.pca_classifier.ensemble(
+            KNeighborsClassifier(n_neighbors=5),
+            LinearSVC(max_iter=100000, random_state=random_state),
+            LogisticRegression(max_iter=10000, random_state=random_state),
+        )

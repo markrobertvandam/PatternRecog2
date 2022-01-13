@@ -10,7 +10,7 @@ from sklearn.feature_selection import mutual_info_classif as MIC
 
 
 class FeatureExtraction:
-    def __init__(self, x: np.ndarray, y: list, dataset: str) -> None:
+    def __init__(self, x: np.ndarray, y: np.ndarray, dataset: str) -> None:
         self.data = x
         self.labels = y
 

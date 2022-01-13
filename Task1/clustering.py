@@ -9,28 +9,43 @@ from sklearn.metrics import silhouette_samples, silhouette_score
 
 
 class Clustering:
-    def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
+    def __init__(
+        self,
+        x: np.ndarray,
+        y: np.ndarray,
+        k_means_clusters: int,
+        spectral_clusters: int,
+    ) -> None:
         self.x = x
         self.y = y
+        self.k_means_clusters = k_means_clusters
+        self.spectral_clusters = spectral_clusters
 
-    def general_clustering(self, cluster, sklearn=True) -> np.ndarray:
+    def general_clustering(self, cluster) -> np.ndarray:
         cluster.fit(self.x)
         silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
-        mutual_info_score = metrics.normalized_mutual_info_score(y, cluster.labels_)
-        print("Silhouette score = ", silhouette_score, " and normalized mutual info score = ", mutual_info_score)
+        mutual_info_score = metrics.normalized_mutual_info_score(
+            self.y, cluster.labels_
+        )
+        print(
+            "Silhouette score = ",
+            silhouette_score,
+            " and normalized mutual info score = ",
+            mutual_info_score,
+        )
         return cluster.labels_
 
-    def k_means(self, n_clusters=4) -> np.ndarray:
+    def k_means(self) -> np.ndarray:
         print("\nK-means clustering:\n -----------------")
-        cluster = KMeans(n_clusters=n_clusters, random_state=42)
+        cluster = KMeans(n_clusters=self.k_means_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def spectral(self, n_clusters=5) -> np.ndarray:
+    def spectral(self) -> np.ndarray:
         print("\nSpectral clustering:\n -----------------")
-        cluster = SpectralClustering(n_clusters=n_clusters, random_state=42)
+        cluster = SpectralClustering(n_clusters=self.spectral_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def agglomerative_clustering(self, n_clusters=5, linkage='ward'):
+    def agglomerative_clustering(self, n_clusters=5, linkage="ward"):
         print("\nagglomerative clustering:\n -----------------")
         cluster = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
         return self.general_clustering(cluster)
@@ -39,7 +54,6 @@ class Clustering:
         print("\nOPTICS clustering:\n -----------------")
         cluster = OPTICS(min_samples=min_samples)
         return self.general_clustering(cluster)
-
 
     def cluster_with_plots(self, algorithm="kmeans") -> None:
         """

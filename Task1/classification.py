@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 import numpy as np
 
-from collections import Counter
 from sklearn import metrics
 
 from sklearn.ensemble import RandomForestClassifier, VotingClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score, f1_score, make_scorer
+from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -24,7 +23,11 @@ class Classification:
         self.x_train_full = self.x_train
         self.y_train_full = self.y_train
         self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(
-            self.x_train, self.y_train, test_size=0.125, random_state=42, stratify=self.y_train
+            self.x_train,
+            self.y_train,
+            test_size=0.125,
+            random_state=42,
+            stratify=self.y_train,
         )
 
         self.k = None
@@ -74,7 +77,7 @@ class Classification:
         clf.fit(self.x_train, self.y_train)
         self.models.append(clf)
 
-    def select_command_action(self, clf, command="tune"):
+    def select_command_action(self, clf, command: str):
         if command == "tune":
             self.grid_search(clf)
         elif command == "test":
@@ -84,31 +87,31 @@ class Classification:
         elif command == "save classifier":
             self.save_classifier(clf)
 
-    def knn_classify(self, k=5, command="tune") -> None:
+    def knn_classify(self, k: int, command: str) -> None:
         # cross-val using KNN means
         print("KNN classifier:\n -----------------")
         clf = KNeighborsClassifier(k)
         self.k = k
         self.select_command_action(clf, command)
 
-    def logistic_regression(self, max_iter=10000, command="tune") -> None:
+    def logistic_regression(self, max_iter: int, command: str) -> None:
         print("\nLogistic Regression classifier:\n -----------------")
         clf = LogisticRegression(max_iter=max_iter, random_state=42)
         self.iter_log = max_iter
         self.select_command_action(clf, command)
 
-    def nb_classify(self, command="tune") -> None:
+    def nb_classify(self, command: str) -> None:
         print("\nNaive-Bayes classifier:\n -----------------")
         clf = GaussianNB()
         self.select_command_action(clf, command)
 
-    def random_forest(self, n_trees=200, command="tune") -> None:
+    def random_forest(self, n_trees: int, command: str) -> None:
         print("\nRandom Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees
         self.select_command_action(clf, command)
 
-    def svm_classify(self, max_iter=100000, command="tune") -> None:
+    def svm_classify(self, max_iter: int, command: str) -> None:
         print("\nLinear SVC classifier:\n -----------------")
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.iter_svc = max_iter
