@@ -29,6 +29,10 @@ def genes_pipeline(args: argparse.Namespace) -> None:
         genes.clustering()
     elif args.command == "ensemble":
         genes.ensemble()
+    elif args.command == "full-run":
+        genes.classification(command="test")
+        genes.ensemble()
+        genes.clustering()
     else:
         genes.classification(command=args.command)
 
@@ -43,6 +47,10 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     elif args.command == "ensemble":
         cats.ensemble()
     elif args.command == "cluster":
+        cats.clustering()
+    elif args.command == "full-run":
+        cats.classification(command="test")
+        cats.ensemble()
         cats.clustering()
     else:
         cats.classification(command=args.command)
