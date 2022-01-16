@@ -97,39 +97,48 @@ class Cats:
         """
         New function to run grid-search on command
         """
-        results_f1_knn = np.zeros((60, 24))
-        results_acc_knn = np.zeros((60, 24))
+        results_f1_knn = np.zeros((4, 4))
+        results_acc_knn = np.zeros((4, 4))
 
-        results_f1_nb = np.zeros(60)
-        results_acc_nb = np.zeros(60)
+        results_f1_nb = np.zeros(4)
+        results_acc_nb = np.zeros(4)
 
-        results_f1_rf = np.zeros((60, 20))
-        results_acc_rf = np.zeros((60, 20))
+        results_f1_rf = np.zeros((4, 4))
+        results_acc_rf = np.zeros((4, 4))
 
-        step = 5
         reduced_sift = self.sift_data
-        for i in range(60):
+
+        # Max keypoints loop
+        for i in range(0, 4):
+            key_points = i * 5
             print("iteration " + str(i))
             self.block_print()
-            self.sift_classifier = Classification(reduced_sift, self.labels, self.file_names)
+            knn_reduced_sift = reduced_sift[:, 0:key_points+255]
+            self.sift_classifier = Classification(knn_reduced_sift, self.labels, self.file_names)
 
-            for j in range(2, 26):
+            # k-value loop
+            for k in range(15, 19):
                 (
-                    results_f1_knn[i][(j - 2)],
-                    results_acc_knn[i][(j - 2)],
-                ) = self.sift_classifier.knn_classify(k=j, command=command)
+                    results_f1_knn[i][(k - 15)],
+                    results_acc_knn[i][(k - 15)],
+                ) = self.sift_classifier.knn_classify(k, command=command)
 
+            # Naive Bayes
+            nb_reduced_sift = reduced_sift[:, 0:key_points+80]
+            self.sift_classifier = Classification(nb_reduced_sift, self.labels, self.file_names)
             results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(
                 command=command
             )
 
-            for k in range(1, 20):
+            # n-trees loop
+            rf_reduced_sift = reduced_sift[:, 0:key_points+210]
+            self.sift_classifier = Classification(rf_reduced_sift, self.labels, self.file_names)
+            for n in range(0, 4):
+                n_trees = 220 + n * 20
                 (
-                    results_f1_rf[i][k],
-                    results_acc_rf[i][k],
-                ) = self.sift_classifier.random_forest(n_trees=k*20, command=command)
-
-            reduced_sift = reduced_sift[:, 0: (len(reduced_sift[0]) - step)]
+                    results_f1_rf[i][n],
+                    results_acc_rf[i][n],
+                ) = self.sift_classifier.random_forest(n_trees=n_trees, command=command)
 
             self.enable_print()
 
