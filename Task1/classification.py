@@ -56,7 +56,7 @@ class Classification:
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
-        # self.evaluate(self.y_val, y_pred)
+        self.evaluate(self.y_val, y_pred)
         return f1_score(self.y_val, y_pred, average='macro'), accuracy_score(self.y_val, y_pred)
 
     def test_run(self, clf):
