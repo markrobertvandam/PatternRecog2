@@ -43,7 +43,11 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     cats.feature_extraction()
     cats.visualize_data()
     if args.command == "cross-val":
-        cats.cross_val()
+        cats.classification(command="cross-val")
+    elif args.command == "tune":
+        cats.tune_classification_parameters()
+    elif args.command == "test":
+        cats.classification(command="test")
     elif args.command == "ensemble":
         cats.ensemble()
     elif args.command == "cluster":
@@ -52,12 +56,6 @@ def cats_pipeline(args: argparse.Namespace) -> None:
         cats.classification(command="test")
         cats.ensemble()
         cats.clustering()
-    elif args.command == "tune":
-        cats.tune_classification_parameters()
-        # cats.classification(command=args.command)
-    else:
-        cats.classification(command=args.command)
-
 
 def main():
 

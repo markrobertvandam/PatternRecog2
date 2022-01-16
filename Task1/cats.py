@@ -85,17 +85,26 @@ class Cats:
 
         self.sift_data = self.feature_extractor.sift()
 
-    # Disable
-    def block_print(self):
-        sys.stdout = open(os.devnull, "w")
-
-    # Restore
-    def enable_print(self):
-        sys.stdout = sys.__stdout__
-
-    def tune_classification_parameters(self, command="tune") -> None:
+    def tune_classification_parameters(self) -> None:
         """
-        New function to run grid-search on command
+        Function to run grid-search for all data
+        """
+        self.sift_classification_parameters()
+
+    def save_tune_results(self, f1_results, acc_results, models) -> None:
+        for i in range(len(models)):
+            print(
+                f"Max {models[i]} f1-score = "
+                + str(np.amax(f1_results[i]))
+                + f", max {models[i]} acc = "
+                + str(np.amax(acc_results[i]))
+            )
+            np.savetxt(os.path.join("data", "results", f"results_f1_{models[i]}.csv"), f1_results[i], delimiter=",")
+            np.savetxt(os.path.join("data", "results", f"results_acc_{models[i]}.csv"), acc_results[i], delimiter=",")
+
+    def sift_classification_parameters(self) -> None:
+        """
+        Helper function to run grid-search for sift
         """
         results_f1_knn = np.zeros((4, 4))
         results_acc_knn = np.zeros((4, 4))
@@ -106,14 +115,10 @@ class Cats:
         results_f1_rf = np.zeros((4, 4))
         results_acc_rf = np.zeros((4, 4))
 
-        reduced_sift = self.sift_data
-
         # Max keypoints loop
         for i in range(0, 4):
             key_points = i * 5
-            print("iteration " + str(i))
-            self.block_print()
-            knn_reduced_sift = reduced_sift[:, 0:key_points+255]
+            knn_reduced_sift = self.sift_data[:, 0:key_points+255]
             self.sift_classifier = Classification(knn_reduced_sift, self.labels, self.file_names)
 
             # k-value loop
@@ -121,57 +126,33 @@ class Cats:
                 (
                     results_f1_knn[i][(k - 15)],
                     results_acc_knn[i][(k - 15)],
-                ) = self.sift_classifier.knn_classify(k, command=command)
+                ) = self.sift_classifier.knn_classify(k, command="tune")
 
             # Naive Bayes
-            nb_reduced_sift = reduced_sift[:, 0:key_points+80]
+            nb_reduced_sift = self.sift_data[:, 0:key_points+80]
             self.sift_classifier = Classification(nb_reduced_sift, self.labels, self.file_names)
             results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(
-                command=command
+                command="tune"
             )
 
             # n-trees loop
-            rf_reduced_sift = reduced_sift[:, 0:key_points+210]
+            rf_reduced_sift = self.sift_data[:, 0:key_points+210]
             self.sift_classifier = Classification(rf_reduced_sift, self.labels, self.file_names)
             for n in range(0, 4):
                 n_trees = 220 + n * 20
                 (
                     results_f1_rf[i][n],
                     results_acc_rf[i][n],
-                ) = self.sift_classifier.random_forest(n_trees=n_trees, command=command)
+                ) = self.sift_classifier.random_forest(n_trees=n_trees, command="tune")
 
-            self.enable_print()
+        f1_results = [results_f1_knn, results_f1_nb, results_f1_rf]
+        acc_results = [results_acc_knn, results_acc_nb, results_acc_rf]
+        models = ["knn", "nb", "rf"]
+        self.save_tune_results(f1_results, acc_results, models)
 
-        print(
-            "Max knn f1-score = "
-            + str(np.amax(results_f1_knn))
-            + ", max knn acc = "
-            + str(np.amax(results_acc_knn))
-        )
-        np.savetxt("data/results/results_f1_knn.csv", results_f1_knn, delimiter=",")
-        np.savetxt("data/results/results_acc_knn.csv", results_acc_knn, delimiter=",")
-
-        print(
-            "Max nb f1-score = "
-            + str(np.amax(results_f1_nb))
-            + ", max nb acc = "
-            + str(np.amax(results_acc_nb))
-        )
-        np.savetxt("data/results/results_f1_nb.csv", results_f1_nb, delimiter=",")
-        np.savetxt("data/results/results_acc_nb.csv", results_acc_nb, delimiter=",")
-
-        print(
-            "Max rf f1-score = "
-            + str(np.amax(results_f1_rf))
-            + ", max rf acc = "
-            + str(np.amax(results_acc_rf))
-        )
-        np.savetxt("data/results/results_f1_rf.csv", results_f1_rf, delimiter=",")
-        np.savetxt("data/results/results_acc_rf.csv", results_acc_rf, delimiter=",")
-
-    def classification(self, command="tune") -> None:
+    def classification(self, command) -> None:
         """
-        function to run grid-search/test-run depending on command
+        function to run cross-val or test-run depending on command with best pipelines
         """
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
@@ -179,7 +160,6 @@ class Cats:
             self.flattened_original, self.labels, self.file_names
         )
         self.normal_classifier.knn_classify(k=5, command=command)
-        self.normal_classifier.nb_classify(command=command)
         self.normal_classifier.random_forest(n_trees=200, command=command)
         print("--------------")
 
@@ -189,40 +169,8 @@ class Cats:
             self.sift_data, self.labels, self.file_names
         )
         self.sift_classifier.knn_classify(k=5, command=command)
-        self.sift_classifier.nb_classify(command=command)
         self.sift_classifier.random_forest(n_trees=200, command=command)
         print("--------------\n")
-
-        # Classify fourier dataset
-
-        print(f"Fourier performance (shape: {self.fourier_data.shape}): \n")
-
-        self.fourier_classifier = Classification(
-            self.fourier_data, self.labels, self.file_names
-        )
-        self.fourier_classifier.knn_classify(k=5, command=command)
-        self.fourier_classifier.nb_classify(command=command)
-        self.fourier_classifier.random_forest(n_trees=200, command=command)
-        print("--------------")
-
-    def cross_val(self) -> None:
-        """
-        function to run cross-val with full data with best pipeliness
-        """
-        print(f"Original performance (shape: {self.flattened_original.shape}): \n")
-
-        self.normal_classifier = Classification(self.flattened_original, self.labels)
-        self.normal_classifier.nb_classify(command="cross-val")
-        self.normal_classifier.random_forest(n_trees=200, command="cross-val")
-        print("--------------")
-
-        # Classify sift dataset
-        print(f"Sift performance (shape: {self.sift_data.shape}): \n")
-        self.sift_classifier = Classification(self.sift_data, self.labels)
-        self.sift_classifier.nb_classify(command="cross-val")
-        self.sift_classifier.random_forest(n_trees=200, command="cross-val")
-
-        print("--------------")
 
     def ensemble(self) -> None:
         """
