@@ -110,10 +110,20 @@ class Cats:
                 delimiter=",",
             )
 
+    # Disable
+    def block_print(self):
+        sys.stdout = open(os.devnull, 'w')
+        sys.stdout = open(os.devnull, "w")
+
+    # Restore
+    def enable_print(self):
+        sys.stdout = sys.__stdout__
+
     def sift_classification_parameters(self) -> None:
         """
         Helper function to run grid-search for sift
         """
+        self.block_print()
         results_f1_knn = np.zeros((4, 4))
         results_acc_knn = np.zeros((4, 4))
 
@@ -158,7 +168,7 @@ class Cats:
                     results_f1_rf[i][n],
                     results_acc_rf[i][n],
                 ) = self.sift_classifier.random_forest(n_trees=n_trees, command="tune")
-
+        self.enable_print()
         self.save_tune_results(
             [results_f1_knn, results_f1_nb, results_f1_rf],
             [results_acc_knn, results_acc_nb, results_acc_rf],

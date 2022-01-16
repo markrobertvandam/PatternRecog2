@@ -55,9 +55,6 @@ class Classification:
 
         self.models_dict = {}
 
-        for i in self.files_val:
-            print(i)
-
     def evaluate(self, y_true, y_pred, probs=None):
         if probs is not None:
             print("Probability of classes")
