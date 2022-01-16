@@ -45,18 +45,24 @@ class Classification:
 
         self.models_dict = {}
 
-    def evaluate(self, y_true, y_pred):
-        conf_matrix = metrics.confusion_matrix(y_true, y_pred)
-        print(conf_matrix)
-        print(
-            f"F1-score: {f1_score(y_true, y_pred, average='macro')}, Accuracy: {accuracy_score(y_true, y_pred)}"
-        )
+    def evaluate(self, y_true, y_pred, probs = None):
+        if probs is not None:
+            print("Probability of classes")
+            for i in probs:
+                print(i)
+        else:
+            conf_matrix = metrics.confusion_matrix(y_true, y_pred)
+            print(conf_matrix)
+            print(
+                f"F1-score: {f1_score(y_true, y_pred, average='macro')}, Accuracy: {accuracy_score(y_true, y_pred)}"
+            )
 
     def grid_search(self, clf):
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
-        # self.evaluate(self.y_val, y_pred)
+        probs = clf.predict_proba(self.x_val)
+        self.evaluate(self.y_val, y_pred, probs)
         return f1_score(self.y_val, y_pred, average='macro'), accuracy_score(self.y_val, y_pred)
 
     def test_run(self, clf):
