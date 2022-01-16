@@ -197,13 +197,13 @@ class Cats:
         np.savetxt('data/results/results_f1_qda.csv', results_f1_qda, delimiter=',')
         np.savetxt('data/results/results_acc_qda.csv', results_acc_qda, delimiter=',')
 
-    def classification(self, command="tuning") -> None:
+    def classification(self, command="tune") -> None:
         """
         function to run grid-search/test-run depending on command
         """
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
-        self.normal_classifier = Classification(self.flattened_original, self.labels)
+        self.normal_classifier = Classification(self.flattened_original, self.labels, self.file_names)
         self.normal_classifier.knn_classify(k=5, command=command)
         self.normal_classifier.nb_classify(command=command)
         self.normal_classifier.random_forest(n_trees=200, command=command)
@@ -211,7 +211,7 @@ class Cats:
 
         # Classify sift dataset
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
-        self.sift_classifier = Classification(self.sift_data, self.labels)
+        self.sift_classifier = Classification(self.sift_data, self.labels, self.file_names)
         self.sift_classifier.knn_classify(k=5, command=command)
         self.sift_classifier.nb_classify(command=command)
         self.sift_classifier.random_forest(n_trees=200, command=command)
@@ -221,7 +221,7 @@ class Cats:
 
         print(f"Fourier performance (shape: {self.fourier_data.shape}): \n")
 
-        self.fourier_classifier = Classification(self.fourier_data, self.labels)
+        self.fourier_classifier = Classification(self.fourier_data, self.labels, self.file_names)
         self.fourier_classifier.knn_classify(k=5, command=command)
         self.fourier_classifier.nb_classify(command=command)
         self.fourier_classifier.random_forest(n_trees=200, command=command)

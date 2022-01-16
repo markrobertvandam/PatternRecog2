@@ -19,18 +19,20 @@ from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 
 
 class Classification:
-    def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
+    def __init__(self, x: np.ndarray, y: np.ndarray, file_names) -> None:
         self.x, self.y = x, y
-        self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
-            x, y, test_size=0.2, random_state=42, stratify=self.y
+        self.x_train, self.x_test, self.y_train, self.y_test, self.files_train, self.files_test = train_test_split(
+            x, y, file_names, test_size=0.2, random_state=42, stratify=self.y
         )
 
         # x: 100%, x_train_full: 80%, x_test: 20%, x_train: 70%, x_val: 10%
         self.x_train_full = self.x_train
         self.y_train_full = self.y_train
-        self.x_train, self.x_val, self.y_train, self.y_val = train_test_split(
+        self.files_train_full = self.files_train
+        self.x_train, self.x_val, self.y_train, self.y_val, self.files_train, self.files_val = train_test_split(
             self.x_train,
             self.y_train,
+            self.files_train,
             test_size=0.125,
             random_state=42,
             stratify=self.y_train,
@@ -44,6 +46,9 @@ class Classification:
         self.models = []
 
         self.models_dict = {}
+
+        for i in self.files_val:
+            print(i)
 
     def evaluate(self, y_true, y_pred, probs = None):
         if probs is not None:
@@ -61,12 +66,9 @@ class Classification:
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
-<<<<<<< HEAD
-        self.evaluate(self.y_val, y_pred)
-=======
+        # self.evaluate(self.y_val, y_pred)
         probs = clf.predict_proba(self.x_val)
         self.evaluate(self.y_val, y_pred, probs)
->>>>>>> 2c3254db3b8d19e02a8ac26f37e97f9885b0a6d9
         return f1_score(self.y_val, y_pred, average='macro'), accuracy_score(self.y_val, y_pred)
 
     def test_run(self, clf):
