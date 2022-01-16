@@ -99,8 +99,16 @@ class Cats:
                 + f", max {models[i]} acc = "
                 + str(np.amax(acc_results[i]))
             )
-            np.savetxt(os.path.join("data", "results", f"results_f1_{models[i]}.csv"), f1_results[i], delimiter=",")
-            np.savetxt(os.path.join("data", "results", f"results_acc_{models[i]}.csv"), acc_results[i], delimiter=",")
+            np.savetxt(
+                os.path.join("data", "results", f"results_f1_{models[i]}.csv"),
+                f1_results[i],
+                delimiter=",",
+            )
+            np.savetxt(
+                os.path.join("data", "results", f"results_acc_{models[i]}.csv"),
+                acc_results[i],
+                delimiter=",",
+            )
 
     def sift_classification_parameters(self) -> None:
         """
@@ -118,8 +126,10 @@ class Cats:
         # Max keypoints loop
         for i in range(0, 4):
             key_points = i * 5
-            knn_reduced_sift = self.sift_data[:, 0:key_points+255]
-            self.sift_classifier = Classification(knn_reduced_sift, self.labels, self.file_names)
+            knn_reduced_sift = self.sift_data[:, 0 : key_points + 255]
+            self.sift_classifier = Classification(
+                knn_reduced_sift, self.labels, self.file_names
+            )
 
             # k-value loop
             for k in range(15, 19):
@@ -129,15 +139,19 @@ class Cats:
                 ) = self.sift_classifier.knn_classify(k, command="tune")
 
             # Naive Bayes
-            nb_reduced_sift = self.sift_data[:, 0:key_points+80]
-            self.sift_classifier = Classification(nb_reduced_sift, self.labels, self.file_names)
+            nb_reduced_sift = self.sift_data[:, 0 : key_points + 80]
+            self.sift_classifier = Classification(
+                nb_reduced_sift, self.labels, self.file_names
+            )
             results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(
                 command="tune"
             )
 
             # n-trees loop
-            rf_reduced_sift = self.sift_data[:, 0:key_points+210]
-            self.sift_classifier = Classification(rf_reduced_sift, self.labels, self.file_names)
+            rf_reduced_sift = self.sift_data[:, 0 : key_points + 210]
+            self.sift_classifier = Classification(
+                rf_reduced_sift, self.labels, self.file_names
+            )
             for n in range(0, 4):
                 n_trees = 220 + n * 20
                 (
@@ -145,10 +159,11 @@ class Cats:
                     results_acc_rf[i][n],
                 ) = self.sift_classifier.random_forest(n_trees=n_trees, command="tune")
 
-        f1_results = [results_f1_knn, results_f1_nb, results_f1_rf]
-        acc_results = [results_acc_knn, results_acc_nb, results_acc_rf]
-        models = ["knn", "nb", "rf"]
-        self.save_tune_results(f1_results, acc_results, models)
+        self.save_tune_results(
+            [results_f1_knn, results_f1_nb, results_f1_rf],
+            [results_acc_knn, results_acc_nb, results_acc_rf],
+            ["knn", "nb", "rf"],
+        )
 
     def classification(self, command) -> None:
         """
