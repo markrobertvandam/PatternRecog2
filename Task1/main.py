@@ -52,6 +52,8 @@ def cats_pipeline(args: argparse.Namespace) -> None:
         cats.classification(command="test")
         cats.ensemble()
         cats.clustering()
+    elif args.command == "tune":
+        cats.tune_classification_parameters()
     else:
         cats.classification(command=args.command)
 

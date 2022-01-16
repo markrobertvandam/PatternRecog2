@@ -11,6 +11,12 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
 
+from sklearn.svm import SVC
+from sklearn.gaussian_process import GaussianProcessClassifier
+from sklearn.gaussian_process.kernels import RBF
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
 
 class Classification:
     def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
@@ -46,11 +52,12 @@ class Classification:
             f"F1-score: {f1_score(y_true, y_pred, average='macro')}, Accuracy: {accuracy_score(y_true, y_pred)}"
         )
 
-    def grid_search(self, clf) -> None:
+    def grid_search(self, clf):
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
-        self.evaluate(self.y_val, y_pred)
+        # self.evaluate(self.y_val, y_pred)
+        return f1_score(self.y_val, y_pred, average='macro'), accuracy_score(self.y_val, y_pred)
 
     def test_run(self, clf):
         clf.fit(self.x_train_full, self.y_train_full)
@@ -79,7 +86,7 @@ class Classification:
 
     def select_command_action(self, clf, command: str):
         if command == "tune":
-            self.grid_search(clf)
+            return self.grid_search(clf)
         elif command == "test":
             self.test_run(clf)
         elif command == "cross-val":
@@ -87,35 +94,54 @@ class Classification:
         elif command == "save classifier":
             self.save_classifier(clf)
 
-    def knn_classify(self, k: int, command: str) -> None:
+    def knn_classify(self, k: int, command: str):
         # cross-val using KNN means
         print("KNN classifier:\n -----------------")
         clf = KNeighborsClassifier(k)
         self.k = k
-        self.select_command_action(clf, command)
+        return self.select_command_action(clf, command)
 
-    def logistic_regression(self, max_iter: int, command: str) -> None:
+    def logistic_regression(self, max_iter: int, command: str):
         print("\nLogistic Regression classifier:\n -----------------")
         clf = LogisticRegression(max_iter=max_iter, random_state=42)
         self.iter_log = max_iter
-        self.select_command_action(clf, command)
+        return self.select_command_action(clf, command)
 
-    def nb_classify(self, command: str) -> None:
+    def nb_classify(self, command: str):
         print("\nNaive-Bayes classifier:\n -----------------")
         clf = GaussianNB()
-        self.select_command_action(clf, command)
+        return self.select_command_action(clf, command)
 
-    def random_forest(self, n_trees: int, command: str) -> None:
+    def random_forest(self, n_trees: int, command: str):
         print("\nRandom Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees
-        self.select_command_action(clf, command)
+        return self.select_command_action(clf, command)
 
-    def svm_classify(self, max_iter: int, command: str) -> None:
+    def svm_classify(self, max_iter: int, command: str):
         print("\nLinear SVC classifier:\n -----------------")
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.iter_svc = max_iter
-        self.select_command_action(clf, command)
+        return self.select_command_action(clf, command)
+
+    def svc(self, kernel: str, command: str):
+        print("\n SV classifier:\n -----------------")
+        clf = SVC(kernel=kernel, random_state=42)
+        return self.select_command_action(clf, command)
+
+    def gp_classify(self, command: str):
+        print("\n GP classifier:\n -----------------")
+        kernel = 1.0 * RBF(1.0)
+        clf = GaussianProcessClassifier(kernel=kernel, random_state=42)
+        return self.select_command_action(clf, command)
+
+    def adb(self, n_trees: int, command: str):
+        clf = AdaBoostClassifier(n_estimators=n_trees, random_state=42)
+        return self.select_command_action(clf, command)
+
+    def qda(self, command: str):
+        clf = QuadraticDiscriminantAnalysis()
+        return self.select_command_action(clf, command)
 
     def train_ensemble_classifiers(
         self, clf1="KNN", param1=5, clf2="NB", param2=None, clf3="RF", param3=200
