@@ -11,12 +11,6 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import LinearSVC
 
-from sklearn.svm import SVC
-from sklearn.gaussian_process import GaussianProcessClassifier
-from sklearn.gaussian_process.kernels import RBF
-from sklearn.ensemble import AdaBoostClassifier
-from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
-
 
 class Classification:
     def __init__(self, x: np.ndarray, y: np.ndarray, file_names) -> None:
@@ -80,7 +74,7 @@ class Classification:
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
-        self.evaluate(self.y_val, y_pred)
+        # self.evaluate(self.y_val, y_pred)
         # probs = clf.predict_proba(self.x_val)
         # self.evaluate(self.y_val, y_pred, probs)
         return f1_score(self.y_val, y_pred, average="macro"), accuracy_score(
@@ -150,25 +144,6 @@ class Classification:
         print("\nLinear SVC classifier:\n -----------------")
         clf = LinearSVC(max_iter=max_iter, random_state=42)
         self.iter_svc = max_iter
-        return self.select_command_action(clf, command)
-
-    def svc(self, kernel: str, command: str):
-        print("\n SV classifier:\n -----------------")
-        clf = SVC(kernel=kernel, random_state=42)
-        return self.select_command_action(clf, command)
-
-    def gp_classify(self, command: str):
-        print("\n GP classifier:\n -----------------")
-        kernel = 1.0 * RBF(1.0)
-        clf = GaussianProcessClassifier(kernel=kernel, random_state=42)
-        return self.select_command_action(clf, command)
-
-    def adb(self, n_trees: int, command: str):
-        clf = AdaBoostClassifier(n_estimators=n_trees, random_state=42)
-        return self.select_command_action(clf, command)
-
-    def qda(self, command: str):
-        clf = QuadraticDiscriminantAnalysis()
         return self.select_command_action(clf, command)
 
     def train_ensemble_classifiers(

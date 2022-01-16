@@ -53,8 +53,8 @@ def cats_pipeline(args: argparse.Namespace) -> None:
         cats.ensemble()
         cats.clustering()
     elif args.command == "tune":
-        # cats.tune_classification_parameters()
-        cats.classification(command=args.command)
+        cats.tune_classification_parameters()
+        # cats.classification(command=args.command)
     else:
         cats.classification(command=args.command)
 
