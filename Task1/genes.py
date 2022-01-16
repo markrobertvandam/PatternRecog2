@@ -182,31 +182,9 @@ class Genes:
         self.pca_classifier.svm_classify(max_iter=100000, command="test")
         self.pca_classifier.logistic_regression(max_iter=10000, command="test")
 
-        print("\nEnsemble using Linear SVC and Logistic Regression:")
-        print("--------------")
-        self.pca_classifier.ensemble(
-            LinearSVC(max_iter=100000),
-            LogisticRegression(max_iter=10000, random_state=random_state),
-        )
-
-        print("\nEnsemble using Linear SVC and KNN:")
-        print("--------------")
-        self.pca_classifier.ensemble(
-            LinearSVC(max_iter=100000, random_state=random_state),
-            KNeighborsClassifier(n_neighbors=5),
-        )
-
         print("\nEnsemble using KNN and Logistic Regression:")
         print("--------------")
         self.pca_classifier.ensemble(
             KNeighborsClassifier(n_neighbors=5),
-            LogisticRegression(max_iter=10000, random_state=random_state),
-        )
-
-        print("\nEnsemble using KNN, Linear SVC and Logistic Regression:")
-        print("--------------")
-        self.pca_classifier.ensemble(
-            KNeighborsClassifier(n_neighbors=5),
-            LinearSVC(max_iter=100000, random_state=random_state),
             LogisticRegression(max_iter=10000, random_state=random_state),
         )
