@@ -85,22 +85,32 @@ class Cats:
 
         self.sift_data = self.feature_extractor.sift()
 
-    def tune_classification_parameters(self) -> None:
+    def tune_classification_params(self) -> None:
         """
         Function to run grid-search for all data
         """
-        self.sift_classification_parameters()
+        self.sift_classification_params()
+        self.normal_classifier = Classification(
+            self.flattened_original, self.labels, self.file_names
+        )
+        self.fourier_classifier = Classification(
+            self.fourier_data, self.labels, self.file_names
+        )
+        self.original_fourier_classification_params(self.normal_classifier, "original")
+        self.original_fourier_classification_params(self.fourier_classifier, "fourier")
 
     # Disable
     def block_print(self):
-        sys.stdout = open(os.devnull, 'w')
+        sys.stdout = open(os.devnull, "w")
         sys.stdout = open(os.devnull, "w")
 
     # Restore
     def enable_print(self):
         sys.stdout = sys.__stdout__
 
-    def save_tune_results(self, f1_results, acc_results, models) -> None:
+    def save_tune_results(
+        self, f1_results: list, acc_results: list, models: list, name: str
+    ) -> None:
         self.enable_print()
         for i in range(len(models)):
             print(
@@ -110,29 +120,67 @@ class Cats:
                 + str(np.amax(acc_results[i]))
             )
             np.savetxt(
-                os.path.join("data", "results", f"results_f1_{models[i]}.csv"),
+                os.path.join("data", "results", f"{name}_f1_{models[i]}.csv"),
                 f1_results[i],
                 delimiter=",",
             )
             np.savetxt(
-                os.path.join("data", "results", f"results_acc_{models[i]}.csv"),
+                os.path.join("data", "results", f"{name}_acc_{models[i]}.csv"),
                 acc_results[i],
                 delimiter=",",
             )
 
-    def sift_classification_parameters(self) -> None:
+    def original_fourier_classification_params(self, clf, name: str) -> None:
         """
-        Helper function to run grid-search for sift
+        Helper function to run grid-search for original data or fourier data
         """
         self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf  = [np.zeros((4, 4)) for _ in range(4)]
+        results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
+            np.zeros(4) for _ in range(4)
+        ]
+        results_f1_nb, results_acc_nb = [np.zeros(1), np.zeros(1)]
+
+        # k-value loop
+        for k in range(15, 19):
+            (
+                results_f1_knn[(k - 15)],
+                results_acc_knn[(k - 15)],
+            ) = clf.knn_classify(k, command="tune")
+
+        results_f1_nb[0], results_acc_nb[0] = clf.nb_classify(command="tune")
+
+        # n-trees loop
+        for n in range(0, 4):
+            n_trees = 220 + n * 20
+            (
+                results_f1_rf[n],
+                results_acc_rf[n],
+            ) = clf.random_forest(n_trees=n_trees, command="tune")
+
+        self.save_tune_results(
+            [results_f1_knn, results_f1_nb, results_f1_rf],
+            [results_acc_knn, results_acc_nb, results_acc_rf],
+            ["knn", "nb", "rf"],
+            name,
+        )
+
+    def sift_classification_params(self) -> None:
+        """
+        Helper function to run grid-search for sift data
+        """
+        self.block_print()
+        results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
+            np.zeros((4, 4)) for _ in range(4)
+        ]
         results_f1_nb, results_acc_nb = [np.zeros(4), np.zeros(4)]
 
         # Max keypoints loop
         for i in range(0, 4):
             key_points = i * 5
-            knn_reduced_sift = self.sift_data[:, 0: key_points + 255]
-            self.sift_classifier = Classification(knn_reduced_sift, self.labels, self.file_names)
+            knn_reduced_sift = self.sift_data[:, 0 : key_points + 255]
+            self.sift_classifier = Classification(
+                knn_reduced_sift, self.labels, self.file_names
+            )
 
             # k-value loop
             for k in range(15, 19):
@@ -142,13 +190,19 @@ class Cats:
                 ) = self.sift_classifier.knn_classify(k, command="tune")
 
             # Naive Bayes
-            nb_reduced_sift = self.sift_data[:, 0: key_points + 80]
-            self.sift_classifier = Classification(nb_reduced_sift, self.labels, self.file_names)
-            results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(command="tune")
+            nb_reduced_sift = self.sift_data[:, 0 : key_points + 80]
+            self.sift_classifier = Classification(
+                nb_reduced_sift, self.labels, self.file_names
+            )
+            results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(
+                command="tune"
+            )
 
             # n-trees loop
-            rf_reduced_sift = self.sift_data[:, 0: key_points + 210]
-            self.sift_classifier = Classification(rf_reduced_sift, self.labels, self.file_names)
+            rf_reduced_sift = self.sift_data[:, 0 : key_points + 210]
+            self.sift_classifier = Classification(
+                rf_reduced_sift, self.labels, self.file_names
+            )
             for n in range(0, 4):
                 n_trees = 220 + n * 20
                 (
@@ -160,6 +214,7 @@ class Cats:
             [results_f1_knn, results_f1_nb, results_f1_rf],
             [results_acc_knn, results_acc_nb, results_acc_rf],
             ["knn", "nb", "rf"],
+            "sift",
         )
 
     def classification(self, command) -> None:

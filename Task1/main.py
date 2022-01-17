@@ -45,7 +45,7 @@ def cats_pipeline(args: argparse.Namespace) -> None:
     if args.command == "cross-val":
         cats.classification(command="cross-val")
     elif args.command == "tune":
-        cats.tune_classification_parameters()
+        cats.tune_classification_params()
     elif args.command == "test":
         cats.classification(command="test")
     elif args.command == "ensemble":
