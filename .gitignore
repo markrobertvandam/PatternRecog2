@@ -1,4 +1,13 @@
+.vscode
 venv
 .idea
+
+# Task 1
 Task1/data
 Task1/__pycache__
+
+# Task 2
+Task2/__pycache__
+Task2/.ipynb_checkpoints
+Task2/data
+Task2/Untitled.ipynb
