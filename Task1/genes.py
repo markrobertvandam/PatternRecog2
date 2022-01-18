@@ -94,7 +94,7 @@ class Genes:
         print("Doing feature extraction...")
         self.feature_extractor = FeatureExtraction(self.samples, self.labels, "genes")
         self.pca_data, self.pca = self.feature_extractor.pca(self.pca_min_variance)
-        self.mi_data = self.feature_extractor.mutual_information(
+        self.mi_data, self.mi = self.feature_extractor.mutual_information(
             self.mi_min_information
         )
 
@@ -188,11 +188,11 @@ class Genes:
         for i in range(0, 20):
 
             if name == "pca":
-                min_variance = 0.5 + 0.01 * i
+                min_variance = 0.45 + 0.01 * i
                 data, _ = self.feature_extractor.pca(min_variance, self.pca)
             elif name == "mi":
-                min_info = 0.5 + 0.01 * i
-                data, _ = self.feature_extractor.mutual_information(min_info, self.pca)
+                min_info = 0.45 + 0.01 * i
+                data, _ = self.feature_extractor.mutual_information(min_info, self.mi)
             clf = Classification(data, self.labels)
             # k-value loop
             for k in range(1, 21):

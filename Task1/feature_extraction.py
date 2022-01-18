@@ -75,8 +75,9 @@ class FeatureExtraction:
 
         return np.array(data_reduced, dtype="object"), pca
 
-    def mutual_information(self, min_information) -> np.ndarray:
-        mi_values = MIC(self.data, self.labels)
+    def mutual_information(self, min_information, mi_values=None) -> (np.ndarray, MIC):
+        if mi_values is None:
+            mi_values = MIC(self.data, self.labels)
 
         low_information_features = []
         # sorted_mi = []
@@ -89,7 +90,7 @@ class FeatureExtraction:
 
         # sorted_mi.sort(key=lambda x: x[1], reverse=True)
 
-        return np.array(data_reduced, dtype="object")
+        return np.array(data_reduced, dtype="object"), mi_values
 
     def scree_plot(self, n_components, explain_var) -> None:
         pc_values = np.arange(n_components) + 1
