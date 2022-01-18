@@ -24,18 +24,19 @@ def genes_pipeline(args: argparse.Namespace) -> None:
     genes.feature_extraction()
     genes.visualize_data()
     if args.command == "cross-val":
-        genes.cross_val()
-    elif args.command == "cluster":
-        genes.clustering()
+        genes.classification(command="cross-val")
+    elif args.command == "tune":
+        genes.tune_classification_params()
+    elif args.command == "test":
+        genes.classification(command="test")
     elif args.command == "ensemble":
         genes.ensemble()
+    elif args.command == "cluster":
+        genes.clustering()
     elif args.command == "full-run":
         genes.classification(command="test")
         genes.ensemble()
         genes.clustering()
-    else:
-        genes.classification(command=args.command)
-
 
 def cats_pipeline(args: argparse.Namespace) -> None:
     cats = Cats()

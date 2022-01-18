@@ -52,10 +52,12 @@ class FeatureExtraction:
 
         return np.array(fourier_data, dtype="object")
 
-    def pca(self, min_variance) -> np.ndarray:
-        # Apply PCA to dataset
-        pca = PCA()
-        pca.fit(self.data)
+    def pca(self, min_variance, pca=None) -> (np.ndarray, PCA):
+
+        if pca is None:
+            # Apply PCA to dataset
+            pca = PCA()
+            pca.fit(self.data)
 
         total_variance = 0
         n_components = 0
@@ -67,11 +69,11 @@ class FeatureExtraction:
 
         pca_reduction = PCA(n_components=n_components)
         data_reduced = pca_reduction.fit_transform(self.data)
-        self.scree_plot(
-            pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100
-        )
+        # self.scree_plot(
+        #     pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100
+        # )
 
-        return np.array(data_reduced, dtype="object")
+        return np.array(data_reduced, dtype="object"), pca
 
     def mutual_information(self, min_information) -> np.ndarray:
         mi_values = MIC(self.data, self.labels)
@@ -95,13 +97,13 @@ class FeatureExtraction:
         plt.title("Scree Plot")
         plt.xlabel("Principal Component (n)")
         plt.ylabel("Variance Explained (%)")
-        plt.savefig(os.path.join("plots", "scree.png"))
+        plt.savefig(os.path.join("plots", f"scree{n_components}.png"))
         plt.close()
 
         pc_values = np.arange(n_components) + 1
-        plt.plot(pc_values[8:], explain_var[8:], "o-")
+        plt.plot(pc_values[-3:], explain_var[-3:], "o-")
         plt.title("Scree Plot")
         plt.xlabel("Principal Component (n)")
         plt.ylabel("Variance Explained (%)")
-        plt.savefig(os.path.join("plots", "scree2.png"))
+        plt.savefig(os.path.join("plots", f"scree{n_components}_short"))
         plt.close()

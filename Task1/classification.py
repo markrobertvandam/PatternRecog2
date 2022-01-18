@@ -13,34 +13,28 @@ from sklearn.svm import LinearSVC
 
 
 class Classification:
-    def __init__(self, x: np.ndarray, y: np.ndarray, file_names) -> None:
+    def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
         self.x, self.y = x, y
         (
             self.x_train,
             self.x_test,
             self.y_train,
             self.y_test,
-            self.files_train,
-            self.files_test,
         ) = train_test_split(
-            x, y, file_names, test_size=0.2, random_state=42, stratify=self.y
+            x, y, test_size=0.2, random_state=42, stratify=self.y
         )
 
         # x: 100%, x_train_full: 80%, x_test: 20%, x_train: 70%, x_val: 10%
         self.x_train_full = self.x_train
         self.y_train_full = self.y_train
-        self.files_train_full = self.files_train
         (
             self.x_train,
             self.x_val,
             self.y_train,
             self.y_val,
-            self.files_train,
-            self.files_val,
         ) = train_test_split(
             self.x_train,
             self.y_train,
-            self.files_train,
             test_size=0.125,
             random_state=42,
             stratify=self.y_train,

@@ -90,10 +90,10 @@ class Cats:
         Function to run grid-search for all data
         """
         self.normal_classifier = Classification(
-            self.flattened_original, self.labels, self.file_names
+            self.flattened_original, self.labels
         )
         self.fourier_classifier = Classification(
-            self.fourier_data, self.labels, self.file_names
+            self.fourier_data, self.labels
         )
         print("Original:")
         self.original_fourier_classification_params(
@@ -118,6 +118,9 @@ class Cats:
     def save_tune_results(
         self, f1_results: list, acc_results: list, models: list, name: str
     ) -> None:
+        result_path = os.path.join("data", "results", "cats")
+        if not os.path.exists(result_path):
+            os.makedirs(result_path)
         self.enable_print()
         for i in range(len(models)):
             print(
@@ -127,12 +130,12 @@ class Cats:
                 + str(np.amax(acc_results[i]))
             )
             np.savetxt(
-                os.path.join("data", "results", f"{name}_f1_{models[i]}.csv"),
+                os.path.join(result_path, f"{name}_f1_{models[i]}.csv"),
                 f1_results[i],
                 delimiter=",",
             )
             np.savetxt(
-                os.path.join("data", "results", f"{name}_acc_{models[i]}.csv"),
+                os.path.join(result_path, f"{name}_acc_{models[i]}.csv"),
                 acc_results[i],
                 delimiter=",",
             )
@@ -186,9 +189,9 @@ class Cats:
         # Max keypoints loop
         for i in range(0, 6):
             key_points = i * 5
-            knn_reduced_sift = self.sift_data[:, 0 : key_points + 250]
+            knn_reduced_sift = self.sift_data[:, 0: key_points + 250]
             self.sift_classifier = Classification(
-                knn_reduced_sift, self.labels, self.file_names
+                knn_reduced_sift, self.labels
             )
 
             # k-value loop
@@ -199,18 +202,18 @@ class Cats:
                 ) = self.sift_classifier.knn_classify(k, command="tune")
 
             # Naive Bayes
-            nb_reduced_sift = self.sift_data[:, 0 : key_points + 75]
+            nb_reduced_sift = self.sift_data[:, 0: key_points + 75]
             self.sift_classifier = Classification(
-                nb_reduced_sift, self.labels, self.file_names
+                nb_reduced_sift, self.labels
             )
             results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(
                 command="tune"
             )
 
             # n-trees loop
-            rf_reduced_sift = self.sift_data[:, 0 : key_points + 205]
+            rf_reduced_sift = self.sift_data[:, 0: key_points + 205]
             self.sift_classifier = Classification(
-                rf_reduced_sift, self.labels, self.file_names
+                rf_reduced_sift, self.labels
             )
             for n in range(0, 6):
                 n_trees = 200 + n * 20
@@ -233,7 +236,7 @@ class Cats:
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
         self.normal_classifier = Classification(
-            self.flattened_original, self.labels, self.file_names
+            self.flattened_original, self.labels
         )
         self.normal_classifier.knn_classify(k=12, command=command)
         self.normal_classifier.random_forest(n_trees=160, command=command)
@@ -242,10 +245,10 @@ class Cats:
         # Classify sift dataset
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
         sift_classifier_knn = Classification(
-            self.sift_data[:, 0:265], self.labels, self.file_names
+            self.sift_data[:, 0:265], self.labels
         )
         sift_classifier_rf = Classification(
-            self.sift_data[:, 0:225], self.labels, self.file_names
+            self.sift_data[:, 0:225], self.labels
         )
         sift_classifier_knn.knn_classify(k=19, command=command)
         sift_classifier_rf.random_forest(n_trees=280, command=command)
@@ -300,7 +303,7 @@ class Cats:
 
         print("SIFT performance: \n")
         sift_clustering = Clustering(self.sift_data, self.labels, 4, 5)
-        sift_cluster_labels = sift_clustering.k_means()
+        sift_clustering.k_means()
         print("--------------\n")
 
         print("Fourier performance: \n")
