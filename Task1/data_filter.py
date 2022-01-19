@@ -15,7 +15,7 @@ def main():
     print(f"New clean dir made at {dir}")
 
     lion_path = os.path.join(path, "Lion")
-    old_lion_path = os.path.join("data", "BigCats", "Lion")
+    old_lion_path = os.path.join("d ata", "BigCats", "Lion")
     if not os.path.exists(lion_path):
         os.mkdir(lion_path)
         for img in glob.glob(os.path.join(old_lion_path, "*.jp*g")):
@@ -57,6 +57,7 @@ def main():
         "hqdefault",
         "hwn4d-GH8W9HM1PCC-Full-Image_GalleryCover-en-US-1508348134678._UY500_UX667_RI_VxijV5YqtdCYfF8fPoweD5sNk1Snr3J_TTW_",
         "d41586-019-03264-2_17323966",
+        "maxresdefault",
     ]
     sift = cv2.SIFT_create()
 
@@ -86,7 +87,7 @@ def main():
             image = cv2.resize(image, (250, 250))
             kp, des = sift.detectAndCompute(image, None)
             if len(des) >= 300:
-                shutil.copy(img, os.path.join(dir, animal, filename))
+                cv2.imwrite(os.path.join(dir, animal, filename), image)
 
 
 if __name__ == "__main__":

@@ -46,9 +46,8 @@ class Cats:
             for img in sorted_files:
                 self.file_names.append(img)
                 image = cv2.imread(img)
-                resized_image = cv2.resize(image, (250, 250))
-                grayscale_img = cv2.cvtColor(resized_image, cv2.COLOR_BGR2GRAY)
-                images.append(resized_image)
+                grayscale_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+                images.append(image)
                 gray_images.append(grayscale_img)
                 labels.append(animal)
         # images shape is (170, 250, 250, 3)
@@ -89,12 +88,8 @@ class Cats:
         """
         Function to run grid-search for all data
         """
-        self.normal_classifier = Classification(
-            self.flattened_original, self.labels
-        )
-        self.fourier_classifier = Classification(
-            self.fourier_data, self.labels
-        )
+        self.normal_classifier = Classification(self.flattened_original, self.labels)
+        self.fourier_classifier = Classification(self.fourier_data, self.labels)
         print("Original:")
         self.original_fourier_classification_params(
             self.normal_classifier, "original", 12, 140
@@ -189,10 +184,8 @@ class Cats:
         # Max keypoints loop
         for i in range(0, 6):
             key_points = i * 5
-            knn_reduced_sift = self.sift_data[:, 0: key_points + 250]
-            self.sift_classifier = Classification(
-                knn_reduced_sift, self.labels
-            )
+            knn_reduced_sift = self.sift_data[:, 0 : key_points + 250]
+            self.sift_classifier = Classification(knn_reduced_sift, self.labels)
 
             # k-value loop
             for k in range(14, 20):
@@ -202,19 +195,15 @@ class Cats:
                 ) = self.sift_classifier.knn_classify(k, command="tune")
 
             # Naive Bayes
-            nb_reduced_sift = self.sift_data[:, 0: key_points + 75]
-            self.sift_classifier = Classification(
-                nb_reduced_sift, self.labels
-            )
+            nb_reduced_sift = self.sift_data[:, 0 : key_points + 75]
+            self.sift_classifier = Classification(nb_reduced_sift, self.labels)
             results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(
                 command="tune"
             )
 
             # n-trees loop
-            rf_reduced_sift = self.sift_data[:, 0: key_points + 205]
-            self.sift_classifier = Classification(
-                rf_reduced_sift, self.labels
-            )
+            rf_reduced_sift = self.sift_data[:, 0 : key_points + 205]
+            self.sift_classifier = Classification(rf_reduced_sift, self.labels)
             for n in range(0, 6):
                 n_trees = 200 + n * 20
                 (
@@ -235,21 +224,15 @@ class Cats:
         """
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
-        self.normal_classifier = Classification(
-            self.flattened_original, self.labels
-        )
+        self.normal_classifier = Classification(self.flattened_original, self.labels)
         self.normal_classifier.knn_classify(k=12, command=command)
         self.normal_classifier.random_forest(n_trees=160, command=command)
         print("--------------")
 
         # Classify sift dataset
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
-        sift_classifier_knn = Classification(
-            self.sift_data[:, 0:265], self.labels
-        )
-        sift_classifier_rf = Classification(
-            self.sift_data[:, 0:225], self.labels
-        )
+        sift_classifier_knn = Classification(self.sift_data[:, 0:265], self.labels)
+        sift_classifier_rf = Classification(self.sift_data[:, 0:225], self.labels)
         sift_classifier_knn.knn_classify(k=19, command=command)
         sift_classifier_rf.random_forest(n_trees=280, command=command)
         print("--------------\n")

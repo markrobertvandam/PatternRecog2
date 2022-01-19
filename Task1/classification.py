@@ -20,19 +20,12 @@ class Classification:
             self.x_test,
             self.y_train,
             self.y_test,
-        ) = train_test_split(
-            x, y, test_size=0.2, random_state=42, stratify=self.y
-        )
+        ) = train_test_split(x, y, test_size=0.2, random_state=42, stratify=self.y)
 
         # x: 100%, x_train_full: 80%, x_test: 20%, x_train: 70%, x_val: 10%
         self.x_train_full = self.x_train
         self.y_train_full = self.y_train
-        (
-            self.x_train,
-            self.x_val,
-            self.y_train,
-            self.y_val,
-        ) = train_test_split(
+        (self.x_train, self.x_val, self.y_train, self.y_val,) = train_test_split(
             self.x_train,
             self.y_train,
             test_size=0.125,
@@ -46,7 +39,6 @@ class Classification:
         self.n_trees = None
 
         self.models = []
-
         self.models_dict = {}
 
     def evaluate(self, y_true, y_pred, probs=None):

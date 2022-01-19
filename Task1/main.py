@@ -38,6 +38,7 @@ def genes_pipeline(args: argparse.Namespace) -> None:
         genes.ensemble()
         genes.clustering()
 
+
 def cats_pipeline(args: argparse.Namespace) -> None:
     cats = Cats()
     cats.load_data()

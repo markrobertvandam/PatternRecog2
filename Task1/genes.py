@@ -102,14 +102,10 @@ class Genes:
         """
         Function to run grid-search for all data
         """
-        self.normal_classifier = Classification(
-            self.samples, self.labels
-        )
+        self.normal_classifier = Classification(self.samples, self.labels)
 
         print("Original:")
-        self.original_classification_params(
-            self.normal_classifier, "original"
-        )
+        self.original_classification_params(self.normal_classifier, "original")
         print("PCA:")
         self.pca_mi_classification_params("pca")
         print("MI:")
@@ -149,15 +145,15 @@ class Genes:
                 delimiter=",",
             )
 
-    def original_classification_params(
-        self, clf, name: str
-    ) -> None:
+    def original_classification_params(self, clf, name: str) -> None:
         """
         Helper function to run grid-search for original data
         """
         self.block_print()
         results_f1_knn, results_acc_knn = [np.zeros(20), np.zeros(20)]
-        results_f1_lr, results_acc_lr, results_f1_svm, results_acc_svm = [np.zeros(1) for _ in range(4)]
+        results_f1_lr, results_acc_lr, results_f1_svm, results_acc_svm = [
+            np.zeros(1) for _ in range(4)
+        ]
 
         # k-value loop
         for k in range(1, 21):
@@ -166,8 +162,12 @@ class Genes:
                 results_acc_knn[(k - 1)],
             ) = clf.knn_classify(k, command="tune")
 
-        results_f1_svm[0], results_acc_svm[0] = clf.svm_classify(max_iter=100000, command="tune")
-        results_f1_lr[0], results_acc_lr[0] = clf.logistic_regression(max_iter=10000, command="tune")
+        results_f1_svm[0], results_acc_svm[0] = clf.svm_classify(
+            max_iter=100000, command="tune"
+        )
+        results_f1_lr[0], results_acc_lr[0] = clf.logistic_regression(
+            max_iter=10000, command="tune"
+        )
 
         self.save_tune_results(
             [results_f1_knn, results_f1_svm, results_f1_lr],
@@ -182,7 +182,9 @@ class Genes:
         """
         self.block_print()
         results_f1_knn, results_acc_knn = [np.zeros((20, 20)), np.zeros((20, 20))]
-        results_f1_lr, results_acc_lr, results_f1_svm, results_acc_svm = [np.zeros(20) for _ in range(4)]
+        results_f1_lr, results_acc_lr, results_f1_svm, results_acc_svm = [
+            np.zeros(20) for _ in range(4)
+        ]
 
         # min-variance loop
         for i in range(0, 20):
@@ -201,8 +203,12 @@ class Genes:
                     results_acc_knn[i][(k - 1)],
                 ) = clf.knn_classify(k, command="tune")
 
-            results_f1_svm[i], results_acc_svm[i] = clf.svm_classify(max_iter=100000, command="tune")
-            results_f1_lr[i], results_acc_lr[i] = clf.logistic_regression(max_iter=10000, command="tune")
+            results_f1_svm[i], results_acc_svm[i] = clf.svm_classify(
+                max_iter=100000, command="tune"
+            )
+            results_f1_lr[i], results_acc_lr[i] = clf.logistic_regression(
+                max_iter=10000, command="tune"
+            )
 
         self.save_tune_results(
             [results_f1_knn, results_f1_svm, results_f1_lr],
