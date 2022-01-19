@@ -15,7 +15,7 @@ def main():
     print(f"New clean dir made at {dir}")
 
     lion_path = os.path.join(path, "Lion")
-    old_lion_path = os.path.join("d ata", "BigCats", "Lion")
+    old_lion_path = os.path.join("data", "BigCats", "Lion")
     if not os.path.exists(lion_path):
         os.mkdir(lion_path)
         for img in glob.glob(os.path.join(old_lion_path, "*.jp*g")):
