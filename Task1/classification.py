@@ -41,7 +41,8 @@ class Classification:
         self.models = []
         self.models_dict = {}
 
-    def evaluate(self, y_true, y_pred, probs=None):
+    @staticmethod
+    def evaluate(y_true, y_pred, probs=None):
         if probs is not None:
             print("Probability of classes")
             for i in probs:
@@ -64,7 +65,7 @@ class Classification:
     def test_run(self, clf):
         clf.fit(self.x_train_full, self.y_train_full)
         y_pred = clf.predict(self.x_test)
-        self.evaluate(self.y_test, y_pred)
+        Classification.evaluate(self.y_test, y_pred)
         return clf
 
     def cross_val_run(self, clf) -> None:
@@ -159,7 +160,7 @@ class Classification:
                 ensemble_predictions.append(model_predictions[1][i])
             else:
                 ensemble_predictions.append((model_predictions[0][i]))
-        self.evaluate(self.y_val, ensemble_predictions)
+        Classification.evaluate(self.y_val, ensemble_predictions)
 
     def ensemble(self, model1, model2, model3=None) -> None:
         estimators = [("model1", model1), ("model2", model2)]

@@ -42,22 +42,25 @@ def genes_pipeline(args: argparse.Namespace) -> None:
 def cats_pipeline(args: argparse.Namespace) -> None:
     cats = Cats()
     cats.load_data()
-    cats.feature_extraction()
-    cats.visualize_data()
-    if args.command == "cross-val":
-        cats.classification(command="cross-val")
-    elif args.command == "tune":
-        cats.tune_classification_params()
-    elif args.command == "test":
-        cats.classification(command="test")
-    elif args.command == "ensemble":
-        cats.ensemble()
-    elif args.command == "cluster":
-        cats.clustering()
-    elif args.command == "full-run":
-        cats.classification(command="test")
-        cats.ensemble()
-        cats.clustering()
+    if args.command == "augment":
+        cats.augmented_run()
+    else:
+        cats.feature_extraction()
+        cats.visualize_data()
+        if args.command == "cross-val":
+            cats.classification(command="cross-val")
+        elif args.command == "tune":
+            cats.tune_classification_params()
+        elif args.command == "test":
+            cats.classification(command="test")
+        elif args.command == "ensemble":
+            cats.ensemble()
+        elif args.command == "cluster":
+            cats.clustering()
+        elif args.command == "full-run":
+            cats.classification(command="test")
+            cats.ensemble()
+            cats.clustering()
 
 
 def main():

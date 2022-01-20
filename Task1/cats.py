@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import skimage
 import cv2
 import glob
 import sys
@@ -8,11 +9,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 import shutil
 
+from collections import Counter
 from classification import Classification
 from clustering import Clustering
 from feature_extraction import FeatureExtraction
 
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -59,6 +62,43 @@ class Cats:
         self.gray_images = np.asarray(gray_images)
         self.labels = np.asarray(labels)
 
+    def augmented_run(self):
+        """
+        Test run with augmentation
+        """
+        augmented_gray = []
+        augmented_labels = []
+        (x_train, x_test, y_train, y_test,) = train_test_split(
+            self.gray_images,
+            self.labels,
+            test_size=0.2,
+            random_state=42,
+            stratify=self.labels,
+        )
+        for i in range(len(x_train)):
+            image = x_train[i]
+            label = y_train[i]
+            flipped_x = image[:, ::-1]
+            gamma = skimage.exposure.adjust_gamma(image, gamma=0.4, gain=0.9)
+            augmented_gray.append(image)
+            augmented_gray.append(flipped_x)
+            augmented_gray.append(gamma)
+            augmented_labels += [label] * 3
+        test_len = len(x_test)
+        augmented_x = np.asarray(augmented_gray)
+        augmented_y = np.asarray(augmented_labels)
+        full_x = np.concatenate((augmented_x, x_test))
+        full_y = np.concatenate((augmented_y, y_test))
+        feature_extractor = FeatureExtraction(full_x, full_y, "cats")
+        sift_data, bad_imgs = feature_extractor.sift(225)
+        augmented_labels = np.delete(augmented_labels, bad_imgs)
+
+        print(f"Sift performance (shape: {sift_data.shape}): \n")
+        sift_classifier_rf = RandomForestClassifier(280, random_state=42)
+        sift_classifier_rf.fit(sift_data[:-test_len], augmented_labels)
+        y_pred = sift_classifier_rf.predict(sift_data[-test_len:])
+        Classification.evaluate(y_test, y_pred)
+
     def visualize_data(self):
         print("Visualizing data...")
         unique, counts = np.unique(self.labels, return_counts=True)
@@ -82,7 +122,7 @@ class Cats:
             self.fourier_data.shape[1] * self.fourier_data.shape[2],
         )
 
-        self.sift_data = self.feature_extractor.sift()
+        self.sift_data, _ = self.feature_extractor.sift()
 
     def tune_classification_params(self) -> None:
         """
@@ -225,15 +265,12 @@ class Cats:
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
         self.normal_classifier = Classification(self.flattened_original, self.labels)
-        self.normal_classifier.knn_classify(k=12, command=command)
         self.normal_classifier.random_forest(n_trees=160, command=command)
         print("--------------")
 
         # Classify sift dataset
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
-        sift_classifier_knn = Classification(self.sift_data[:, 0:265], self.labels)
         sift_classifier_rf = Classification(self.sift_data[:, 0:225], self.labels)
-        sift_classifier_knn.knn_classify(k=19, command=command)
         sift_classifier_rf.random_forest(n_trees=280, command=command)
         print("--------------\n")
 

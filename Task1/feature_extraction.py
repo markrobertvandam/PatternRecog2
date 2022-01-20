@@ -14,18 +14,21 @@ class FeatureExtraction:
         self.data = x
         self.labels = y
 
-    def sift(self) -> np.ndarray:
+    def sift(self, max_keypoints=300) -> (np.ndarray, list):
         # sift
-        max_keypoints = 300
         sift = cv2.SIFT_create(max_keypoints)
         sift_data = []
-
-        for image in self.data:
+        low_info_imgs = []
+        for i in range(len(self.data)):
+            image = self.data[i]
             # only keeps the descriptors of best keypoints
             kp, des = sift.detectAndCompute(image, None)
-            sift_data.append(des[:max_keypoints])
+            if len(des) < max_keypoints:
+                low_info_imgs.append(i)
+            else:
+                sift_data.append(des[:max_keypoints])
 
-        final_descriptors = np.array(sift_data, dtype="object")
+        final_descriptors = np.asarray(sift_data, dtype="object")
         descriptors_float = final_descriptors.astype(float).reshape(
             (len(sift_data) * max_keypoints, 128)
         )
@@ -38,7 +41,7 @@ class FeatureExtraction:
             for w in words:
                 bow_visual[i][w] += 1
 
-        return bow_visual
+        return bow_visual, low_info_imgs
 
     def fourier_transform(self) -> np.ndarray:
         # Apply DFT and shift the zero frequency component to center
