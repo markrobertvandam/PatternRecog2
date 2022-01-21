@@ -67,7 +67,6 @@ class Cats:
         Test run with augmentation
         """
         augmented_gray = []
-        augmented_labels = []
         (x_train, x_test, y_train, y_test,) = train_test_split(
             self.gray_images,
             self.labels,
@@ -75,20 +74,16 @@ class Cats:
             random_state=42,
             stratify=self.labels,
         )
+        print("Augmenting images...")
         for i in range(len(x_train)):
             image = x_train[i]
-            label = y_train[i]
-            flipped_x = image[:, ::-1]
-            gamma = skimage.exposure.adjust_gamma(image, gamma=0.4, gain=0.9)
-            augmented_gray.append(image)
-            augmented_gray.append(flipped_x)
-            augmented_gray.append(gamma)
-            augmented_labels += [label] * 3
+            augmented_gray += Cats.augment_image(image)
         test_len = len(x_test)
-        augmented_x = np.asarray(augmented_gray)
-        augmented_y = np.asarray(augmented_labels)
-        full_x = np.concatenate((augmented_x, x_test))
-        full_y = np.concatenate((augmented_y, y_test))
+        augmented_labels = np.repeat(y_train, 3, axis=0)
+        full_x = np.concatenate((augmented_gray, x_test))
+        full_y = np.concatenate((augmented_labels, y_test))
+
+        print("Running SIFT Feature Extraction...")
         feature_extractor = FeatureExtraction(full_x, full_y, "cats")
         sift_data, bad_imgs = feature_extractor.sift(225)
         augmented_labels = np.delete(augmented_labels, bad_imgs)
@@ -98,6 +93,12 @@ class Cats:
         sift_classifier_rf.fit(sift_data[:-test_len], augmented_labels)
         y_pred = sift_classifier_rf.predict(sift_data[-test_len:])
         Classification.evaluate(y_test, y_pred)
+
+    @staticmethod
+    def augment_image(image) -> list:
+        flipped_x = image[:, ::-1]
+        gamma = skimage.exposure.adjust_gamma(image, gamma=0.4, gain=0.9)
+        return [image, flipped_x, gamma]
 
     def visualize_data(self):
         print("Visualizing data...")
