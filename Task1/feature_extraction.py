@@ -43,7 +43,7 @@ class FeatureExtraction:
 
         return bow_visual, low_info_imgs
 
-    def fourier_transform(self) -> np.ndarray:
+    def fourier_transform(self, inner_filter_radius=35, outer_filter_radius=250) -> np.ndarray:
         # Apply DFT and shift the zero frequency component to center
         fourier_data = []
 
@@ -52,6 +52,18 @@ class FeatureExtraction:
             f_shift = np.fft.fftshift(f)
             magnitude_spectrum = 20 * np.log(np.abs(f_shift))
             fourier_data.append(magnitude_spectrum)
+
+        rows, cols = fourier_data[0].shape
+        crow, ccol = int(rows / 2), int(cols / 2)
+        mask = np.zeros((rows, cols), np.uint8)
+        center = [crow, ccol]
+        x, y = np.ogrid[:rows, :cols]
+        mask_area = np.logical_and(((x - center[0]) ** 2 + (y - center[1]) ** 2 >= inner_filter_radius ** 2),
+                                   ((x - center[0]) ** 2 + (y - center[1]) ** 2 <= outer_filter_radius ** 2))
+        mask[mask_area] = 1
+
+        for i in range(len(fourier_data)):
+            fourier_data[i] = fourier_data[i] * mask
 
         return np.array(fourier_data, dtype="object")
 
