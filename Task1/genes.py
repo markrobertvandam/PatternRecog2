@@ -107,9 +107,9 @@ class Genes:
         print("Original:")
         self.original_classification_params(self.normal_classifier, "original")
         print("PCA:")
-        self.pca_mi_classification_params("pca")
+        self.pca_mi_classification_params("pca", k_offset=1, glvq_offset=0, lr_offset=12)
         print("MI:")
-        self.pca_mi_classification_params("mi")
+        self.pca_mi_classification_params("mi", k_offset=0, glvq_offset=14, lr_offset=0)
 
     # Disable
     def block_print(self):
@@ -150,17 +150,17 @@ class Genes:
         Helper function to run grid-search for original data
         """
         self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros((20, 20)) for _ in range(4)]
+        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros(6) for _ in range(4)]
         results_f1_lr, results_acc_lr = [np.zeros(1), np.zeros(1)]
 
         # k-value loop
-        for k in range(1, 21):
+        for k in range(1, 7):
             (
                 results_f1_knn[(k - 1)],
                 results_acc_knn[(k - 1)],
             ) = clf.knn_classify(k, command="tune")
 
-        for n in range(1,21):
+        for n in range(1, 7):
             (
                 results_f1_glvq[n-1],
                 results_acc_glvq[n-1],
@@ -177,38 +177,41 @@ class Genes:
             name,
         )
 
-    def pca_mi_classification_params(self, name: str) -> None:
+    def pca_mi_classification_params(self, name: str, k_offset: int, glvq_offset: int, lr_offset: int) -> None:
         """
         Helper function to run grid-search for pca data
         """
         self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros((20, 20)) for _ in range(4)]
-        results_f1_lr, results_acc_lr = [np.zeros(20), np.zeros(20)]
+        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros((6, 6)) for _ in range(4)]
+        results_f1_lr, results_acc_lr = [np.zeros(6), np.zeros(6)]
 
         # min-variance loop
-        for i in range(0, 20):
+        for i in range(0, 6):
 
             if name == "pca":
                 min_variance = 0.45 + 0.01 * i
                 data, _ = self.feature_extractor.pca(min_variance, self.pca)
+                lr_data, _ = self.feature_extractor.pca(min_variance + 0.01*lr_offset, self.pca)
             elif name == "mi":
                 min_info = 0.45 + 0.01 * i
                 data, _ = self.feature_extractor.mutual_information(min_info, self.mi)
+                lr_data, _ = self.feature_extractor.mutual_information(min_info + 0.01 * lr_offset, self.mi)
             clf = Classification(data, self.labels)
+            clf_lr = Classification(lr_data, self.labels)
             # k-value loop
-            for k in range(1, 21):
+            for k in range(1, 7):
                 (
                     results_f1_knn[i][(k - 1)],
                     results_acc_knn[i][(k - 1)],
-                ) = clf.knn_classify(k, command="tune")
+                ) = clf.knn_classify(k+k_offset, command="tune")
 
-            for n in range(1, 21):
+            for n in range(1, 7):
                 (
                     results_f1_glvq[i][(n-1)],
                     results_acc_glvq[i][(n-1)],
-                ) = clf.glvq_classify(prototypes_per_class=n, command="tune")
+                ) = clf.glvq_classify(prototypes_per_class=n+glvq_offset, command="tune")
 
-            results_f1_lr[i], results_acc_lr[i] = clf.logistic_regression(
+            results_f1_lr[i], results_acc_lr[i] = clf_lr.logistic_regression(
                 max_iter=10000, command="tune"
             )
 
@@ -219,9 +222,9 @@ class Genes:
             name,
         )
 
-    def classification(self, command="tuning") -> None:
+    def classification(self, command: str) -> None:
         """
-        function to run grid-search/test-run depending on command
+        function to run cross-val/test-run depending on command
         """
         print(f"Original performance (shape: {self.samples.shape}): \n")
 
