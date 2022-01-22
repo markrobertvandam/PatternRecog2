@@ -219,9 +219,9 @@ class Genes:
             name,
         )
 
-    def classification(self, command="tuning") -> None:
+    def classification(self, command: str) -> None:
         """
-        function to run grid-search/test-run depending on command
+        function to run cross-val/test-run depending on command
         """
         print(f"Original performance (shape: {self.samples.shape}): \n")
 

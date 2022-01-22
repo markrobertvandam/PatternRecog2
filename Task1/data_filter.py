@@ -87,7 +87,9 @@ def main():
             image = cv2.resize(image, (250, 250))
             kp, des = sift.detectAndCompute(image, None)
             if len(des) >= 300:
-                cv2.imwrite(os.path.join(dir, animal, filename), image)
+                factor = size[0]/size[1] if size[0] > size[1] else size[1]/size[0]
+                if factor < 2.5:
+                    cv2.imwrite(os.path.join(dir, animal, filename), image)
 
 
 if __name__ == "__main__":
