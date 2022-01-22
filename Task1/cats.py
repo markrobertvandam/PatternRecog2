@@ -16,7 +16,7 @@ from feature_extraction import FeatureExtraction
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
 
@@ -186,7 +186,7 @@ class Cats:
         results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
             np.zeros(6) for _ in range(4)
         ]
-        results_f1_nb, results_acc_nb = [np.zeros(1), np.zeros(1)]
+        results_f1_svm, results_acc_svm = [np.zeros(1), np.zeros(1)]
 
         # k-value loop
         for k in range(knn_offset, knn_offset + 6):
@@ -195,7 +195,7 @@ class Cats:
                 results_acc_knn[(k - knn_offset)],
             ) = clf.knn_classify(k, command="tune")
 
-        results_f1_nb[0], results_acc_nb[0] = clf.nb_classify(command="tune")
+        results_f1_svm[0], results_acc_svm[0] = clf.svm_classify(kernel='linear', command="tune")
 
         # n-trees loop
         for n in range(0, 6):
@@ -206,9 +206,9 @@ class Cats:
             ) = clf.random_forest(n_trees=n_trees, command="tune")
 
         self.save_tune_results(
-            [results_f1_knn, results_f1_nb, results_f1_rf],
-            [results_acc_knn, results_acc_nb, results_acc_rf],
-            ["knn", "nb", "rf"],
+            [results_f1_knn, results_f1_svm, results_f1_rf],
+            [results_acc_knn, results_acc_svm, results_acc_rf],
+            ["knn", "svm", "rf"],
             name,
         )
 
@@ -220,7 +220,7 @@ class Cats:
         results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
             np.zeros((6, 6)) for _ in range(4)
         ]
-        results_f1_nb, results_acc_nb = [np.zeros(6), np.zeros(6)]
+        results_f1_svm, results_acc_svm = [np.zeros(6), np.zeros(6)]
 
         # Max keypoints loop
         for i in range(0, 6):
@@ -236,10 +236,10 @@ class Cats:
                 ) = self.sift_classifier.knn_classify(k, command="tune")
 
             # Naive Bayes
-            nb_reduced_sift = self.sift_data[:, 0 : key_points + 75]
-            self.sift_classifier = Classification(nb_reduced_sift, self.labels)
-            results_f1_nb[i], results_acc_nb[i] = self.sift_classifier.nb_classify(
-                command="tune"
+            svm_reduced_sift = self.sift_data[:, 0 : key_points + 75]
+            self.sift_classifier = Classification(svm_reduced_sift, self.labels)
+            results_f1_svm[i], results_acc_svm[i] = self.sift_classifier.svm_classify(
+                kernel='linear', command="tune"
             )
 
             # n-trees loop
@@ -253,9 +253,9 @@ class Cats:
                 ) = self.sift_classifier.random_forest(n_trees=n_trees, command="tune")
 
         self.save_tune_results(
-            [results_f1_knn, results_f1_nb, results_f1_rf],
-            [results_acc_knn, results_acc_nb, results_acc_rf],
-            ["knn", "nb", "rf"],
+            [results_f1_knn, results_f1_svm, results_f1_rf],
+            [results_acc_knn, results_acc_svm, results_acc_rf],
+            ["knn", "svm", "rf"],
             "sift",
         )
 
@@ -285,18 +285,18 @@ class Cats:
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
         self.sift_classifier = Classification(self.sift_data, self.labels)
         self.sift_classifier.knn_classify(k=5, command="test")
-        self.sift_classifier.nb_classify(command="test")
+        self.sift_classifier.svm_classify(kernel='linear', command="test")
         self.sift_classifier.random_forest(n_trees=200, command="test")
 
         print("\nEnsemble using Naive Bayes and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
-            GaussianNB(), RandomForestClassifier(random_state=random_state)
+            SVC(), RandomForestClassifier(random_state=random_state)
         )
 
         print("\nEnsemble using Naive Bayes and KNN:")
         print("--------------")
-        self.sift_classifier.ensemble(GaussianNB(), KNeighborsClassifier(n_neighbors=5))
+        self.sift_classifier.ensemble(SVC(), KNeighborsClassifier(n_neighbors=5))
 
         print("\nEnsemble using KNN and Random Forest:")
         print("--------------")
@@ -309,7 +309,7 @@ class Cats:
         print("--------------")
         self.sift_classifier.ensemble(
             KNeighborsClassifier(n_neighbors=5),
-            GaussianNB(),
+            SVC(),
             RandomForestClassifier(random_state=random_state),
         )
 
