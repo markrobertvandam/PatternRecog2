@@ -37,6 +37,8 @@ class Classification:
 
         self.k = None
         self.kernel = None
+        self.c = None
+        self.gamma = None
         self.iter_log = None
         self.n_trees = None
 
@@ -117,10 +119,12 @@ class Classification:
         self.n_trees = n_trees
         return self.select_command_action(clf, command)
 
-    def svm_classify(self, kernel: str, command: str):
+    def svm_classify(self, kernel: str, c: float, gamma, command: str):
         print("\nSVC classifier:\n -----------------")
-        clf = SVC(kernel=kernel, random_state=42)
+        clf = SVC(C=c, kernel=kernel, gamma=gamma, random_state=42)
         self.kernel = kernel
+        self.c = c
+        self.gamma = gamma
         return self.select_command_action(clf, command)
 
     def glvq_classify(self, prototypes_per_class: int, command: str):
