@@ -150,10 +150,8 @@ class Genes:
         Helper function to run grid-search for original data
         """
         self.block_print()
-        results_f1_knn, results_acc_knn = [np.zeros(20), np.zeros(20)]
-        results_f1_lr, results_acc_lr, results_f1_glvq, results_acc_glvq = [
-            np.zeros(1) for _ in range(4)
-        ]
+        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros((20, 20)) for _ in range(4)]
+        results_f1_lr, results_acc_lr = [np.zeros(1), np.zeros(1)]
 
         # k-value loop
         for k in range(1, 21):
@@ -162,9 +160,12 @@ class Genes:
                 results_acc_knn[(k - 1)],
             ) = clf.knn_classify(k, command="tune")
 
-        results_f1_glvq[0], results_acc_glvq[0] = clf.glvq_classify(
-            prototypes_per_class=1, command="tune"
-        )
+        for n in range(1,21):
+            (
+                results_f1_glvq[n-1],
+                results_acc_glvq[n-1],
+            ) = clf.glvq_classify(prototypes_per_class=n, command="tune")
+
         results_f1_lr[0], results_acc_lr[0] = clf.logistic_regression(
             max_iter=10000, command="tune"
         )
@@ -181,10 +182,8 @@ class Genes:
         Helper function to run grid-search for pca data
         """
         self.block_print()
-        results_f1_knn, results_acc_knn = [np.zeros((20, 20)), np.zeros((20, 20))]
-        results_f1_lr, results_acc_lr, results_f1_glvq, results_acc_glvq = [
-            np.zeros(20) for _ in range(4)
-        ]
+        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros((20, 20)) for _ in range(4)]
+        results_f1_lr, results_acc_lr = [np.zeros(20), np.zeros(20)]
 
         # min-variance loop
         for i in range(0, 20):
@@ -203,9 +202,12 @@ class Genes:
                     results_acc_knn[i][(k - 1)],
                 ) = clf.knn_classify(k, command="tune")
 
-            results_f1_glvq[i], results_acc_glvq[i] = clf.glvq_classify(
-                prototypes_per_class=1, command="tune"
-            )
+            for n in range(1, 21):
+                (
+                    results_f1_glvq[i][(n-1)],
+                    results_acc_glvq[i][(n-1)],
+                ) = clf.glvq_classify(prototypes_per_class=n, command="tune")
+
             results_f1_lr[i], results_acc_lr[i] = clf.logistic_regression(
                 max_iter=10000, command="tune"
             )
