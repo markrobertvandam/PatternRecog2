@@ -17,6 +17,7 @@ from sklearn.preprocessing import StandardScaler
 
 RANDOM_STATE = 42
 
+
 class SemiSupervised:
     def __init__(self, df: pd.DataFrame, neighbors: int) -> None:
         """
