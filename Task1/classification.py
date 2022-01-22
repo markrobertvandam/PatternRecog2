@@ -9,7 +9,7 @@ from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.svm import LinearSVC
+from sklearn.svm import SVC
 
 from sklearn_lvq import GlvqModel
 
@@ -36,7 +36,7 @@ class Classification:
         )
 
         self.k = None
-        self.iter_svc = None
+        self.kernel = None
         self.iter_log = None
         self.n_trees = None
 
@@ -117,16 +117,16 @@ class Classification:
         self.n_trees = n_trees
         return self.select_command_action(clf, command)
 
-    def svm_classify(self, max_iter: int, command: str):
-        print("\nLinear SVC classifier:\n -----------------")
-        clf = LinearSVC(max_iter=max_iter, random_state=42)
-        self.iter_svc = max_iter
+    def svm_classify(self, kernel: str, command: str):
+        print("\nSVC classifier:\n -----------------")
+        clf = SVC(kernel=kernel, random_state=42)
+        self.kernel = kernel
         return self.select_command_action(clf, command)
 
-    def glvq_classify(self, command: str):
+    def glvq_classify(self, prototypes_per_class: int, command: str):
         print("\nGLVQ classifier:\n -----------------")
         # The creation of the model object used to fit the data to.
-        clf = GlvqModel(max_iter=1)
+        clf = GlvqModel(prototypes_per_class=prototypes_per_class, random_state=42)
         return self.select_command_action(clf, command)
 
     def ensemble(self, model1, model2, model3=None) -> None:
