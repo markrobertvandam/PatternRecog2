@@ -151,7 +151,7 @@ class Genes:
         """
         self.block_print()
         results_f1_knn, results_acc_knn = [np.zeros(20), np.zeros(20)]
-        results_f1_lr, results_acc_lr, results_f1_svm, results_acc_svm = [
+        results_f1_lr, results_acc_lr, results_f1_glvq, results_acc_glvq = [
             np.zeros(1) for _ in range(4)
         ]
 
@@ -162,7 +162,7 @@ class Genes:
                 results_acc_knn[(k - 1)],
             ) = clf.knn_classify(k, command="tune")
 
-        results_f1_svm[0], results_acc_svm[0] = clf.glvq_classify(
+        results_f1_glvq[0], results_acc_glvq[0] = clf.glvq_classify(
             prototypes_per_class=1, command="tune"
         )
         results_f1_lr[0], results_acc_lr[0] = clf.logistic_regression(
@@ -170,9 +170,9 @@ class Genes:
         )
 
         self.save_tune_results(
-            [results_f1_knn, results_f1_svm, results_f1_lr],
-            [results_acc_knn, results_acc_svm, results_acc_lr],
-            ["knn", "svm", "lr"],
+            [results_f1_knn, results_f1_glvq, results_f1_lr],
+            [results_acc_knn, results_acc_glvq, results_acc_lr],
+            ["knn", "glvq", "lr"],
             name,
         )
 
@@ -182,7 +182,7 @@ class Genes:
         """
         self.block_print()
         results_f1_knn, results_acc_knn = [np.zeros((20, 20)), np.zeros((20, 20))]
-        results_f1_lr, results_acc_lr, results_f1_svm, results_acc_svm = [
+        results_f1_lr, results_acc_lr, results_f1_glvq, results_acc_glvq = [
             np.zeros(20) for _ in range(4)
         ]
 
@@ -203,7 +203,7 @@ class Genes:
                     results_acc_knn[i][(k - 1)],
                 ) = clf.knn_classify(k, command="tune")
 
-            results_f1_svm[i], results_acc_svm[i] = clf.glvq_classify(
+            results_f1_glvq[i], results_acc_glvq[i] = clf.glvq_classify(
                 prototypes_per_class=1, command="tune"
             )
             results_f1_lr[i], results_acc_lr[i] = clf.logistic_regression(
@@ -211,9 +211,9 @@ class Genes:
             )
 
         self.save_tune_results(
-            [results_f1_knn, results_f1_svm, results_f1_lr],
-            [results_acc_knn, results_acc_svm, results_acc_lr],
-            ["knn", "svm", "lr"],
+            [results_f1_knn, results_f1_glvq, results_f1_lr],
+            [results_acc_knn, results_acc_glvq, results_acc_lr],
+            ["knn", "glvq", "lr"],
             name,
         )
 
