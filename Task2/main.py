@@ -7,6 +7,9 @@ from ss import SemiSupervised
 
 
 def parse_args() -> argparse.Namespace:
+    """
+    Argument parser
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("data", help="Folder of creditcard.csv")
     parser.add_argument("res", help="Folder where the plots will be saved")
@@ -15,6 +18,14 @@ def parse_args() -> argparse.Namespace:
 
 
 def plot(args, scores: list, type: str) -> None:
+    """
+    Plots the F-score.
+
+    Arguments:
+    args: Parser containing result directory.
+    scores: List of scores over various runs.
+    type: Type of plot. Options: "line", "box"
+    """
     titles = [
         "Baseline model (KNN): Epochs vs F1 score",
         "Semi-supervised model (LinearPropogation): Epochs vs F1 score",
