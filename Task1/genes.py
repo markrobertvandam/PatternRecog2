@@ -162,8 +162,8 @@ class Genes:
                 results_acc_knn[(k - 1)],
             ) = clf.knn_classify(k, command="tune")
 
-        results_f1_svm[0], results_acc_svm[0] = clf.svm_classify(
-            max_iter=100000, command="tune"
+        results_f1_svm[0], results_acc_svm[0] = clf.glvq_classify(
+            prototypes_per_class=1, command="tune"
         )
         results_f1_lr[0], results_acc_lr[0] = clf.logistic_regression(
             max_iter=10000, command="tune"
@@ -203,8 +203,8 @@ class Genes:
                     results_acc_knn[i][(k - 1)],
                 ) = clf.knn_classify(k, command="tune")
 
-            results_f1_svm[i], results_acc_svm[i] = clf.svm_classify(
-                max_iter=100000, command="tune"
+            results_f1_svm[i], results_acc_svm[i] = clf.glvq_classify(
+                prototypes_per_class=1, command="tune"
             )
             results_f1_lr[i], results_acc_lr[i] = clf.logistic_regression(
                 max_iter=10000, command="tune"
@@ -225,7 +225,7 @@ class Genes:
 
         self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.knn_classify(k=5, command=command)
-        self.normal_classifier.svm_classify(max_iter=100000, command=command)
+        self.normal_classifier.glvq_classify(prototypes_per_class=1, command=command)
         self.normal_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------")
 
@@ -233,7 +233,7 @@ class Genes:
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.knn_classify(k=5, command=command)
-        self.pca_classifier.svm_classify(max_iter=100000, command=command)
+        self.pca_classifier.glvq_classify(prototypes_per_class=1, command=command)
         self.pca_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------\n")
 
@@ -243,7 +243,7 @@ class Genes:
 
         self.mi_classifier = Classification(self.mi_data, self.labels)
         self.mi_classifier.knn_classify(k=5, command=command)
-        self.mi_classifier.svm_classify(max_iter=100000, command=command)
+        self.mi_classifier.glvq_classify(prototypes_per_class=1, command=command)
         self.mi_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------")
 
@@ -255,7 +255,7 @@ class Genes:
 
         self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.knn_classify(k=5, command="cross-val")
-        self.normal_classifier.svm_classify(max_iter=100000, command="cross-val")
+        self.normal_classifier.glvq_classify(prototypes_per_class=1, command="cross-val")
         self.normal_classifier.logistic_regression(max_iter=10000, command="cross-val")
         print("--------------")
 
@@ -263,7 +263,7 @@ class Genes:
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.knn_classify(k=5, command="cross-val")
-        self.pca_classifier.svm_classify(max_iter=100000, command="cross-val")
+        self.pca_classifier.glvq_classify(prototypes_per_class=1, command="cross-val")
         self.pca_classifier.logistic_regression(max_iter=10000, command="cross-val")
         print("--------------")
 
@@ -300,7 +300,7 @@ class Genes:
         print(f"Sift performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.knn_classify(k=5, command="test")
-        self.pca_classifier.svm_classify(max_iter=100000, command="test")
+        self.pca_classifier.glvq_classify(prototypes_per_class=1, command="test")
         self.pca_classifier.logistic_regression(max_iter=10000, command="test")
 
         print("\nEnsemble using KNN and Logistic Regression:")
