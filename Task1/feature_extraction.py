@@ -11,10 +11,33 @@ from sklearn.feature_selection import mutual_info_classif as MIC
 
 class FeatureExtraction:
     def __init__(self, x: np.ndarray, y: np.ndarray, dataset: str) -> None:
+        """
+        Initialize dataset for feature extraction.
+
+        Arguments:
+        x: Input features.
+        y: Class labels.
+        dataset: Name of dataset.
+
+        Returns:
+        None
+        """
+        
         self.data = x
         self.labels = y
 
     def sift(self, max_keypoints=300) -> (np.ndarray, list):
+        """
+        Function to perform SIFT feature extraction.
+
+        Arguments:
+        max_keypoints: Maximum keypoints to consider.
+
+        Returns:
+        bow_visual: Bag of features containing strongest features.
+        low_info_imgs: List of underperforming images.
+        """
+        
         # sift
         sift = cv2.SIFT_create(max_keypoints)
         sift_data = []
@@ -44,6 +67,17 @@ class FeatureExtraction:
         return bow_visual, low_info_imgs
 
     def fourier_transform(self, filter_radius=35, fourier_data=None) -> np.ndarray:
+        """
+        Function to perform feature extraction using fourier transform.
+
+        Arguments:
+        filter_radius: Radius of specified filter.
+        fourier_data: Fourier data containing spectral information.
+
+        Returns:
+        fourier_data: Fourier transformed data.
+        """
+        
         print(filter_radius)
         if fourier_data is None:
             # Apply DFT and shift the zero frequency component to center
@@ -73,6 +107,15 @@ class FeatureExtraction:
         return fourier_data
 
     def pca(self, min_variance, pca=None) -> (np.ndarray, PCA):
+        """
+        Function to perform feature extraction using PCA.
+
+        Arguments:
+        min_variance: Minimum variance for selecting components.
+
+        Returns:
+        np.array: Reduced components based on the specified variance.
+        """
 
         if pca is None:
             # Apply PCA to dataset
@@ -96,6 +139,17 @@ class FeatureExtraction:
         return np.array(data_reduced, dtype="object"), pca
 
     def mutual_information(self, min_information, mi_values=None) -> (np.ndarray, MIC):
+        """
+        Function to perform feature extraction using Mutual Information.
+
+        Arguments:
+        min_information: Minimum information for thresholding.
+        mi_values: Mutual information of data.
+
+        Returns:
+        np.array: Reduced data with Mutual information.
+        """
+        
         if mi_values is None:
             mi_values = MIC(self.data, self.labels)
 
@@ -113,6 +167,17 @@ class FeatureExtraction:
         return np.array(data_reduced, dtype="object"), mi_values
 
     def scree_plot(self, n_components, explain_var) -> None:
+        """
+        Function to plot variance of components.
+
+        Arguments:
+        n_components: Number of components.
+        explain_var: Variance of components.
+
+        Returns:
+        None
+        """
+        
         pc_values = np.arange(n_components) + 1
         plt.plot(pc_values, explain_var, "o-")
         plt.title("Scree Plot")

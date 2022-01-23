@@ -15,6 +15,11 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class Genes:
     def __init__(self, pca_min_variance=0.6, mi_min_information=0.55):
+        """
+        Initialize dataset, feature extractorsa and clustering algorithms
+        for gene dataset.
+        """
+
         self.samples = None
         self.labels = None
         self.label_names = {"PRAD": 0, "LUAD": 1, "BRCA": 2, "KIRC": 3, "COAD": 4}
@@ -33,6 +38,10 @@ class Genes:
         self.mi_clustering = None
 
     def load_data(self) -> None:
+        """
+        Function to load the data.
+        """
+
         print("Loading data...")
         filename_samples = f"data/Genes/data.csv"
         self.samples = np.loadtxt(
@@ -50,6 +59,19 @@ class Genes:
         self.labels = np.asarray(labels, dtype=int)
 
     def biplot_helper(self, name: str, vars: str, data: np.ndarray, offset=0) -> None:
+        """
+        Function to plot gene features.
+
+        Arguments:
+        name: Filename for saving plots.
+        vars: Class labels of gene dataset.
+        data: Input feature array.
+        offset: Offset for shifting plot data.
+
+        Returns:
+        None
+        """
+        
         plt.figure()
         fig, axs = plt.subplots(1, 3, figsize=(15, 5))
         for i in range(0 + offset, 3 + offset):
@@ -69,6 +91,10 @@ class Genes:
         plt.close(fig)
 
     def visualize_data(self) -> None:
+        """
+        Function to visualize gene data.
+        """
+        
         print("Visualizing the data...")
         # Biplots to show scatter using 2 random genes
         self.biplot_helper("original", "gene", self.samples, 1)
@@ -91,6 +117,11 @@ class Genes:
         self.biplot_helper("mi", "mi", self.mi_data)
 
     def feature_extraction(self) -> None:
+        """
+        Function to extract features using PCA and
+        mutual information.
+        """
+        
         print("Doing feature extraction...")
         self.feature_extractor = FeatureExtraction(self.samples, self.labels, "genes")
         self.pca_data, self.pca = self.feature_extractor.pca(self.pca_min_variance)
@@ -102,6 +133,7 @@ class Genes:
         """
         Function to run grid-search for all data
         """
+
         self.normal_classifier = Classification(self.samples, self.labels)
 
         print("Original:")
@@ -123,6 +155,19 @@ class Genes:
     def save_tune_results(
         self, f1_results: list, acc_results: list, models: list, name: str
     ) -> None:
+        """
+        Function to save tuning results.
+
+        Arguments:
+        f1_results: List containing F1-scores.
+        acc_results: List containing accuracies.
+        model: List containing models names.
+        name: String for choice for saving filename.
+
+        Returns:
+        None
+        """
+        
         result_path = os.path.join("data", "results", "genes")
         if not os.path.exists(result_path):
             os.makedirs(result_path)
@@ -148,7 +193,15 @@ class Genes:
     def original_classification_params(self, clf, name: str) -> None:
         """
         Helper function to run grid-search for original data
+
+        Arguments:
+        clf: Classifier model.
+        name: Name for saving tuning results.
+
+        Returns:
+        None
         """
+
         self.block_print()
         results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros(6) for _ in range(4)]
         results_f1_lr, results_acc_lr = [np.zeros(1), np.zeros(1)]
@@ -180,7 +233,17 @@ class Genes:
     def pca_mi_classification_params(self, name: str, k_offset: int, glvq_offset: int, lr_offset: int) -> None:
         """
         Helper function to run grid-search for pca data
+
+        Arguments:
+        name: Name of feature extractor (Options: "pca", "mi")
+        k_offset: Offset for neighbor value.
+        glvq_offset: Offset for LVQ.
+        lr_offset: Offset for PCA.
+
+        Returns:
+        None
         """
+
         self.block_print()
         results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros((6, 6)) for _ in range(4)]
         results_f1_lr, results_acc_lr = [np.zeros(6), np.zeros(6)]
@@ -225,7 +288,11 @@ class Genes:
     def classification(self, command: str) -> None:
         """
         function to run cross-val/test-run depending on command
+
+        Arguments:
+        command: Commant specific for model operations.
         """
+
         print(f"Original performance (shape: {self.samples.shape}): \n")
 
         self.normal_classifier = Classification(self.samples, self.labels)
@@ -256,6 +323,7 @@ class Genes:
         """
         function to run cross-val with full data with best pipelines
         """
+
         print(f"Original performance (shape: {self.samples.shape}): \n")
 
         self.normal_classifier = Classification(self.samples, self.labels)
@@ -273,6 +341,10 @@ class Genes:
         print("--------------")
 
     def clustering(self) -> None:
+        """
+        Function to perform clustering.
+        """
+
         print("Clustering: \n")
         print("Original performance: \n")
         normal_clustering = Clustering(
@@ -299,6 +371,7 @@ class Genes:
         """
         function to run all possible ensembles with full data
         """
+        
         random_state = 42  # seed
 
         # Classify pca dataset

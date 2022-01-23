@@ -16,12 +16,36 @@ class Clustering:
         k_means_clusters: int,
         spectral_clusters: int,
     ) -> None:
+
+        """
+        Initialize dataset and parameters for Clustering.
+
+        Arguments:
+        x: Input features.
+        y: Class labels.
+        k_means_clusters: Number of clusters for K-means.
+        spectral_clusters: Number of clusters for Spectral Clustering.
+
+        Returns:
+        None
+        """
+
         self.x = x
         self.y = y
         self.k_means_clusters = k_means_clusters
         self.spectral_clusters = spectral_clusters
 
     def general_clustering(self, cluster) -> np.ndarray:
+        """
+        Function to perform clustering.
+
+        Arguments:
+        cluster: Clustering model.
+
+        Returns:
+        cluster.labels_: Cluster labels array.
+        """
+        
         cluster.fit(self.x)
         silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
         mutual_info_score = metrics.normalized_mutual_info_score(
@@ -36,21 +60,57 @@ class Clustering:
         return cluster.labels_
 
     def k_means(self) -> np.ndarray:
+        """
+        Function to perform clustering using K-means.
+
+        Returns:
+        cluster.labels_: Cluster labels array.
+        """
+        
         print("\nK-means clustering:\n -----------------")
         cluster = KMeans(n_clusters=self.k_means_clusters, random_state=42)
         return self.general_clustering(cluster)
 
     def spectral(self) -> np.ndarray:
+        """
+        Function to perform Spectral clustering.
+
+        Returns:
+        cluster.labels_: Cluster labels array.
+        """
+        
         print("\nSpectral clustering:\n -----------------")
         cluster = SpectralClustering(n_clusters=self.spectral_clusters, random_state=42)
         return self.general_clustering(cluster)
 
     def agglomerative_clustering(self, n_clusters=5, linkage="ward"):
+        """
+        Function to perform Agglomerative Clustering.
+
+        Arguments:
+        n_clusters: Number of clusters.
+        linkage: Specify type of linkage.
+
+        Returns:
+        cluster.labels_: Cluster labels array.
+        """
+        
         print("\nagglomerative clustering:\n -----------------")
         cluster = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
         return self.general_clustering(cluster)
 
     def optics(self, min_samples=5):
+        """
+        Function to perform Ordering Points To 
+        Identify Cluster Structure (OPTICS) clustering.
+
+        Arguments:
+        min_samples: Minumum number of samples for clustering.
+
+        Returns:
+        cluster.labels_: Cluster labels array.
+        """
+        
         print("\nOPTICS clustering:\n -----------------")
         cluster = OPTICS(min_samples=min_samples)
         return self.general_clustering(cluster)
@@ -59,7 +119,12 @@ class Clustering:
         """
         Function that plots silhouette scores for range n_clusters
         Code from https://scikit-learn.org/stable/auto_examples/cluster/plot_kmeans_silhouette_analysis.html
-        :param algorithm: the clustering algorithm used
+
+        Arguments:
+        algorithm: the clustering algorithm used
+        
+        Returns:
+        None
         """
         range_n_clusters = [2, 3, 4, 5, 6]
 

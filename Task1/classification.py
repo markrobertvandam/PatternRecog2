@@ -16,6 +16,17 @@ from sklearn_lvq import GlvqModel
 
 class Classification:
     def __init__(self, x: np.ndarray, y: np.ndarray) -> None:
+        """
+        Initialize dataset, splitting and model parameters.
+
+        Arguments:
+        X: Input features.
+        y: Class labels.
+
+        Returns:
+        None
+        """
+        
         self.x, self.y = x, y
         (
             self.x_train,
@@ -47,6 +58,17 @@ class Classification:
 
     @staticmethod
     def evaluate(y_true, y_pred, probs=None):
+        """
+        Static function to evaluate F-score and Accuracy.
+
+        Arguments:
+        y_true: True class labels.
+        y_pred: Predicted class labels.
+
+        Returns:
+        None
+        """
+        
         if probs is not None:
             print("Probability of classes")
             for i in probs:
@@ -59,6 +81,16 @@ class Classification:
             )
 
     def grid_search(self, clf):
+        """
+        Function to train model with splitted data.
+
+        Arguments:
+        clf: Classifier model.
+
+        Returns:
+        None
+        """
+        
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
@@ -67,12 +99,31 @@ class Classification:
         )
 
     def test_run(self, clf):
+        """
+        Function to train model with entire train data 
+        and test on test data.
+
+        Arguments:
+        clf: Classifier model.
+        """
+        
         clf.fit(self.x_train_full, self.y_train_full)
         y_pred = clf.predict(self.x_test)
         Classification.evaluate(self.y_test, y_pred)
         return clf
 
     def cross_val_run(self, clf) -> None:
+        """
+        Function to train model on cross validated data
+        and print cross validated test scores.
+
+        Arguments:
+        clf: Classifier model
+
+        Return:
+        None
+        """
+        
         cross_val_scores = cross_validate(
             clf, self.x, self.y, scoring=["f1_macro", "accuracy"]
         )
@@ -88,6 +139,17 @@ class Classification:
         )
 
     def select_command_action(self, clf, command: str):
+        """
+        Function to run specific model operation.
+
+        Arguments:
+        clf: Classifier model.
+        command: Command specifying model operation.
+
+        Returns:
+        None
+        """
+        
         if command == "tune":
             return self.grid_search(clf)
         elif command == "test":
@@ -95,31 +157,86 @@ class Classification:
         elif command == "cross-val":
             self.cross_val_run(clf)
 
-    def knn_classify(self, k: int, command: str):
+    def knn_classify(self, k: int, command: str) -> function:
+        """
+        Function to perform classification with KNN.
+
+        Arguments:
+        K: Neighbor size.
+        command: Command specifying model operation.
+
+        Returns:
+        Function: Performing the selected operation.
+        """
         # cross-val using KNN means
         print("KNN classifier:\n -----------------")
         clf = KNeighborsClassifier(k)
         self.k = k
         return self.select_command_action(clf, command)
 
-    def logistic_regression(self, max_iter: int, command: str):
+    def logistic_regression(self, max_iter: int, command: str) -> function:
+        """
+        Function to perform classification with Logistic Regression.
+
+        Arguments:
+        max_iter: Maximum iterations for LR model.
+        command: Command specifying model operation.
+
+        Returns:
+        Function: Performing the selected operation.
+        """
+        
         print("\nLogistic Regression classifier:\n -----------------")
         clf = LogisticRegression(max_iter=max_iter, random_state=42)
         self.iter_log = max_iter
         return self.select_command_action(clf, command)
 
     def nb_classify(self, command: str):
+        """
+        Function to perform classification using Naive-Bayes.
+
+        Arguments:
+        command: Command specifying model operation.
+
+        Returns:
+        Function: Performing the selected operation.
+        """
+        
         print("\nNaive-Bayes classifier:\n -----------------")
         clf = GaussianNB()
         return self.select_command_action(clf, command)
 
     def random_forest(self, n_trees: int, command: str):
+        """
+        Function to perform classification using Random Forests.
+
+        Arguments:
+        n_trees: Number of decision trees.
+        command: Command specifying model operation.
+
+        Returns:
+        Function: Performing the selected operation.
+        """
+        
         print("\nRandom Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees
         return self.select_command_action(clf, command)
 
     def svm_classify(self, kernel: str, c: float, gamma, command: str):
+        """
+        Function to perform classification using SVM.
+
+        Arguments:
+        kernel: Type of kernel for SVM.
+        c: Regularization parameter.
+        gamma: Gamma for influencing distance in training.
+        command: Command specifying model operation.
+
+        Returns:
+        Function: Performing the selected operation.
+        """
+        
         print("\nSVC classifier:\n -----------------")
         clf = SVC(C=c, kernel=kernel, gamma=gamma, random_state=42)
         self.kernel = kernel
@@ -128,12 +245,32 @@ class Classification:
         return self.select_command_action(clf, command)
 
     def glvq_classify(self, prototypes_per_class: int, command: str):
+        """
+        Function to perform classification using Generalized LVQ.
+
+        Arguments:
+        prototypes_per_class: Number of prototypes per class.
+        command: Command specifying model operation.
+
+        Returns:
+        Function: Performing the selected operation.
+        """
+        
         print("\nGLVQ classifier:\n -----------------")
         # The creation of the model object used to fit the data to.
         clf = GlvqModel(prototypes_per_class=prototypes_per_class, random_state=42)
         return self.select_command_action(clf, command)
 
     def ensemble(self, model1, model2, model3=None) -> None:
+        """
+        Function to perform classification using Ensemble classifier.
+
+        Arguments:
+        model1: First classification model.
+        model2: Second classification model.
+        model3: Third classification model.
+        """
+        
         estimators = [("model1", model1), ("model2", model2)]
         if model3 is not None:
             estimators.append(("model3", model3))

@@ -6,6 +6,10 @@ import shutil
 
 
 def main():
+    """
+    Main function to perform data filtering of cats dataset.
+    """
+    
     path = os.path.join("data", "cats_projekat")
     dir = os.path.join("data", "cats_projekat_filtered")
     if os.path.exists(dir):

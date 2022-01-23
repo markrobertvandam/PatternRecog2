@@ -8,6 +8,13 @@ from genes import Genes
 
 
 def parse_args() -> argparse.Namespace:
+    """
+    Function to parse arguments.
+
+    Returns:
+    parser: Argument parser containing arguments.
+    """
+    
     parser = argparse.ArgumentParser(description="Run the Pattern Recognition Pipeline")
     parser.add_argument("pipeline", help="options are cats and genes")
     parser.add_argument(
@@ -19,6 +26,14 @@ def parse_args() -> argparse.Namespace:
 
 
 def genes_pipeline(args: argparse.Namespace) -> None:
+    """
+    Pipline for performing clustering/classification on
+    gene dataset based on specified model operation.
+
+    Arguments:
+    args: Parser object containing necessary arguments.
+    """
+    
     genes = Genes()
     genes.load_data()
     genes.feature_extraction()
@@ -40,6 +55,14 @@ def genes_pipeline(args: argparse.Namespace) -> None:
 
 
 def cats_pipeline(args: argparse.Namespace) -> None:
+    """
+    Pipline for performing clustering/classification on
+    cats dataset based on specified model operation.
+
+    Arguments:
+    args: Parser object containing necessary arguments.
+    """
+
     cats = Cats()
     cats.load_data()
     if args.command == "augment":
@@ -64,6 +87,9 @@ def cats_pipeline(args: argparse.Namespace) -> None:
 
 
 def main():
+    """
+    Main function for choosing pipeline
+    """
 
     args = parse_args()
     if args.pipeline == "genes":

@@ -22,6 +22,10 @@ from sklearn.neighbors import KNeighborsClassifier
 
 class Cats:
     def __init__(self):
+        """
+        Intialize classifiers and extractors for cats dataset.
+        """
+
         self.file_names = []
         self.images = None
         self.flattened_original = None
@@ -35,6 +39,10 @@ class Cats:
         self.fourier_classifier = None
 
     def load_data(self) -> None:
+        """
+        Function for loading image data.
+        """
+
         print("Loading data...")
         animals = ["Cheetah", "Jaguar", "Leopard", "Lion", "Tiger"]
         images = []
@@ -66,6 +74,7 @@ class Cats:
         """
         Test run with augmentation
         """
+
         augmented_gray = []
         (x_train, x_test, y_train, y_test,) = train_test_split(
             self.gray_images,
@@ -96,6 +105,16 @@ class Cats:
 
     @staticmethod
     def augment_image(image) -> list:
+        """
+        Function for augmenting images.
+
+        Arguments:
+        image: Numpy array containing image data.
+
+        Returns:
+        list: [the original image, flipped image, contrast adjusted image]
+        """
+
         flipped_x = image[:, ::-1]
         gamma = skimage.exposure.adjust_gamma(image, gamma=0.4, gain=0.9)
         return [image, flipped_x, gamma]
@@ -111,6 +130,11 @@ class Cats:
         plt.close()
 
     def feature_extraction(self) -> None:
+        """
+        Function to perform feature extraction 
+        using fourier transform
+        """
+
         print("Doing feature extraction...")
         self.feature_extractor = FeatureExtraction(
             self.gray_images, self.labels, "cats"
@@ -150,6 +174,19 @@ class Cats:
     def save_tune_results(
         self, f1_results: list, acc_results: list, models: list, name: str
     ) -> None:
+        """
+        Function to save tuning results.
+
+        Arguments:
+        f1_results: List containing F1-scores.
+        acc_results: List containing accuracies.
+        model: List containing models names.
+        name: String for choice for saving filename.
+
+        Returns:
+        None
+        """
+        
         result_path = os.path.join("data", "results", "cats")
         if not os.path.exists(result_path):
             os.makedirs(result_path)
@@ -220,6 +257,12 @@ class Cats:
     def sift_fourier_classification_params(self, name: str) -> None:
         """
         Helper function to run grid-search for sift data
+
+        Arguments:
+        name: Name of preprocessing. (Options: "sift", "fourier")
+
+        Returns:
+        None
         """
         #self.block_print()
         results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
@@ -296,7 +339,14 @@ class Cats:
     def classification(self, command) -> None:
         """
         function to run cross-val or test-run depending on command with best pipelines
+
+        Arguments:
+        command: String for specifying the type of model operation.
+
+        Returns:
+        None
         """
+
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
         self.normal_classifier = Classification(self.flattened_original, self.labels)
@@ -313,6 +363,7 @@ class Cats:
         """
         function to run all possible ensembles with full data
         """
+
         random_state = 42  # seed
 
         # Classify sift dataset
@@ -350,6 +401,10 @@ class Cats:
         print("--------------")
 
     def clustering(self) -> None:
+        """
+        Function to perform clustering of data.
+        """
+
         print("Clustering: \n")
         print("Original performance: \n")
         normal_clustering = Clustering(self.flattened_original, self.labels, 4, 5)
@@ -367,6 +422,17 @@ class Cats:
         print("--------------\n")
 
     def save_clustering(self, cluster_labels, n_clusters) -> None:
+        """
+        Function to save clustering results.
+
+        Arguments:
+        cluster_labels: List containing strings of clustering names.
+        n_clusters: Interger specifying number of clusters.
+
+        Returns:
+        None
+        """
+        
         # holds the cluster id and the images { id: [images] }
         clustering_folder = os.path.join("data", "clustering")
         if os.path.exists(clustering_folder):
