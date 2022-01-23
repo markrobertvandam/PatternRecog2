@@ -121,7 +121,7 @@ class Tuning:
             if cols:
                 if cols[i]:
                     df_acc = pd.concat([df_acc], keys=[col_names[i]], axis=1)
-                    df_f1 = pd.concat([df_acc], keys=[col_names[i]], axis=1)
+                    df_f1 = pd.concat([df_f1], keys=[col_names[i]], axis=1)
             save_f1 = os.path.join(result_path, f"{name}_f1_{models[i]}.csv")
             save_acc = os.path.join(result_path, f"{name}_acc_{models[i]}.csv")
 
