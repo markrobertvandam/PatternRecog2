@@ -223,7 +223,7 @@ class Classification:
         self.n_trees = n_trees
         return self.select_command_action(clf, command)
 
-    def svm_classify(self, kernel: str, c: float, gamma, command: str):
+    def svm_classify(self, kernel: str, c: float, gamma, degree: int, command: str):
         """
         Function to perform classification using SVM.
 
@@ -238,7 +238,7 @@ class Classification:
         """
         
         print("\nSVC classifier:\n -----------------")
-        clf = SVC(C=c, kernel=kernel, gamma=gamma, random_state=42)
+        clf = SVC(C=c, kernel=kernel, gamma=gamma, degree=degree, random_state=42)
         self.kernel = kernel
         self.c = c
         self.gamma = gamma

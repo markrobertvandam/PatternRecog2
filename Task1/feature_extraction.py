@@ -66,7 +66,7 @@ class FeatureExtraction:
 
         return bow_visual, low_info_imgs
 
-    def fourier_transform(self, filter_radius=35, fourier_data=None) -> np.ndarray:
+    def fourier_transform(self, filter_radius=0, fourier_data=None) -> np.ndarray:
         """
         Function to perform feature extraction using fourier transform.
 
@@ -78,7 +78,7 @@ class FeatureExtraction:
         fourier_data: Fourier transformed data.
         """
         
-        print(filter_radius)
+        print("filter radius: ", filter_radius)
         if fourier_data is None:
             # Apply DFT and shift the zero frequency component to center
             fourier_data = []

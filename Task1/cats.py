@@ -147,7 +147,7 @@ class Cats:
             self.fourier_data.shape[1] * self.fourier_data.shape[2],
         )
 
-        self.sift_data, _ = self.feature_extractor.sift()
+        # self.sift_data, _ = self.feature_extractor.sift()
 
     def tune_classification_params(self) -> None:
         """
@@ -264,17 +264,19 @@ class Cats:
         Returns:
         None
         """
-        #self.block_print()
+        self.block_print()
         results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
-            np.zeros((60, 25)) for _ in range(4)
+            np.zeros((13, 25)) for _ in range(4)
         ]
-        results_f1_svm, results_acc_svm = [np.zeros((60, 96)), np.zeros((60, 96))]
+        results_f1_svm, results_acc_svm = [np.zeros((13, 12)), np.zeros((13, 12))]
 
         # Max keypoints loop
-        for i in range(13):
-            print("Iteration: ", i)
+        for i in range(60):
             if name == "sift":
                 key_points = i * 5
+                self.enable_print()
+                print("number of keypoints: ", (key_points + 5))
+                self.block_print()
 
                 knn_reduced_sift = self.sift_data[:, 0: key_points + 5]
                 knn_classifier = Classification(knn_reduced_sift, self.labels)
@@ -285,6 +287,11 @@ class Cats:
                 rf_reduced_sift = self.sift_data[:, 0: key_points + 5]
                 rf_classifier = Classification(rf_reduced_sift, self.labels)
             elif name == "fourier":
+                if i >= 13:
+                    break
+                self.enable_print()
+                print("filter radius: ", (i*2))
+                self.block_print()
                 if self.fourier_data is None:
                     self.fourier_data = self.feature_extractor.fourier_transform(i*5)
                     fourier_data = self.fourier_data
@@ -312,15 +319,20 @@ class Cats:
             kernels = ['linear', 'poly', 'rbf', 'sigmoid']
             c = [0.1, 1, 10, 100]
             gamma = ['scale', 'auto', 0.0001, 0.001, 0.1, 1]
+            degree = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 
-            for j in range(4):
-                for k in range(4):
-                    for m in range(6):
-                        print(j, k, m)
-                        results_f1_svm[i][(j*24 + k*6 + m)], results_acc_svm[i][(j*24 + k*6 + m)] = \
-                            svm_classifier.svm_classify(
-                            kernel=kernels[j], c=c[k], gamma=gamma[m], command="tune"
-                        )
+            for j in range(2):
+                for k in range(1, 2):
+                    for m in range(1):
+                        if j == 1:
+                            degree_range = 11
+                        else:
+                            degree_range = 1
+                        for n in range(degree_range):
+                            results_f1_svm[i][(j + n)], results_acc_svm[i][(j + n)] = \
+                                svm_classifier.svm_classify(
+                                kernel=kernels[j], c=c[k], gamma=gamma[m], degree=degree[n], command="tune"
+                            )
 
             # n-trees loop
             for n in range(25):
