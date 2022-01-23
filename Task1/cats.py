@@ -228,7 +228,7 @@ class Cats:
 
         # Max keypoints loop
         for i in range(60):
-
+            print("Iteration: ", i)
             if name == "sift":
                 key_points = i * 5
 
@@ -241,26 +241,21 @@ class Cats:
                 rf_reduced_sift = self.sift_data[:, 0: key_points + 5]
                 rf_classifier = Classification(rf_reduced_sift, self.labels)
             elif name == "fourier":
-                knn_fourier_data = self.feature_extractor.fourier_transform(filter_radius=i)
-                knn_fourier_data = knn_fourier_data.reshape(
-                    knn_fourier_data.shape[0],
-                    knn_fourier_data.shape[1] * knn_fourier_data.shape[2],
-                )
-                knn_classifier = Classification(knn_fourier_data, self.labels)
-
-                svm_fourier_data = self.feature_extractor.fourier_transform(filter_radius=i)
-                svm_fourier_data = svm_fourier_data.reshape(
-                    svm_fourier_data.shape[0],
-                    svm_fourier_data.shape[1] * svm_fourier_data.shape[2],
-                )
-                svm_classifier = Classification(svm_fourier_data, self.labels)
-
-                rf_fourier_data = self.feature_extractor.fourier_transform(filter_radius=i)
-                rf_fourier_data = rf_fourier_data.reshape(
-                    rf_fourier_data.shape[0],
-                    rf_fourier_data.shape[1] * rf_fourier_data.shape[2],
-                )
-                rf_classifier = Classification(rf_fourier_data, self.labels)
+                if self.fourier_data is None:
+                    self.fourier_data = self.feature_extractor.fourier_transform(i)
+                    fourier_data = self.fourier_data
+                else:
+                    fourier_data = self.feature_extractor.fourier_transform(i, self.fourier_data)
+                    # knn_fourier_data = self.feature_extractor.fourier_transform(i + knn_offset, self.fourier_data)
+                    # svm_fourier_data = self.feature_extractor.fourier_transform(i + svm_offset, self.fourier_data)
+                    # rf_fourier_data = self.feature_extractor.fourier_transform(i+ rf_offset, self.fourier_data)
+                    fourier_data = fourier_data.reshape(
+                        fourier_data.shape[0],
+                        fourier_data.shape[1] * fourier_data.shape[2],
+                    )
+                knn_classifier = Classification(fourier_data, self.labels)
+                svm_classifier = Classification(fourier_data, self.labels)
+                rf_classifier = Classification(fourier_data, self.labels)
 
             # k-value loop knn
             for k in range(1, 26):

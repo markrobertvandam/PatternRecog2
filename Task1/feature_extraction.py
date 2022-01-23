@@ -43,15 +43,17 @@ class FeatureExtraction:
 
         return bow_visual, low_info_imgs
 
-    def fourier_transform(self, filter_radius=35) -> np.ndarray:
-        # Apply DFT and shift the zero frequency component to center
-        fourier_data = []
+    def fourier_transform(self, filter_radius=35, fourier_data=None) -> np.ndarray:
 
-        for img in self.data:
-            f = np.fft.fft2(img)
-            f_shift = np.fft.fftshift(f)
-            magnitude_spectrum = 20 * np.log(np.abs(f_shift))
-            fourier_data.append(magnitude_spectrum)
+        if fourier_data is None:
+            # Apply DFT and shift the zero frequency component to center
+            fourier_data = []
+
+            for img in self.data:
+                f = np.fft.fft2(img)
+                f_shift = np.fft.fftshift(f)
+                magnitude_spectrum = 20 * np.log(np.abs(f_shift))
+                fourier_data.append(magnitude_spectrum)
 
         n_rows, n_cols = fourier_data[0].shape
         central_row, central_col = int(n_rows / 2), int(n_cols / 2)
