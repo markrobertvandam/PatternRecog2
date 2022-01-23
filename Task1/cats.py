@@ -243,22 +243,22 @@ class Cats:
             elif name == "fourier":
                 knn_fourier_data = self.feature_extractor.fourier_transform(filter_radius=i)
                 knn_fourier_data = knn_fourier_data.reshape(
-                    knn_fourier_data[0],
-                    knn_fourier_data[1] * knn_fourier_data[2],
+                    knn_fourier_data.shape[0],
+                    knn_fourier_data.shape[1] * knn_fourier_data.shape[2],
                 )
                 knn_classifier = Classification(knn_fourier_data, self.labels)
 
                 svm_fourier_data = self.feature_extractor.fourier_transform(filter_radius=i)
                 svm_fourier_data = svm_fourier_data.reshape(
-                    svm_fourier_data[0],
-                    svm_fourier_data[1] * svm_fourier_data[2],
+                    svm_fourier_data.shape[0],
+                    svm_fourier_data.shape[1] * svm_fourier_data.shape[2],
                 )
                 svm_classifier = Classification(svm_fourier_data, self.labels)
 
                 rf_fourier_data = self.feature_extractor.fourier_transform(filter_radius=i)
                 rf_fourier_data = rf_fourier_data.reshape(
-                    rf_fourier_data[0],
-                    rf_fourier_data[1] * rf_fourier_data[2],
+                    rf_fourier_data.shape[0],
+                    rf_fourier_data.shape[1] * rf_fourier_data.shape[2],
                 )
                 rf_classifier = Classification(rf_fourier_data, self.labels)
 
