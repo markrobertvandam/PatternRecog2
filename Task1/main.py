@@ -14,7 +14,7 @@ def parse_args() -> argparse.Namespace:
     Returns:
     parser: Argument parser containing arguments.
     """
-    
+
     parser = argparse.ArgumentParser(description="Run the Pattern Recognition Pipeline")
     parser.add_argument("pipeline", help="options are cats and genes")
     parser.add_argument(
@@ -33,7 +33,7 @@ def genes_pipeline(args: argparse.Namespace) -> None:
     Arguments:
     args: Parser object containing necessary arguments.
     """
-    
+
     genes = Genes()
     genes.load_data()
     genes.feature_extraction()

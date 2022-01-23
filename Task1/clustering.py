@@ -45,7 +45,7 @@ class Clustering:
         Returns:
         cluster.labels_: Cluster labels array.
         """
-        
+
         cluster.fit(self.x)
         silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
         mutual_info_score = metrics.normalized_mutual_info_score(
@@ -66,7 +66,7 @@ class Clustering:
         Returns:
         cluster.labels_: Cluster labels array.
         """
-        
+
         print("\nK-means clustering:\n -----------------")
         cluster = KMeans(n_clusters=self.k_means_clusters, random_state=42)
         return self.general_clustering(cluster)
@@ -78,7 +78,7 @@ class Clustering:
         Returns:
         cluster.labels_: Cluster labels array.
         """
-        
+
         print("\nSpectral clustering:\n -----------------")
         cluster = SpectralClustering(n_clusters=self.spectral_clusters, random_state=42)
         return self.general_clustering(cluster)
@@ -94,14 +94,14 @@ class Clustering:
         Returns:
         cluster.labels_: Cluster labels array.
         """
-        
+
         print("\nagglomerative clustering:\n -----------------")
         cluster = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
         return self.general_clustering(cluster)
 
     def optics(self, min_samples=5):
         """
-        Function to perform Ordering Points To 
+        Function to perform Ordering Points To
         Identify Cluster Structure (OPTICS) clustering.
 
         Arguments:
@@ -110,7 +110,7 @@ class Clustering:
         Returns:
         cluster.labels_: Cluster labels array.
         """
-        
+
         print("\nOPTICS clustering:\n -----------------")
         cluster = OPTICS(min_samples=min_samples)
         return self.general_clustering(cluster)
@@ -122,7 +122,7 @@ class Clustering:
 
         Arguments:
         algorithm: the clustering algorithm used
-        
+
         Returns:
         None
         """

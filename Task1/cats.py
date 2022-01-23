@@ -131,7 +131,7 @@ class Cats:
 
     def feature_extraction(self) -> None:
         """
-        Function to perform feature extraction 
+        Function to perform feature extraction
         using fourier transform
         """
 
@@ -186,7 +186,7 @@ class Cats:
         Returns:
         None
         """
-        
+
         result_path = os.path.join("data", "results", "cats")
         if not os.path.exists(result_path):
             os.makedirs(result_path)
@@ -227,17 +227,19 @@ class Cats:
                 results_acc_knn[(k - 1)],
             ) = clf.knn_classify(k, command="tune")
 
-        kernels = ['linear', 'poly', 'rbf', 'sigmoid']
+        kernels = ["linear", "poly", "rbf", "sigmoid"]
         c = [0.1, 1, 10, 100]
-        gamma = ['scale', 'auto', 0.0001, 0.001, 0.1, 1]
+        gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
         for i in range(4):
             for j in range(4):
                 for k in range(6):
-                    results_f1_svm[(i * 24 + j * 6 + k)], results_acc_svm[(i * 24 + j * 6 + k)] = \
-                        clf.svm_classify(
-                            kernel=kernels[i], c=c[j], gamma=gamma[k], command="tune"
-                        )
+                    (
+                        results_f1_svm[(i * 24 + j * 6 + k)],
+                        results_acc_svm[(i * 24 + j * 6 + k)],
+                    ) = clf.svm_classify(
+                        kernel=kernels[i], c=c[j], gamma=gamma[k], command="tune"
+                    )
 
         # n-trees loop
         for n in range(25):
@@ -264,7 +266,7 @@ class Cats:
         Returns:
         None
         """
-        #self.block_print()
+        # self.block_print()
         results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
             np.zeros((60, 25)) for _ in range(4)
         ]
@@ -276,20 +278,22 @@ class Cats:
             if name == "sift":
                 key_points = i * 5
 
-                knn_reduced_sift = self.sift_data[:, 0: key_points + 5]
+                knn_reduced_sift = self.sift_data[:, 0 : key_points + 5]
                 knn_classifier = Classification(knn_reduced_sift, self.labels)
 
-                svm_reduced_sift = self.sift_data[:, 0: key_points + 5]
+                svm_reduced_sift = self.sift_data[:, 0 : key_points + 5]
                 svm_classifier = Classification(svm_reduced_sift, self.labels)
 
-                rf_reduced_sift = self.sift_data[:, 0: key_points + 5]
+                rf_reduced_sift = self.sift_data[:, 0 : key_points + 5]
                 rf_classifier = Classification(rf_reduced_sift, self.labels)
             elif name == "fourier":
                 if self.fourier_data is None:
-                    self.fourier_data = self.feature_extractor.fourier_transform(i*5)
+                    self.fourier_data = self.feature_extractor.fourier_transform(i * 5)
                     fourier_data = self.fourier_data
                 else:
-                    fourier_data = self.feature_extractor.fourier_transform(i*5, self.fourier_data)
+                    fourier_data = self.feature_extractor.fourier_transform(
+                        i * 5, self.fourier_data
+                    )
                     # knn_fourier_data = self.feature_extractor.fourier_transform(i + knn_offset, self.fourier_data)
                     # svm_fourier_data = self.feature_extractor.fourier_transform(i + svm_offset, self.fourier_data)
                     # rf_fourier_data = self.feature_extractor.fourier_transform(i+ rf_offset, self.fourier_data)
@@ -309,16 +313,18 @@ class Cats:
                 ) = knn_classifier.knn_classify(k, command="tune")
 
             # SVM
-            kernels = ['linear', 'poly', 'rbf', 'sigmoid']
+            kernels = ["linear", "poly", "rbf", "sigmoid"]
             c = [0.1, 1, 10, 100]
-            gamma = ['scale', 'auto', 0.0001, 0.001, 0.1, 1]
+            gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
             for j in range(4):
                 for k in range(4):
                     for m in range(6):
                         print(j, k, m)
-                        results_f1_svm[i][(j*24 + k*6 + m)], results_acc_svm[i][(j*24 + k*6 + m)] = \
-                            svm_classifier.svm_classify(
+                        (
+                            results_f1_svm[i][(j * 24 + k * 6 + m)],
+                            results_acc_svm[i][(j * 24 + k * 6 + m)],
+                        ) = svm_classifier.svm_classify(
                             kernel=kernels[j], c=c[k], gamma=gamma[m], command="tune"
                         )
 
@@ -371,7 +377,9 @@ class Cats:
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
         self.sift_classifier = Classification(self.sift_data, self.labels)
         self.sift_classifier.knn_classify(k=5, command="test")
-        self.sift_classifier.svm_classify(kernel='linear', c=1, gamma='scale', command="test")
+        self.sift_classifier.svm_classify(
+            kernel="linear", c=1, gamma="scale", command="test"
+        )
         self.sift_classifier.random_forest(n_trees=200, command="test")
 
         print("\nEnsemble using Naive Bayes and Random Forest:")
@@ -433,7 +441,7 @@ class Cats:
         Returns:
         None
         """
-        
+
         # holds the cluster id and the images { id: [images] }
         clustering_folder = os.path.join("data", "clustering")
         if os.path.exists(clustering_folder):

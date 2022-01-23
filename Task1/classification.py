@@ -26,7 +26,7 @@ class Classification:
         Returns:
         None
         """
-        
+
         self.x, self.y = x, y
         (
             self.x_train,
@@ -68,7 +68,7 @@ class Classification:
         Returns:
         None
         """
-        
+
         if probs is not None:
             print("Probability of classes")
             for i in probs:
@@ -90,7 +90,7 @@ class Classification:
         Returns:
         None
         """
-        
+
         # one validation run
         clf.fit(self.x_train, self.y_train)
         y_pred = clf.predict(self.x_val)
@@ -100,13 +100,13 @@ class Classification:
 
     def test_run(self, clf):
         """
-        Function to train model with entire train data 
+        Function to train model with entire train data
         and test on test data.
 
         Arguments:
         clf: Classifier model.
         """
-        
+
         clf.fit(self.x_train_full, self.y_train_full)
         y_pred = clf.predict(self.x_test)
         Classification.evaluate(self.y_test, y_pred)
@@ -123,7 +123,7 @@ class Classification:
         Return:
         None
         """
-        
+
         cross_val_scores = cross_validate(
             clf, self.x, self.y, scoring=["f1_macro", "accuracy"]
         )
@@ -149,7 +149,7 @@ class Classification:
         Returns:
         None
         """
-        
+
         if command == "tune":
             return self.grid_search(clf)
         elif command == "test":
@@ -185,7 +185,7 @@ class Classification:
         Returns:
         Function: Performing the selected operation.
         """
-        
+
         print("\nLogistic Regression classifier:\n -----------------")
         clf = LogisticRegression(max_iter=max_iter, random_state=42)
         self.iter_log = max_iter
@@ -201,7 +201,7 @@ class Classification:
         Returns:
         Function: Performing the selected operation.
         """
-        
+
         print("\nNaive-Bayes classifier:\n -----------------")
         clf = GaussianNB()
         return self.select_command_action(clf, command)
@@ -217,7 +217,7 @@ class Classification:
         Returns:
         Function: Performing the selected operation.
         """
-        
+
         print("\nRandom Forest classifier:\n -----------------")
         clf = RandomForestClassifier(n_trees, random_state=42)
         self.n_trees = n_trees
@@ -236,7 +236,7 @@ class Classification:
         Returns:
         Function: Performing the selected operation.
         """
-        
+
         print("\nSVC classifier:\n -----------------")
         clf = SVC(C=c, kernel=kernel, gamma=gamma, random_state=42)
         self.kernel = kernel
@@ -255,7 +255,7 @@ class Classification:
         Returns:
         Function: Performing the selected operation.
         """
-        
+
         print("\nGLVQ classifier:\n -----------------")
         # The creation of the model object used to fit the data to.
         clf = GlvqModel(prototypes_per_class=prototypes_per_class, random_state=42)
@@ -270,7 +270,7 @@ class Classification:
         model2: Second classification model.
         model3: Third classification model.
         """
-        
+
         estimators = [("model1", model1), ("model2", model2)]
         if model3 is not None:
             estimators.append(("model3", model3))
