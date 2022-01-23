@@ -22,7 +22,7 @@ class FeatureExtraction:
         Returns:
         None
         """
-        
+
         self.data = x
         self.labels = y
 
@@ -37,7 +37,7 @@ class FeatureExtraction:
         bow_visual: Bag of features containing strongest features.
         low_info_imgs: List of underperforming images.
         """
-        
+
         # sift
         sift = cv2.SIFT_create(max_keypoints)
         sift_data = []
@@ -149,7 +149,7 @@ class FeatureExtraction:
         Returns:
         np.array: Reduced data with Mutual information.
         """
-        
+
         if mi_values is None:
             mi_values = MIC(self.data, self.labels)
 
@@ -177,7 +177,7 @@ class FeatureExtraction:
         Returns:
         None
         """
-        
+
         pc_values = np.arange(n_components) + 1
         plt.plot(pc_values, explain_var, "o-")
         plt.title("Scree Plot")

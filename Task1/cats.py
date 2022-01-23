@@ -131,7 +131,7 @@ class Cats:
 
     def feature_extraction(self) -> None:
         """
-        Function to perform feature extraction 
+        Function to perform feature extraction
         using fourier transform
         """
 
@@ -186,7 +186,7 @@ class Cats:
         Returns:
         None
         """
-        
+
         result_path = os.path.join("data", "results", "cats")
         if not os.path.exists(result_path):
             os.makedirs(result_path)
@@ -234,10 +234,12 @@ class Cats:
         for i in range(4):
             for j in range(4):
                 for k in range(6):
-                    results_f1_svm[(i * 24 + j * 6 + k)], results_acc_svm[(i * 24 + j * 6 + k)] = \
-                        clf.svm_classify(
-                            kernel=kernels[i], c=c[j], gamma=gamma[k], command="tune"
-                        )
+                    (
+                        results_f1_svm[(i * 24 + j * 6 + k)],
+                        results_acc_svm[(i * 24 + j * 6 + k)],
+                    ) = clf.svm_classify(
+                        kernel=kernels[i], c=c[j], gamma=gamma[k], command="tune"
+                    )
 
         # n-trees loop
         for n in range(25):
@@ -278,13 +280,13 @@ class Cats:
                 print("number of keypoints: ", (key_points + 5))
                 self.block_print()
 
-                knn_reduced_sift = self.sift_data[:, 0: key_points + 5]
+                knn_reduced_sift = self.sift_data[:, 0 : key_points + 5]
                 knn_classifier = Classification(knn_reduced_sift, self.labels)
 
-                svm_reduced_sift = self.sift_data[:, 0: key_points + 5]
+                svm_reduced_sift = self.sift_data[:, 0 : key_points + 5]
                 svm_classifier = Classification(svm_reduced_sift, self.labels)
 
-                rf_reduced_sift = self.sift_data[:, 0: key_points + 5]
+                rf_reduced_sift = self.sift_data[:, 0 : key_points + 5]
                 rf_classifier = Classification(rf_reduced_sift, self.labels)
             elif name == "fourier":
                 if i >= 13:
@@ -383,7 +385,9 @@ class Cats:
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
         self.sift_classifier = Classification(self.sift_data, self.labels)
         self.sift_classifier.knn_classify(k=5, command="test")
-        self.sift_classifier.svm_classify(kernel='linear', c=1, gamma='scale', command="test")
+        self.sift_classifier.svm_classify(
+            kernel="linear", c=1, gamma="scale", command="test"
+        )
         self.sift_classifier.random_forest(n_trees=200, command="test")
 
         print("\nEnsemble using Naive Bayes and Random Forest:")
@@ -445,7 +449,7 @@ class Cats:
         Returns:
         None
         """
-        
+
         # holds the cluster id and the images { id: [images] }
         clustering_folder = os.path.join("data", "clustering")
         if os.path.exists(clustering_folder):

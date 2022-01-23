@@ -2,9 +2,6 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
-import os
-import pandas as pd
-import sys
 
 from classification import Classification
 from clustering import Clustering
@@ -12,6 +9,7 @@ from feature_extraction import FeatureExtraction
 
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
+from tuning import Tuning
 
 
 class Genes:
@@ -72,7 +70,7 @@ class Genes:
         Returns:
         None
         """
-        
+
         plt.figure()
         fig, axs = plt.subplots(1, 3, figsize=(15, 5))
         for i in range(0 + offset, 3 + offset):
@@ -95,7 +93,7 @@ class Genes:
         """
         Function to visualize gene data.
         """
-        
+
         print("Visualizing the data...")
         # Biplots to show scatter using 2 random genes
         self.biplot_helper("original", "gene", self.samples, 1)
@@ -122,7 +120,7 @@ class Genes:
         Function to extract features using PCA and
         mutual information.
         """
-        
+
         print("Doing feature extraction...")
         self.feature_extractor = FeatureExtraction(self.samples, self.labels, "genes")
         self.pca_data, self.pca = self.feature_extractor.pca(self.pca_min_variance)
@@ -135,160 +133,8 @@ class Genes:
         Function to run grid-search for all data
         """
 
-        self.normal_classifier = Classification(self.samples, self.labels)
-
-        print("Original:")
-        self.original_classification_params(self.normal_classifier, "original")
-        print("PCA:")
-        self.pca_mi_classification_params("pca", k_offset=1, glvq_offset=0, lr_offset=12)
-        print("MI:")
-        self.pca_mi_classification_params("mi", k_offset=0, glvq_offset=14, lr_offset=0)
-
-    # Disable
-    def block_print(self):
-        sys.stdout = open(os.devnull, "w")
-        sys.stdout = open(os.devnull, "w")
-
-    # Restore
-    def enable_print(self):
-        sys.stdout = sys.__stdout__
-
-    def save_tune_results(
-        self, f1_results: list, acc_results: list, columns: list, rows: list, models: list, name: str
-    ) -> None:
-        """
-        Function to save tuning results.
-
-        Arguments:
-        f1_results: List containing F1-scores.
-        acc_results: List containing accuracies.
-        model: List containing models names.
-        name: String for choice for saving filename.
-
-        Returns:
-        None
-        """
-
-        result_path = os.path.join("data", "results", "genes")
-        if not os.path.exists(result_path):
-            os.makedirs(result_path)
-        self.enable_print()
-        for i in range(len(models)):
-            print(
-                f"Max {models[i]} f1-score = "
-                + str(np.amax(f1_results[i]))
-                + f", max {models[i]} acc = "
-                + str(np.amax(acc_results[i]))
-            )
-            df_acc = pd.DataFrame(data=acc_results[i], index=rows, columns=cols)
-            df_f1 = pd.DataFrame(data=f1_results[i], index=rows, columns=cols)
-            print(df_acc)
-
-            np.savetxt(
-                os.path.join(result_path, f"{name}_f1_{models[i]}.csv"),
-                f1_results[i],
-                delimiter=",",
-            )
-            np.savetxt(
-                os.path.join(result_path, f"{name}_acc_{models[i]}.csv"),
-                acc_results[i],
-                delimiter=",",
-            )
-
-    def original_classification_params(self, clf, name: str) -> None:
-        """
-        Helper function to run grid-search for original data
-
-        Arguments:
-        clf: Classifier model.
-        name: Name for saving tuning results.
-
-        Returns:
-        None
-        """
-
-        self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros(6) for _ in range(4)]
-        results_f1_lr, results_acc_lr = [np.zeros(1), np.zeros(1)]
-
-        # k-value loop
-        for k in range(1, 7):
-            (
-                results_f1_knn[(k - 1)],
-                results_acc_knn[(k - 1)],
-            ) = clf.knn_classify(k, command="tune")
-
-        for n in range(1, 7):
-            (
-                results_f1_glvq[n-1],
-                results_acc_glvq[n-1],
-            ) = clf.glvq_classify(prototypes_per_class=n, command="tune")
-
-        results_f1_lr[0], results_acc_lr[0] = clf.logistic_regression(
-            max_iter=10000, command="tune"
-        )
-
-        self.save_tune_results(
-            [results_f1_knn, results_f1_glvq, results_f1_lr],
-            [results_acc_knn, results_acc_glvq, results_acc_lr],
-            ["knn", "glvq", "lr"],
-            name,
-        )
-
-    def pca_mi_classification_params(self, name: str, k_offset: int, glvq_offset: int, lr_offset: int) -> None:
-        """
-        Helper function to run grid-search for pca data
-
-        Arguments:
-        name: Name of feature extractor (Options: "pca", "mi")
-        k_offset: Offset for neighbor value.
-        glvq_offset: Offset for LVQ.
-        lr_offset: Offset for PCA.
-
-        Returns:
-        None
-        """
-
-        self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [np.zeros((6, 6)) for _ in range(4)]
-        results_f1_lr, results_acc_lr = [np.zeros(6), np.zeros(6)]
-
-        # min-variance loop
-        for i in range(0, 6):
-
-            if name == "pca":
-                min_variance = 0.45 + 0.01 * i
-                data, _ = self.feature_extractor.pca(min_variance, self.pca)
-                lr_data, _ = self.feature_extractor.pca(min_variance + 0.01*lr_offset, self.pca)
-            elif name == "mi":
-                min_info = 0.45 + 0.01 * i
-                data, _ = self.feature_extractor.mutual_information(min_info, self.mi)
-                lr_data, _ = self.feature_extractor.mutual_information(min_info + 0.01 * lr_offset, self.mi)
-            clf = Classification(data, self.labels)
-            clf_lr = Classification(lr_data, self.labels)
-            # k-value loop
-            for k in range(1, 7):
-                (
-                    results_f1_knn[i][(k - 1)],
-                    results_acc_knn[i][(k - 1)],
-                ) = clf.knn_classify(k+k_offset, command="tune")
-
-            for n in range(1, 7):
-                (
-                    results_f1_glvq[i][(n-1)],
-                    results_acc_glvq[i][(n-1)],
-                ) = clf.glvq_classify(prototypes_per_class=n+glvq_offset, command="tune")
-
-            results_f1_lr[i], results_acc_lr[i] = clf_lr.logistic_regression(
-                max_iter=10000, command="tune"
-            )
-
-        self.save_tune_results(
-            [results_f1_knn, results_f1_glvq, results_f1_lr],
-            [results_acc_knn, results_acc_glvq, results_acc_lr],
-            ["knn", "glvq", "lr"],
-            name,
-        )
+        genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes")
+        genes_tuner.tune_gene_params()
 
     def classification(self, command: str) -> None:
         """
@@ -333,7 +179,9 @@ class Genes:
 
         self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.knn_classify(k=5, command="cross-val")
-        self.normal_classifier.glvq_classify(prototypes_per_class=1, command="cross-val")
+        self.normal_classifier.glvq_classify(
+            prototypes_per_class=1, command="cross-val"
+        )
         self.normal_classifier.logistic_regression(max_iter=10000, command="cross-val")
         print("--------------")
 
@@ -376,7 +224,7 @@ class Genes:
         """
         function to run all possible ensembles with full data
         """
-        
+
         random_state = 42  # seed
 
         # Classify pca dataset

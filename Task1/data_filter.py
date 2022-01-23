@@ -9,7 +9,7 @@ def main():
     """
     Main function to perform data filtering of cats dataset.
     """
-    
+
     path = os.path.join("data", "cats_projekat")
     dir = os.path.join("data", "cats_projekat_filtered")
     if os.path.exists(dir):
@@ -91,7 +91,7 @@ def main():
             image = cv2.resize(image, (250, 250))
             kp, des = sift.detectAndCompute(image, None)
             if len(des) >= 300:
-                factor = size[0]/size[1] if size[0] > size[1] else size[1]/size[0]
+                factor = size[0] / size[1] if size[0] > size[1] else size[1] / size[0]
                 if factor < 2.5:
                     cv2.imwrite(os.path.join(dir, animal, filename), image)
 
