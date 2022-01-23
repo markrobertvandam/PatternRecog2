@@ -3,6 +3,7 @@ import csv
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import pandas as pd
 import sys
 
 from classification import Classification
@@ -153,7 +154,7 @@ class Genes:
         sys.stdout = sys.__stdout__
 
     def save_tune_results(
-        self, f1_results: list, acc_results: list, models: list, name: str
+        self, f1_results: list, acc_results: list, columns: list, rows: list, models: list, name: str
     ) -> None:
         """
         Function to save tuning results.
@@ -167,7 +168,7 @@ class Genes:
         Returns:
         None
         """
-        
+
         result_path = os.path.join("data", "results", "genes")
         if not os.path.exists(result_path):
             os.makedirs(result_path)
@@ -179,6 +180,10 @@ class Genes:
                 + f", max {models[i]} acc = "
                 + str(np.amax(acc_results[i]))
             )
+            df_acc = pd.DataFrame(data=acc_results[i], index=rows, columns=cols)
+            df_f1 = pd.DataFrame(data=f1_results[i], index=rows, columns=cols)
+            print(df_acc)
+
             np.savetxt(
                 os.path.join(result_path, f"{name}_f1_{models[i]}.csv"),
                 f1_results[i],

@@ -271,7 +271,7 @@ class Cats:
         results_f1_svm, results_acc_svm = [np.zeros((60, 96)), np.zeros((60, 96))]
 
         # Max keypoints loop
-        for i in range(16):
+        for i in range(13):
             print("Iteration: ", i)
             if name == "sift":
                 key_points = i * 5
@@ -286,10 +286,10 @@ class Cats:
                 rf_classifier = Classification(rf_reduced_sift, self.labels)
             elif name == "fourier":
                 if self.fourier_data is None:
-                    self.fourier_data = self.feature_extractor.fourier_transform(i*4)
+                    self.fourier_data = self.feature_extractor.fourier_transform(i*5)
                     fourier_data = self.fourier_data
                 else:
-                    fourier_data = self.feature_extractor.fourier_transform(i*4, self.fourier_data)
+                    fourier_data = self.feature_extractor.fourier_transform(i*5, self.fourier_data)
                     # knn_fourier_data = self.feature_extractor.fourier_transform(i + knn_offset, self.fourier_data)
                     # svm_fourier_data = self.feature_extractor.fourier_transform(i + svm_offset, self.fourier_data)
                     # rf_fourier_data = self.feature_extractor.fourier_transform(i+ rf_offset, self.fourier_data)
@@ -316,7 +316,8 @@ class Cats:
             for j in range(4):
                 for k in range(4):
                     for m in range(6):
-                        results_f1_svm[i][(j*24 + k*6 + j)], results_acc_svm[i][(j*24 + k*6 + j)] = \
+                        print(j, k, m)
+                        results_f1_svm[i][(j*24 + k*6 + m)], results_acc_svm[i][(j*24 + k*6 + m)] = \
                             svm_classifier.svm_classify(
                             kernel=kernels[j], c=c[k], gamma=gamma[m], command="tune"
                         )
