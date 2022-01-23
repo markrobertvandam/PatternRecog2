@@ -157,7 +157,7 @@ class Classification:
         elif command == "cross-val":
             self.cross_val_run(clf)
 
-    def knn_classify(self, k: int, command: str) -> function:
+    def knn_classify(self, k: int, command: str):
         """
         Function to perform classification with KNN.
 
@@ -174,7 +174,7 @@ class Classification:
         self.k = k
         return self.select_command_action(clf, command)
 
-    def logistic_regression(self, max_iter: int, command: str) -> function:
+    def logistic_regression(self, max_iter: int, command: str):
         """
         Function to perform classification with Logistic Regression.
 
