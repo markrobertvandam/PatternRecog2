@@ -341,7 +341,7 @@ class Tuning:
                 i * 2, self.fourier
             )
 
-            knn_fourier_data = self.feature_extractor.fourier_transform(
+            knn_fourier_data, _ = self.feature_extractor.fourier_transform(
                 i * 2, fourier_data
             )
             knn_fourier_data = knn_fourier_data.reshape(
@@ -349,7 +349,7 @@ class Tuning:
                 knn_fourier_data.shape[1] * knn_fourier_data.shape[2],
             )
 
-            svm_fourier_data = self.feature_extractor.fourier_transform(
+            svm_fourier_data, _ = self.feature_extractor.fourier_transform(
                 i * 2 + 4, fourier_data
             )
             svm_fourier_data = svm_fourier_data.reshape(
@@ -357,10 +357,10 @@ class Tuning:
                 svm_fourier_data.shape[1] * svm_fourier_data.shape[2],
             )
 
-            rf_fourier_data = self.feature_extractor.fourier_transform(
+            rf_fourier_data, _ = self.feature_extractor.fourier_transform(
                 i * 2 + 4, fourier_data
             )
-            rf_fourier_data = rf_fourier_data.reshape(
+            rf_fourier_data, _ = rf_fourier_data.reshape(
                 rf_fourier_data.shape[0],
                 rf_fourier_data.shape[1] * rf_fourier_data.shape[2],
             )
