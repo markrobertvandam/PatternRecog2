@@ -49,10 +49,18 @@ class Tuning:
 
         print("Original:")
         self.original_gene_params(self.normal_classifier, "original")
-        print("PCA:")
-        self.pca_mi_params("pca", k_offset=1, glvq_offset=0, lr_offset=12)
-        print("MI:")
-        self.pca_mi_params("mi", k_offset=0, glvq_offset=14, lr_offset=0)
+
+        # small sweep
+        if self.steps == 6:
+            print("PCA:")
+            self.pca_mi_params("pca", k_offset=1, glvq_offset=0, lr_offset=12)
+            print("MI:")
+            self.pca_mi_params("mi", k_offset=0, glvq_offset=14, lr_offset=0)
+        # big sweep
+        else:
+            self.pca_mi_params("pca", k_offset=0, glvq_offset=0, lr_offset=0)
+            print("MI:")
+            self.pca_mi_params("mi", k_offset=0, glvq_offset=0, lr_offset=0)
 
     def tune_cats_params(self) -> None:
         """
@@ -62,9 +70,9 @@ class Tuning:
         print("Original:")
         self.original_cats_params()
         print("Sift:")
-        self.sift_params(k_offset=20, c_offset=0, rf_offset=10, keypoints=[255, 170, 205])
+        self.sift_params(k_offset=20, c_offset=0, rf_offset=10, key_pts=[255, 170, 205])
         print("Fourier:")
-        self.fourier_params()
+        self.fourier_params(k_offset=16, deg_offset=0, rf_offset=7, masks=[0, 4, 4])
 
     # Disable
     def block_print(self):
@@ -184,8 +192,8 @@ class Tuning:
             ["knn", "glvq", "lr"],
             name,
             rows=[
-                ("K-neighbors", list(range(1, 7))),
-                ("Prototypes", list(range(1, 7))),
+                ("K-neighbors", list(range(1, 1+self.steps))),
+                ("Prototypes", list(range(1, 1+self.steps))),
                 None,
             ], dataset="genes",
         )
@@ -321,7 +329,7 @@ class Tuning:
             dataset="cats",
         )
 
-    def fourier_params(self) -> None:
+    def fourier_params(self, k_offset: int, deg_offset: int, rf_offset: int, masks: list) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -344,7 +352,7 @@ class Tuning:
         # Fourier masking loop
         for i in range(self.steps):
             knn_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2, self.fourier
+                i * 2 + masks[0], self.fourier
             )
             knn_fourier_data = knn_fourier_data.reshape(
                 knn_fourier_data.shape[0],
@@ -352,7 +360,7 @@ class Tuning:
             )
 
             svm_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2 + 4, self.fourier
+                i * 2 + masks[1], self.fourier
             )
             svm_fourier_data = svm_fourier_data.reshape(
                 svm_fourier_data.shape[0],
@@ -360,7 +368,7 @@ class Tuning:
             )
 
             rf_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2 + 4, self.fourier
+                i * 2 + masks[2], self.fourier
             )
             rf_fourier_data = rf_fourier_data.reshape(
                 rf_fourier_data.shape[0],
@@ -376,7 +384,7 @@ class Tuning:
                 (
                     results_f1_knn[i][(k)],
                     results_acc_knn[i][(k)],
-                ) = knn_classifier.knn_classify(k + 16, command="tune")
+                ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
             kernels = ["linear", "poly", "rbf", "sigmoid"]
@@ -392,13 +400,13 @@ class Tuning:
                     kernel=kernels[1],
                     c=c[1],
                     gamma=gamma[0],
-                    degree=degree[n],
+                    degree=degree[n+deg_offset],
                     command="tune",
                 )
 
             # n-trees loop
             for n in range(self.steps):
-                n_trees = 20 + (n+6) * 20
+                n_trees = (n+rf_offset) * 20
                 (
                     results_f1_rf[i][n],
                     results_acc_rf[i][n],
@@ -409,6 +417,13 @@ class Tuning:
             [results_acc_knn, results_acc_svm, results_acc_rf],
             ["knn", "svm", "rf"],
             "fourier",
+            rows=[("Mask radius", [2 * i + masks[0] for i in range(self.steps)]),
+                  ("Mask radius", [2 * i + masks[1] for i in range(self.steps)]),
+                  ("Mask radius", [2 * i + masks[2] for i in range(self.steps)])],
+            cols=[[i + k_offset for i in range(self.steps)],
+                  [i + deg_offset for i in range(self.steps)],
+                  [(i + rf_offset) * 20 for i in range(self.steps)]],
+            col_names=["K-Neighbors", "Degree", "n_trees"],
             dataset="cats",
         )
 
