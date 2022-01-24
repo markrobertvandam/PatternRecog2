@@ -46,13 +46,10 @@ def genes_pipeline(args: argparse.Namespace) -> None:
         genes.tune_classification_params("big")
     elif args.command == "test":
         genes.classification(command="test")
-    elif args.command == "ensemble":
-        genes.ensemble()
     elif args.command == "cluster":
         genes.clustering()
     elif args.command == "full-run":
         genes.classification(command="test")
-        genes.ensemble()
         genes.clustering()
 
 
