@@ -128,13 +128,16 @@ class Genes:
             self.mi_min_information
         )
 
-    def tune_classification_params(self) -> None:
+    def tune_classification_params(self, option=None) -> None:
         """
         Function to run grid-search for all data
         """
-
-        genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes")
-        genes_tuner.tune_gene_params()
+        if option:
+            genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes", 20)
+            genes_tuner.tune_gene_params()
+        else:
+            genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes", 6)
+            genes_tuner.tune_gene_params()
 
     def classification(self, command: str) -> None:
         """
@@ -219,24 +222,3 @@ class Genes:
         )
         mi_clustering.spectral()
         print("--------------\n")
-
-    def ensemble(self) -> None:
-        """
-        function to run all possible ensembles with full data
-        """
-
-        random_state = 42  # seed
-
-        # Classify pca dataset
-        print(f"Sift performance (shape: {self.pca_data.shape}): \n")
-        self.pca_classifier = Classification(self.pca_data, self.labels)
-        self.pca_classifier.knn_classify(k=5, command="test")
-        self.pca_classifier.glvq_classify(prototypes_per_class=1, command="test")
-        self.pca_classifier.logistic_regression(max_iter=10000, command="test")
-
-        print("\nEnsemble using KNN and Logistic Regression:")
-        print("--------------")
-        self.pca_classifier.ensemble(
-            KNeighborsClassifier(n_neighbors=5),
-            LogisticRegression(max_iter=10000, random_state=random_state),
-        )

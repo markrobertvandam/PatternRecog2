@@ -17,6 +17,7 @@ class Tuning:
         reduced_1: np.ndarray,
         reduced_2: np.ndarray,
         name: str,
+        steps: int
     ) -> None:
         """
         Initialize dataset, splitting and model parameters.
@@ -37,6 +38,7 @@ class Tuning:
         if name == "cats":
             self.sift = reduced_1
             self.fourier = reduced_2
+        self.steps = steps
 
     def tune_gene_params(self) -> None:
         """
@@ -142,18 +144,18 @@ class Tuning:
 
         self.block_print()
         results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [
-            np.zeros(6) for _ in range(4)
+            np.zeros(self.steps) for _ in range(4)
         ]
         results_f1_lr, results_acc_lr = [np.zeros(1), np.zeros(1)]
 
         # k-value loop
-        for k in range(1, 7):
+        for k in range(1, 1+self.steps):
             (
                 results_f1_knn[(k - 1)],
                 results_acc_knn[(k - 1)],
             ) = clf.knn_classify(k, command="tune")
 
-        for n in range(1, 7):
+        for n in range(1, 1+self.steps):
             (
                 results_f1_glvq[n - 1],
                 results_acc_glvq[n - 1],
@@ -193,13 +195,13 @@ class Tuning:
 
         self.block_print()
         results_f1_knn, results_acc_knn, results_f1_glvq, results_acc_glvq = [
-            np.zeros((6, 6)) for _ in range(4)
+            np.zeros((self.steps, self.steps)) for _ in range(4)
         ]
-        results_f1_lr, results_acc_lr = [np.zeros(6), np.zeros(6)]
+        results_f1_lr, results_acc_lr = [np.zeros(self.steps), np.zeros(self.steps)]
 
         # min-variance loop
-        min_values = [0.45 + 0.01 * i for i in range(0, 6)]
-        for i in range(0, 6):
+        min_values = [0.45 + 0.01 * i for i in range(0, self.steps)]
+        for i in range(0, self.steps):
             if name == "pca":
                 min_variance = min_values[i]
                 data, _ = self.feature_extractor.pca(min_variance, self.pca)
@@ -215,13 +217,13 @@ class Tuning:
             clf = Classification(data, self.labels)
             clf_lr = Classification(lr_data, self.labels)
             # k-value loop
-            for k in range(1, 7):
+            for k in range(1, 1+self.steps):
                 (
                     results_f1_knn[i][(k - 1)],
                     results_acc_knn[i][(k - 1)],
                 ) = clf.knn_classify(k + k_offset, command="tune")
 
-            for n in range(1, 7):
+            for n in range(1, 1+self.steps):
                 (
                     results_f1_glvq[i][(n - 1)],
                     results_acc_glvq[i][(n - 1)],
@@ -247,8 +249,8 @@ class Tuning:
                 (row_name, [i + 0.01 * lr_offset for i in min_values]),
             ],
             cols=[
-                [i + k_offset for i in range(1, 7)],
-                [i + glvq_offset for i in range(1, 7)],
+                [i + k_offset for i in range(1, 1+self.steps)],
+                [i + glvq_offset for i in range(1, 1+self.steps)],
                 None,
             ],
             col_names=["K-neighbors", "Prototypes", None],

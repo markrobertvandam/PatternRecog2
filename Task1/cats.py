@@ -420,8 +420,6 @@ class Cats:
         function to run all possible ensembles with full data
         """
 
-        random_state = 42  # seed
-
         # Classify sift dataset
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
         self.sift_classifier = Classification(self.sift_data, self.labels)
@@ -431,29 +429,30 @@ class Cats:
         )
         self.sift_classifier.random_forest(n_trees=200, command="test")
 
-        print("\nEnsemble using Naive Bayes and Random Forest:")
+        print("\nEnsemble using SVM and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
-            SVC(), RandomForestClassifier(random_state=random_state)
+            SVC(kernel="linear", C=1, gamma="scale"), RandomForestClassifier()
         )
 
-        print("\nEnsemble using Naive Bayes and KNN:")
+        print("\nEnsemble using SVC and KNN:")
         print("--------------")
-        self.sift_classifier.ensemble(SVC(), KNeighborsClassifier(n_neighbors=5))
+        self.sift_classifier.ensemble(SVC(kernel="linear", C=1, gamma="scale"),
+                                      KNeighborsClassifier(n_neighbors=5))
 
         print("\nEnsemble using KNN and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
             KNeighborsClassifier(n_neighbors=5),
-            RandomForestClassifier(random_state=random_state),
+            RandomForestClassifier(),
         )
 
-        print("\nEnsemble using KNN, Naive Bayes and Random Forest:")
+        print("\nEnsemble using KNN, SVC and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
             KNeighborsClassifier(n_neighbors=5),
-            SVC(),
-            RandomForestClassifier(random_state=random_state),
+            SVC(kernel="linear", C=1, gamma="scale"),
+            RandomForestClassifier(),
         )
 
         print("--------------")
