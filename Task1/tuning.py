@@ -410,16 +410,18 @@ class Tuning:
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
+            count=0
             for i in range(len(kernels)):
                 for j in range(len(c)):
                     for k in range(len(gamma)):
                         for l in range(len(degree)):
                             (
-                                results_f1_svm[(i * 24 + j * 6 + k)],
-                                results_acc_svm[(i * 24 + j * 6 + k)],
+                                results_f1_svm[count],
+                                results_acc_svm[count],
                             ) = svm_classifier.svm_classify(
                                 kernel=kernels[i], c=c[j], gamma=gamma[k], degree=degree[l], command="tune"
                             )
+                            count+=1
 
             # n-trees loop
             for n in range(self.steps):
@@ -438,7 +440,7 @@ class Tuning:
                   ("Mask radius", [2 * i + masks[1] for i in range(self.steps)]),
                   ("Mask radius", [2 * i + masks[2] for i in range(self.steps)])],
             cols=[[i + k_offset for i in range(self.steps)],
-                  degree[:self.steps],
+                  None,
                   [(i + rf_offset) * 20 for i in range(self.steps)]],
             col_names=["K-Neighbors", "Degree", "n_trees"],
             dataset="cats",
@@ -486,16 +488,17 @@ class Tuning:
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
-
+            count = 0
             for i in range(len(kernels)):
                 for j in range(len(c)):
                     for k in range(len(gamma)):
                         (
-                            results_f1_svm[(i * len(kernels) + j * len(c) + k)],
-                            results_acc_svm[(i * len(kernels) + j * len(c) + k)],
+                            results_f1_svm[count],
+                            results_acc_svm[count],
                         ) = svm_classifier.svm_classify(
-                            kernel=kernels[i], c=c[j], gamma=gamma[k], degree=degree[l], command="tune"
+                            kernel=kernels[i], c=c[j], gamma=gamma[k], degree=3, command="tune"
                         )
+                        count+=1
 
             # n-trees loop
             for n in range(self.steps):
@@ -514,7 +517,7 @@ class Tuning:
                   ("Max_Keypoints", [5*i + key_pts[1] for i in range(self.steps)]),
                   ("Max_Keypoints", [5*i + key_pts[2] for i in range(self.steps)])],
             cols=[[i+k_offset for i in range(self.steps)],
-                  c,
+                  None,
                   [(i+rf_offset)*20 for i in range(self.steps)]],
             col_names=["K-Neighbors", "C", "n_trees"],
             dataset="cats",
