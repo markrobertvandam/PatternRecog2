@@ -80,7 +80,7 @@ class Tuning:
             self.original_cats_params(k_offset=3, rf_offset=18)
             print("Sift:")
             self.sift_params(k_offset=20, rf_offset=10, key_pts=[255, 170, 205],
-                                kernels=sift_kernels, c=sift_c, gamma=sift_gamma, degree=[3])
+                                kernels=sift_kernels, c=sift_c, gamma=sift_gamma)
             print("Fourier:")
             self.fourier_params(k_offset=16, rf_offset=7, masks=[0, 4, 4],
                                 kernels=fourier_kernels, c=fourier_c, gamma=fourier_gamma, degree=fourier_degree)
@@ -92,7 +92,7 @@ class Tuning:
             print("Original:")
             self.original_cats_params()
             print("Sift:")
-            self.sift_params(key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma, degree=[3])
+            self.sift_params(key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
             print("Fourier:")
             self.fourier_params(masks=[0, 0, 0], kernels=kernels, c=c, gamma=gamma, degree=[3])
 
@@ -444,7 +444,7 @@ class Tuning:
             dataset="cats",
         )
 
-    def sift_params(self, key_pts: list, kernels: list, c: list, gamma: list, degree: list,
+    def sift_params(self, key_pts: list, kernels: list, c: list, gamma: list,
                     k_offset=0, rf_offset=0) -> None:
         """
         Helper function to run grid-search for sift data
@@ -490,13 +490,12 @@ class Tuning:
             for i in range(len(kernels)):
                 for j in range(len(c)):
                     for k in range(len(gamma)):
-                        for l in range(len(degree)):
-                            (
-                                results_f1_svm[(i * 24 + j * 6 + k)],
-                                results_acc_svm[(i * 24 + j * 6 + k)],
-                            ) = svm_classifier.svm_classify(
-                                kernel=kernels[i], c=c[j], gamma=gamma[k], degree=degree[l], command="tune"
-                            )
+                        (
+                            results_f1_svm[(i * len(kernels) + j * len(c) + k)],
+                            results_acc_svm[(i * len(kernels) + j * len(c) + k)],
+                        ) = svm_classifier.svm_classify(
+                            kernel=kernels[i], c=c[j], gamma=gamma[k], degree=degree[l], command="tune"
+                        )
 
             # n-trees loop
             for n in range(self.steps):
