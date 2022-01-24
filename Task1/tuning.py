@@ -337,12 +337,8 @@ class Tuning:
 
         # Max keypoints loop
         for i in range(6):
-            fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2, self.fourier
-            )
-
             knn_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2, fourier_data
+                i * 2, self.fourier
             )
             knn_fourier_data = knn_fourier_data.reshape(
                 knn_fourier_data.shape[0],
@@ -350,7 +346,7 @@ class Tuning:
             )
 
             svm_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2 + 4, fourier_data
+                i * 2 + 4, self.fourier
             )
             svm_fourier_data = svm_fourier_data.reshape(
                 svm_fourier_data.shape[0],
@@ -358,9 +354,9 @@ class Tuning:
             )
 
             rf_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2 + 4, fourier_data
+                i * 2 + 4, self.fourier
             )
-            rf_fourier_data, _ = rf_fourier_data.reshape(
+            rf_fourier_data = rf_fourier_data.reshape(
                 rf_fourier_data.shape[0],
                 rf_fourier_data.shape[1] * rf_fourier_data.shape[2],
             )
