@@ -128,13 +128,16 @@ class Genes:
             self.mi_min_information
         )
 
-    def tune_classification_params(self) -> None:
+    def tune_classification_params(self, option=None) -> None:
         """
         Function to run grid-search for all data
         """
-
-        genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes")
-        genes_tuner.tune_gene_params()
+        if option:
+            genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes", 20)
+            genes_tuner.tune_gene_params()
+        else:
+            genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes", 6)
+            genes_tuner.tune_gene_params()
 
     def classification(self, command: str) -> None:
         """
