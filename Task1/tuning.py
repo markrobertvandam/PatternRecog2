@@ -327,9 +327,9 @@ class Tuning:
         c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
         gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
-        for i in c:
+        for i in range(len(c)):
             (results_f1_svm[i], results_acc_svm[i],) = clf.svm_classify(
-                kernel=kernels[0], c=i, gamma=gamma[0], degree=3, command="tune"
+                kernel=kernels[0], c=c[i], gamma=gamma[0], degree=3, command="tune"
             )
 
         # n-trees loop
