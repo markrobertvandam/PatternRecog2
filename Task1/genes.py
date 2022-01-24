@@ -133,10 +133,14 @@ class Genes:
         Function to run grid-search for all data
         """
         if option:
-            genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes", 20)
+            genes_tuner = Tuning(
+                self.samples, self.labels, self.pca, self.mi, "genes", 20
+            )
             genes_tuner.tune_gene_params()
         else:
-            genes_tuner = Tuning(self.samples, self.labels, self.pca, self.mi, "genes", 6)
+            genes_tuner = Tuning(
+                self.samples, self.labels, self.pca, self.mi, "genes", 6
+            )
             genes_tuner.tune_gene_params()
 
     def classification(self, command: str) -> None:

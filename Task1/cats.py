@@ -3,13 +3,11 @@
 import skimage
 import cv2
 import glob
-import sys
 import os
 import matplotlib.pyplot as plt
 import numpy as np
 import shutil
 
-from collections import Counter
 from classification import Classification
 from clustering import Clustering
 from feature_extraction import FeatureExtraction
@@ -18,6 +16,8 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
+
+from tuning import Tuning
 
 
 class Cats:
@@ -32,6 +32,7 @@ class Cats:
         self.gray_images = None
         self.labels = None
         self.feature_extractor = None
+        self.fourier_unmasked = None
         self.fourier_data = None
         self.sift_data = None
         self.normal_classifier = None
@@ -139,7 +140,10 @@ class Cats:
         self.feature_extractor = FeatureExtraction(
             self.gray_images, self.labels, "cats"
         )
-        self.fourier_data = self.feature_extractor.fourier_transform()
+        (
+            self.fourier_data,
+            self.fourier_unmasked,
+        ) = self.feature_extractor.fourier_transform()
 
         # flatten fourier
         self.fourier_data = self.fourier_data.reshape(
@@ -149,248 +153,30 @@ class Cats:
 
         self.sift_data, _ = self.feature_extractor.sift()
 
-    def tune_classification_params(self) -> None:
+    def tune_classification_params(self, option=None) -> None:
         """
         Function to run grid-search for all data
         """
-
-        print("Original:")
-        self.original_classification_params()
-        print("Sift:")
-        self.sift_classification_params()
-        print("Fourier:")
-        self.fourier_data = None
-        self.fourier_classification_params()
-
-    # Disable
-    def block_print(self):
-        sys.stdout = open(os.devnull, "w")
-        sys.stdout = open(os.devnull, "w")
-
-    # Restore
-    def enable_print(self):
-        sys.stdout = sys.__stdout__
-
-    def save_tune_results(
-        self, f1_results: list, acc_results: list, models: list, name: str
-    ) -> None:
-        """
-        Function to save tuning results.
-
-        Arguments:
-        f1_results: List containing F1-scores.
-        acc_results: List containing accuracies.
-        model: List containing models names.
-        name: String for choice for saving filename.
-
-        Returns:
-        None
-        """
-
-        result_path = os.path.join("data", "results", "cats")
-        if not os.path.exists(result_path):
-            os.makedirs(result_path)
-        self.enable_print()
-        for i in range(len(models)):
-            print(
-                f"Max {models[i]} f1-score = "
-                + str(np.amax(f1_results[i]))
-                + f", max {models[i]} acc = "
-                + str(np.amax(acc_results[i]))
+        if option:
+            cats_tuner = Tuning(
+                self.flattened_original,
+                self.labels,
+                self.sift_data,
+                self.fourier_unmasked,
+                "cats",
+                20,
             )
-            np.savetxt(
-                os.path.join(result_path, f"{name}_f1_{models[i]}.csv"),
-                f1_results[i],
-                delimiter=",",
+            cats_tuner.tune_gene_params()
+        else:
+            cats_tuner = Tuning(
+                self.flattened_original,
+                self.labels,
+                self.sift_data,
+                self.fourier_unmasked,
+                "cats",
+                6,
             )
-            np.savetxt(
-                os.path.join(result_path, f"{name}_acc_{models[i]}.csv"),
-                acc_results[i],
-                delimiter=",",
-            )
-
-    def original_classification_params(self) -> None:
-        """
-        Helper function to run grid-search for original data or fourier data
-        """
-        clf = Classification(self.flattened_original, self.labels)
-        self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf, results_f1_svm, results_acc_svm = [
-            np.zeros(6) for _ in range(6)
-        ]
-
-        # k-value loop
-        for k in range(3, 9):
-            (
-                results_f1_knn[(k - 3)],
-                results_acc_knn[(k - 3)],
-            ) = clf.knn_classify(k, command="tune")
-
-        kernels = ['linear', 'poly', 'rbf', 'sigmoid']
-        c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
-        gamma = ['scale', 'auto', 0.0001, 0.001, 0.1, 1]
-
-        for i in range(6):
-            (
-                results_f1_svm[i],
-                results_acc_svm[i],
-            ) = clf.svm_classify(
-                kernel=kernels[0], c=c[i], gamma=gamma[0], degree=3, command="tune"
-            )
-
-        # n-trees loop
-        for n in range(17, 23):
-            n_trees = 20 + n * 20
-            (
-                results_f1_rf[n-17],
-                results_acc_rf[n-17],
-            ) = clf.random_forest(n_trees=n_trees, command="tune")
-
-        self.save_tune_results(
-            [results_f1_knn, results_f1_svm, results_f1_rf],
-            [results_acc_knn, results_acc_svm, results_acc_rf],
-            ["knn", "svm", "rf"],
-            "original",
-        )
-
-    def fourier_classification_params(self) -> None:
-        """
-        Helper function to run grid-search for sift data
-
-        Arguments:
-        name: Name of preprocessing. (Options: "sift", "fourier")
-
-        Returns:
-        None
-        """
-        self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf, results_f1_svm, results_acc_svm = [
-            np.zeros((6, 6)) for _ in range(6)
-        ]
-
-        # Max keypoints loop
-        for i in range(6):
-
-            if self.fourier_data is None:
-                self.fourier_data = self.feature_extractor.fourier_transform(i*2)
-                fourier_data = self.fourier_data
-
-            knn_fourier_data = self.feature_extractor.fourier_transform(i*2, self.fourier_data)
-            knn_fourier_data = knn_fourier_data.reshape(
-                knn_fourier_data.shape[0],
-                knn_fourier_data.shape[1] * knn_fourier_data.shape[2],
-            )
-
-            svm_fourier_data = self.feature_extractor.fourier_transform(i*2 + 4, self.fourier_data)
-            svm_fourier_data = svm_fourier_data.reshape(
-                svm_fourier_data.shape[0],
-                svm_fourier_data.shape[1] * svm_fourier_data.shape[2],
-            )
-
-            rf_fourier_data = self.feature_extractor.fourier_transform(i*2 + 4, self.fourier_data)
-            rf_fourier_data = rf_fourier_data.reshape(
-                rf_fourier_data.shape[0],
-                rf_fourier_data.shape[1] * rf_fourier_data.shape[2],
-            )
-
-            knn_classifier = Classification(knn_fourier_data, self.labels)
-            svm_classifier = Classification(svm_fourier_data, self.labels)
-            rf_classifier = Classification(rf_fourier_data, self.labels)
-
-            # k-value loop knn
-            for k in range(16, 22):
-                (
-                    results_f1_knn[i][(k - 16)],
-                    results_acc_knn[i][(k - 16)],
-                ) = knn_classifier.knn_classify(k, command="tune")
-
-            # SVM
-            kernels = ['linear', 'poly', 'rbf', 'sigmoid']
-            c = [0.1, 1, 10, 100]
-            gamma = ['scale', 'auto', 0.0001, 0.001, 0.1, 1]
-            degree = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-
-            for n in range(6):
-                results_f1_svm[i][n], results_acc_svm[i][n] = \
-                    svm_classifier.svm_classify(
-                    kernel=kernels[1], c=c[1], gamma=gamma[0], degree=degree[n], command="tune"
-                )
-
-            # n-trees loop
-            for n in range(6, 12):
-                n_trees = 20 + n * 20
-                (
-                    results_f1_rf[i][n-6],
-                    results_acc_rf[i][n-6],
-                ) = rf_classifier.random_forest(n_trees=n_trees, command="tune")
-
-        self.save_tune_results(
-            [results_f1_knn, results_f1_svm, results_f1_rf],
-            [results_acc_knn, results_acc_svm, results_acc_rf],
-            ["knn", "svm", "rf"],
-            "fourier",
-        )
-
-    def sift_classification_params(self) -> None:
-        """
-        Helper function to run grid-search for sift data
-
-        Arguments:
-        name: Name of preprocessing. (Options: "sift", "fourier")
-
-        Returns:
-        None
-        """
-        self.block_print()
-        results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf, results_f1_svm, results_acc_svm = [
-            np.zeros((6, 6)) for _ in range(6)
-        ]
-
-        # Max keypoints loop
-        for i in range(6):
-            key_points = i * 5
-
-            knn_reduced_sift = self.sift_data[:, 0: key_points + 255]
-            knn_classifier = Classification(knn_reduced_sift, self.labels)
-
-            svm_reduced_sift = self.sift_data[:, 0: key_points + 170]
-            svm_classifier = Classification(svm_reduced_sift, self.labels)
-
-            rf_reduced_sift = self.sift_data[:, 0: key_points + 205]
-            rf_classifier = Classification(rf_reduced_sift, self.labels)
-
-            # k-value loop knn
-            for k in range(20, 26):
-                (
-                    results_f1_knn[i][(k - 20)],
-                    results_acc_knn[i][(k - 20)],
-                ) = knn_classifier.knn_classify(k, command="tune")
-
-            # SVM
-            kernels = ['linear', 'poly', 'rbf', 'sigmoid']
-            c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
-            gamma = ['scale', 'auto', 0.0001, 0.001, 0.1, 1]
-
-            for n in range(6):
-                results_f1_svm[i][n], results_acc_svm[i][n] = \
-                    svm_classifier.svm_classify(
-                    kernel=kernels[3], c=c[n], gamma=gamma[0], degree=3, command="tune"
-                )
-
-            # n-trees loop
-            for n in range(9, 15):
-                n_trees = 20 + n * 20
-                (
-                    results_f1_rf[i][n-9],
-                    results_acc_rf[i][n-9],
-                ) = rf_classifier.random_forest(n_trees=n_trees, command="tune")
-
-        self.save_tune_results(
-            [results_f1_knn, results_f1_svm, results_f1_rf],
-            [results_acc_knn, results_acc_svm, results_acc_rf],
-            ["knn", "svm", "rf"],
-            "sift",
-        )
+            cats_tuner.tune_gene_params()
 
     def classification(self, command) -> None:
         """
@@ -437,8 +223,10 @@ class Cats:
 
         print("\nEnsemble using SVC and KNN:")
         print("--------------")
-        self.sift_classifier.ensemble(SVC(kernel="linear", C=1, gamma="scale"),
-                                      KNeighborsClassifier(n_neighbors=5))
+        self.sift_classifier.ensemble(
+            SVC(kernel="linear", C=1, gamma="scale"),
+            KNeighborsClassifier(n_neighbors=5),
+        )
 
         print("\nEnsemble using KNN and Random Forest:")
         print("--------------")
