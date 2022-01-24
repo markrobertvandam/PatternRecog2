@@ -66,7 +66,9 @@ class FeatureExtraction:
 
         return bow_visual, low_info_imgs
 
-    def fourier_transform(self, filter_radius=0, fourier_data=None) -> np.ndarray:
+    def fourier_transform(
+        self, filter_radius=0, fourier_data=None
+    ) -> (np.ndarray, np.ndarray):
         """
         Function to perform feature extraction using fourier transform.
 
@@ -77,7 +79,7 @@ class FeatureExtraction:
         Returns:
         fourier_data: Fourier transformed data.
         """
-        
+
         print("filter radius: ", filter_radius)
         if fourier_data is None:
             # Apply DFT and shift the zero frequency component to center
@@ -90,7 +92,6 @@ class FeatureExtraction:
                 fourier_data.append(magnitude_spectrum)
             fourier_data = np.asarray(fourier_data, dtype=object)
 
-        print(fourier_data.shape)
         n_rows, n_cols = fourier_data[0].shape
         central_row, central_col = int(n_rows / 2), int(n_cols / 2)
 
@@ -101,10 +102,11 @@ class FeatureExtraction:
         mask_area = (x - center[0]) ** 2 + (y - center[1]) ** 2 <= r * r
         mask[mask_area] = 0
 
-        for i in range(len(fourier_data)):
-            fourier_data[i] = fourier_data[i] * mask
+        fourier_masked = np.zeros(fourier_data.shape)
+        for i in range(len(fourier_masked)):
+            fourier_masked[i] = fourier_data[i] * mask
 
-        return fourier_data
+        return fourier_masked, fourier_data
 
     def pca(self, min_variance, pca=None) -> (np.ndarray, PCA):
         """
