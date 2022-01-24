@@ -464,19 +464,26 @@ class Cats:
 
         print("Clustering: \n")
         print("Original performance: \n")
-        normal_clustering = Clustering(self.flattened_original, self.labels, 4, 5)
+        normal_clustering = Clustering(self.flattened_original, self.labels, 4, 5, 5)
+        normal_clustering.agglomerative_clustering()
         normal_clustering.k_means()
+        normal_clustering.spectral()
+        normal_clustering.optics()
         print("--------------\n")
 
         print("SIFT performance: \n")
-        sift_clustering = Clustering(self.sift_data, self.labels, 4, 5)
+        sift_clustering = Clustering(self.sift_data, self.labels, 4, 5, 5)
+        sift_clustering.agglomerative_clustering()
         sift_clustering.k_means()
+        sift_clustering.spectral()
+        sift_clustering.optics()
+        # normal_clustering.h_dbscan()
         print("--------------\n")
 
-        print("Fourier performance: \n")
-        fourier_clustering = Clustering(self.fourier_data, self.labels, 4, 5)
-        fourier_clustering.k_means()
-        print("--------------\n")
+        # print("Fourier performance: \n")
+        # fourier_clustering = Clustering(self.fourier_data, self.labels, 4, 5)
+        # fourier_clustering.agglomerative_clustering()
+        # print("--------------\n")
 
     def save_clustering(self, cluster_labels, n_clusters) -> None:
         """

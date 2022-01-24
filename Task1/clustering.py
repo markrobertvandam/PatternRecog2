@@ -15,6 +15,7 @@ class Clustering:
         y: np.ndarray,
         k_means_clusters: int,
         spectral_clusters: int,
+        agglormarative_clusters: int,
     ) -> None:
 
         """
@@ -34,6 +35,7 @@ class Clustering:
         self.y = y
         self.k_means_clusters = k_means_clusters
         self.spectral_clusters = spectral_clusters
+        self.agglomerative_clusters = agglormarative_clusters
 
     def general_clustering(self, cluster) -> np.ndarray:
         """
@@ -47,7 +49,10 @@ class Clustering:
         """
 
         cluster.fit(self.x)
-        silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
+        if not cluster.labels_.count(cluster.labels_[0]) == len(cluster.labels_):
+            silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
+        else:
+            silhouette_score = 0
         mutual_info_score = metrics.normalized_mutual_info_score(
             self.y, cluster.labels_
         )
@@ -59,7 +64,7 @@ class Clustering:
         )
         return cluster.labels_
 
-    def k_means(self) -> np.ndarray:
+    def k_means(self, n_clusters=5) -> np.ndarray:
         """
         Function to perform clustering using K-means.
 
@@ -68,10 +73,10 @@ class Clustering:
         """
 
         print("\nK-means clustering:\n -----------------")
-        cluster = KMeans(n_clusters=self.k_means_clusters, random_state=42)
+        cluster = KMeans(n_clusters=n_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def spectral(self) -> np.ndarray:
+    def spectral(self, n_clusters=5) -> np.ndarray:
         """
         Function to perform Spectral clustering.
 
@@ -80,10 +85,10 @@ class Clustering:
         """
 
         print("\nSpectral clustering:\n -----------------")
-        cluster = SpectralClustering(n_clusters=self.spectral_clusters, random_state=42)
+        cluster = SpectralClustering(affinity='nearest_neighbors', n_clusters=n_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def agglomerative_clustering(self, n_clusters=5, linkage="ward"):
+    def agglomerative_clustering(self, linkage="ward", n_clusters=5):
         """
         Function to perform Agglomerative Clustering.
 
@@ -114,6 +119,10 @@ class Clustering:
         print("\nOPTICS clustering:\n -----------------")
         cluster = OPTICS(min_samples=min_samples)
         return self.general_clustering(cluster)
+
+    # def h_dbscan(self, min_samples=5):
+    #     cluster = hdbscan.HDBSCAN(min_cluster_size=min_samples)
+    #     return self.general_clustering(cluster)
 
     def cluster_with_plots(self, algorithm="kmeans") -> None:
         """
