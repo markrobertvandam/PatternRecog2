@@ -1,10 +1,11 @@
 import numpy as np
 import math
 
-results_array = np.genfromtxt('data/results/cats/sift_f1_knn.csv', delimiter=',')
+results_array = np.genfromtxt('data/results/cats/fourier_f1_svm.csv', delimiter=',')
 
-# results_array = results_array[:, 1:]
+# results_array = results_array[:, 78]
 # print(results_array.shape)
+# print(results_array)
 
 data_dimension = 2
 
@@ -15,7 +16,6 @@ window_size_row = 1
 max_value = 0
 max_averages = []
 max_region = []
-
 if data_dimension == 1:
     for row in range(((n_rows + 1) - window_size_row)):
         average = np.average(results_array[row:(row + window_size_row)])
@@ -48,7 +48,18 @@ elif data_dimension == 2:
                 max_averages = [average]
                 max_region = [[row + 1, col + 1]]
 
-    print("Max averages regions are ", max_averages)
+    # zipped_lists = zip(max_averages, max_region)
+    #
+    # sorted_pairs = sorted(zipped_lists)
+    #
+    # tuples = zip(*sorted_pairs)
+    #
+    # max_averages, max_region = [list(tup) for tup in tuples]
+    #
+    # print(max_averages[17])
+    # print(max_region[17])
+
+    print("Maxorder = np.max_averages.arg averages regions are ", max_averages)
     print("Max region rows and cols are ", max_region)
 
 elif data_dimension == 3:
