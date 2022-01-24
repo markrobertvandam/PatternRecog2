@@ -37,7 +37,7 @@ class Clustering:
         self.spectral_clusters = spectral_clusters
         self.agglomerative_clusters = agglormarative_clusters
 
-    def general_clustering(self, cluster) -> np.ndarray:
+    def general_clustering(self, cluster):
         """
         Function to perform clustering.
 
@@ -49,10 +49,10 @@ class Clustering:
         """
 
         cluster.fit(self.x)
-        if not cluster.labels_.count(cluster.labels_[0]) == len(cluster.labels_):
+        if not np.all(cluster.labels_ == cluster.labels_[0]):
             silhouette_score = metrics.silhouette_score(self.x, cluster.labels_)
         else:
-            silhouette_score = 0
+            silhouette_score = -1
         mutual_info_score = metrics.normalized_mutual_info_score(
             self.y, cluster.labels_
         )
@@ -62,7 +62,7 @@ class Clustering:
             " and normalized mutual info score = ",
             mutual_info_score,
         )
-        return cluster.labels_
+        return silhouette_score, mutual_info_score
 
     def k_means(self, n_clusters=5) -> np.ndarray:
         """
@@ -119,10 +119,6 @@ class Clustering:
         print("\nOPTICS clustering:\n -----------------")
         cluster = OPTICS(min_samples=min_samples)
         return self.general_clustering(cluster)
-
-    # def h_dbscan(self, min_samples=5):
-    #     cluster = hdbscan.HDBSCAN(min_cluster_size=min_samples)
-    #     return self.general_clustering(cluster)
 
     def cluster_with_plots(self, algorithm="kmeans") -> None:
         """
