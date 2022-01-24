@@ -176,7 +176,7 @@ class Cats:
                 "cats",
                 6,
             )
-            cats_tuner.tune_gene_params()
+            cats_tuner.tune_cats_params()
 
     def classification(self, command) -> None:
         """
