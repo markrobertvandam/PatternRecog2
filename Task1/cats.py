@@ -147,7 +147,7 @@ class Cats:
             self.fourier_data.shape[1] * self.fourier_data.shape[2],
         )
 
-        # self.sift_data, _ = self.feature_extractor.sift()
+        self.sift_data, _ = self.feature_extractor.sift()
 
     def tune_classification_params(self) -> None:
         """
@@ -156,11 +156,11 @@ class Cats:
 
         # print("Original:")
         # self.original_classification_params()
-        # print("Sift:")
-        # self.sift_fourier_classification_params("sift")
-        print("Fourier:")
-        self.fourier_data = None
-        self.sift_fourier_classification_params("fourier")
+        print("Sift:")
+        self.sift_classification_params("sift")
+        # print("Fourier:")
+        # self.fourier_data = None
+        # self.sift_fourier_classification_params("fourier")
 
     # Disable
     def block_print(self):
@@ -256,7 +256,7 @@ class Cats:
             "original",
         )
 
-    def sift_fourier_classification_params(self, name: str) -> None:
+    def fourier_classification_params(self, name: str) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -273,42 +273,25 @@ class Cats:
         results_f1_svm, results_acc_svm = [np.zeros((13, 12)), np.zeros((13, 12))]
 
         # Max keypoints loop
-        for i in range(60):
-            if name == "sift":
-                key_points = i * 5
-                self.enable_print()
-                print("number of keypoints: ", (key_points + 5))
-                self.block_print()
-
-                knn_reduced_sift = self.sift_data[:, 0 : key_points + 5]
-                knn_classifier = Classification(knn_reduced_sift, self.labels)
-
-                svm_reduced_sift = self.sift_data[:, 0 : key_points + 5]
-                svm_classifier = Classification(svm_reduced_sift, self.labels)
-
-                rf_reduced_sift = self.sift_data[:, 0 : key_points + 5]
-                rf_classifier = Classification(rf_reduced_sift, self.labels)
-            elif name == "fourier":
-                if i >= 13:
-                    break
-                self.enable_print()
-                print("filter radius: ", (i*2))
-                self.block_print()
-                if self.fourier_data is None:
-                    self.fourier_data = self.feature_extractor.fourier_transform(i*5)
-                    fourier_data = self.fourier_data
-                else:
-                    fourier_data = self.feature_extractor.fourier_transform(i*5, self.fourier_data)
-                    # knn_fourier_data = self.feature_extractor.fourier_transform(i + knn_offset, self.fourier_data)
-                    # svm_fourier_data = self.feature_extractor.fourier_transform(i + svm_offset, self.fourier_data)
-                    # rf_fourier_data = self.feature_extractor.fourier_transform(i+ rf_offset, self.fourier_data)
-                fourier_data = fourier_data.reshape(
-                    fourier_data.shape[0],
-                    fourier_data.shape[1] * fourier_data.shape[2],
-                )
-                knn_classifier = Classification(fourier_data, self.labels)
-                svm_classifier = Classification(fourier_data, self.labels)
-                rf_classifier = Classification(fourier_data, self.labels)
+        for i in range(13):
+            self.enable_print()
+            print("filter radius: ", (i*2))
+            self.block_print()
+            if self.fourier_data is None:
+                self.fourier_data = self.feature_extractor.fourier_transform(i*5)
+                fourier_data = self.fourier_data
+            else:
+                fourier_data = self.feature_extractor.fourier_transform(i*5, self.fourier_data)
+                # knn_fourier_data = self.feature_extractor.fourier_transform(i + knn_offset, self.fourier_data)
+                # svm_fourier_data = self.feature_extractor.fourier_transform(i + svm_offset, self.fourier_data)
+                # rf_fourier_data = self.feature_extractor.fourier_transform(i+ rf_offset, self.fourier_data)
+            fourier_data = fourier_data.reshape(
+                fourier_data.shape[0],
+                fourier_data.shape[1] * fourier_data.shape[2],
+            )
+            knn_classifier = Classification(fourier_data, self.labels)
+            svm_classifier = Classification(fourier_data, self.labels)
+            rf_classifier = Classification(fourier_data, self.labels)
 
             # k-value loop knn
             for k in range(1, 26):
@@ -342,6 +325,72 @@ class Cats:
                 (
                     results_f1_rf[i][n],
                     results_acc_rf[i][n],
+                ) = rf_classifier.random_forest(n_trees=n_trees, command="tune")
+
+        self.save_tune_results(
+            [results_f1_knn, results_f1_svm, results_f1_rf],
+            [results_acc_knn, results_acc_svm, results_acc_rf],
+            ["knn", "svm", "rf"],
+            name,
+        )
+
+    def sift_classification_params(self, name: str) -> None:
+        """
+        Helper function to run grid-search for sift data
+
+        Arguments:
+        name: Name of preprocessing. (Options: "sift", "fourier")
+
+        Returns:
+        None
+        """
+        self.block_print()
+        results_f1_knn, results_acc_knn, results_f1_rf, results_acc_rf = [
+            np.zeros((6, 6)) for _ in range(4)
+        ]
+        results_f1_svm, results_acc_svm = [np.zeros((6, 11)), np.zeros((6, 11))]
+
+        # Max keypoints loop
+        for i in range(6):
+            key_points = i * 5
+            self.enable_print()
+            print("number of keypoints: ", (key_points + 5))
+            self.block_print()
+
+            knn_reduced_sift = self.sift_data[:, 255: key_points + 5]
+            knn_classifier = Classification(knn_reduced_sift, self.labels)
+
+            svm_reduced_sift = self.sift_data[:, 0: key_points + 5]
+            svm_classifier = Classification(svm_reduced_sift, self.labels)
+
+            rf_reduced_sift = self.sift_data[:, 205: key_points + 5]
+            rf_classifier = Classification(rf_reduced_sift, self.labels)
+
+            # k-value loop knn
+            for k in range(19, 26):
+                (
+                    results_f1_knn[i][(k - 19)],
+                    results_acc_knn[i][(k - 19)],
+                ) = knn_classifier.knn_classify(k, command="tune")
+
+            # SVM
+            kernels = ['linear', 'poly', 'rbf', 'sigmoid']
+            c = [0.1, 1, 10, 100]
+            gamma = ['scale', 'auto', 0.0001, 0.001, 0.1, 1]
+            degree = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+            for n in range(11):
+                results_f1_svm[i][n], results_acc_svm[i][n] = \
+                    svm_classifier.svm_classify(
+                    kernel=kernels[3], c=c[2], gamma=gamma[0], degree=degree[n], command="tune"
+                )
+
+            # n-trees loop
+            for n in range(9, 16):
+                n_trees = 20 + n * 20
+                (
+                    results_f1_rf[i][n-9],
+                    results_acc_rf[i][n-9],
                 ) = rf_classifier.random_forest(n_trees=n_trees, command="tune")
 
         self.save_tune_results(
