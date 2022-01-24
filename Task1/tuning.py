@@ -67,9 +67,9 @@ class Tuning:
         Function to run grid-search for all data
         """
         if self.steps == 6:
-            sift_kernels = ["linear", "poly", "rbf", "sigmoid"]
+            sift_kernels = ["sigmoid"]
             sift_c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
-            sift_gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
+            sift_gamma = ["scale"]
 
             fourier_kernels = ["poly"]
             fourier_c = [1]
