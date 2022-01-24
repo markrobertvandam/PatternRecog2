@@ -68,7 +68,7 @@ class Tuning:
         """
 
         print("Original:")
-        self.original_cats_params(k_offset=3, rf_offset=17)
+        self.original_cats_params(k_offset=3, rf_offset=18)
         print("Sift:")
         self.sift_params(k_offset=20, rf_offset=10, key_pts=[255, 170, 205])
         print("Fourier:")
@@ -325,7 +325,7 @@ class Tuning:
             "original",
             rows=[("K-neighbors", list(range(k_offset, k_offset+self.steps))),
                   ("C", c),
-                  ("n_trees", list(range(rf_offset, rf_offset+self.steps)))],
+                  ("n_trees", [(i + rf_offset) * 20 for i in range(self.steps)])],
             dataset="cats",
         )
 
