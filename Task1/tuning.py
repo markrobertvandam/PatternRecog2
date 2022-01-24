@@ -341,14 +341,10 @@ class Tuning:
             results_acc_svm,
         ) = [np.zeros((self.steps, self.steps)) for _ in range(self.steps)]
 
-        # Max keypoints loop
+        # Fourier masking loop
         for i in range(self.steps):
-            fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2, self.fourier
-            )
-
             knn_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2, fourier_data
+                i * 2, self.fourier
             )
             knn_fourier_data = knn_fourier_data.reshape(
                 knn_fourier_data.shape[0],
@@ -356,7 +352,7 @@ class Tuning:
             )
 
             svm_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2 + 4, fourier_data
+                i * 2 + 4, self.fourier
             )
             svm_fourier_data = svm_fourier_data.reshape(
                 svm_fourier_data.shape[0],
@@ -364,7 +360,7 @@ class Tuning:
             )
 
             rf_fourier_data, _ = self.feature_extractor.fourier_transform(
-                i * 2 + 4, fourier_data
+                i * 2 + 4, self.fourier
             )
             rf_fourier_data = rf_fourier_data.reshape(
                 rf_fourier_data.shape[0],
