@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 # results_array = np.genfromtxt("data/results/clustering/sift_spec_mi.csv", delimiter=",")
-results_array = np.loadtxt("data/results/clustering/sift_km_mi.csv")
+results_array = np.loadtxt("data/results/clustering/sift_spec_mi.csv")
 
 # results_array = results_array[:, 78]
 # print(results_array.shape)
@@ -12,7 +12,7 @@ data_dimension = 2
 
 n_rows = results_array.shape[0]
 
-window_size_row = 6
+window_size_row = 1
 
 max_value = 0
 max_averages = []
@@ -35,7 +35,7 @@ if data_dimension == 1:
 elif data_dimension == 2:
 
     n_cols = results_array.shape[1]
-    window_size_col = 6
+    window_size_col = 1
 
     for row in range(((n_rows + 1) - window_size_row)):
         for col in range(((n_cols + 1) - window_size_col)):

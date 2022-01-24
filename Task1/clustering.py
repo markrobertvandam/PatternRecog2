@@ -15,7 +15,6 @@ class Clustering:
         y: np.ndarray,
         k_means_clusters: int,
         spectral_clusters: int,
-        agglormarative_clusters: int,
     ) -> None:
 
         """
@@ -35,7 +34,6 @@ class Clustering:
         self.y = y
         self.k_means_clusters = k_means_clusters
         self.spectral_clusters = spectral_clusters
-        self.agglomerative_clusters = agglormarative_clusters
 
     def general_clustering(self, cluster):
         """
@@ -76,7 +74,7 @@ class Clustering:
         cluster = KMeans(n_clusters=n_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def spectral(self, n_clusters=5) -> np.ndarray:
+    def spectral(self, n_clusters=5, n_neighbors=10):
         """
         Function to perform Spectral clustering.
 
@@ -85,39 +83,8 @@ class Clustering:
         """
 
         print("\nSpectral clustering:\n -----------------")
-        cluster = SpectralClustering(affinity='nearest_neighbors', n_clusters=n_clusters, random_state=42)
-        return self.general_clustering(cluster)
-
-    def agglomerative_clustering(self, linkage="ward", n_clusters=5):
-        """
-        Function to perform Agglomerative Clustering.
-
-        Arguments:
-        n_clusters: Number of clusters.
-        linkage: Specify type of linkage.
-
-        Returns:
-        cluster.labels_: Cluster labels array.
-        """
-
-        print("\nagglomerative clustering:\n -----------------")
-        cluster = AgglomerativeClustering(n_clusters=n_clusters, linkage=linkage)
-        return self.general_clustering(cluster)
-
-    def optics(self, min_samples=5):
-        """
-        Function to perform Ordering Points To
-        Identify Cluster Structure (OPTICS) clustering.
-
-        Arguments:
-        min_samples: Minumum number of samples for clustering.
-
-        Returns:
-        cluster.labels_: Cluster labels array.
-        """
-
-        print("\nOPTICS clustering:\n -----------------")
-        cluster = OPTICS(min_samples=min_samples)
+        cluster = SpectralClustering(affinity='nearest_neighbors', n_clusters=n_clusters, n_neighbors=n_neighbors,
+                                     random_state=42)
         return self.general_clustering(cluster)
 
     def cluster_with_plots(self, algorithm="kmeans") -> None:

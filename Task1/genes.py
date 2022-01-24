@@ -205,24 +205,36 @@ class Genes:
         Function to perform clustering.
         """
 
+        normal_km_s, normal_km_mi = [np.zeros(24), np.zeros(24)]
+        pca_km_s, pca_km_mi = [np.zeros((20, 24)), np.zeros((20, 24))]
+
         print("Clustering: \n")
         print("Original performance: \n")
         normal_clustering = Clustering(
             self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
         )
-        normal_clustering.spectral()
+        for k in range(2, 26):
+            normal_km_s[(k-2)], normal_km_mi[(k-2)] = normal_clustering.k_means(n_clusters=k)
         print("--------------\n")
+        print('Max sil score normal km = ' + str(np.max(normal_km_s)) + ', Max mi score normal km = ' +
+              str(np.max(normal_km_mi)))
+
+        np.savetxt('data/results/clustering/normal_km_s.csv', normal_km_s)
+        np.savetxt('data/results/clustering/normal_km_mi.csv', normal_km_mi)
 
         print("PCA performance: \n")
-        pca_clustering = Clustering(
-            self.pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
-        )
-        pca_clustering.spectral()
+        for i in range(20):
+            current_pca_data, _ = self.feature_extractor.pca(
+                0.45 + 0.01 * i, self.pca)
+            pca_clustering = Clustering(
+                current_pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
+            )
+            for k in range(2, 26):
+                pca_km_s[i][(k-2)], pca_km_mi[i][(k-2)] = pca_clustering.k_means(n_clusters=k)
         print("--------------\n")
 
-        print("Mutual Information performance: \n")
-        mi_clustering = Clustering(
-            x=self.mi_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
-        )
-        mi_clustering.spectral()
-        print("--------------\n")
+        print('Max sil score pca km = ' + str(np.max(pca_km_s)) + ', Max mi score pca km = ' +
+              str(np.max(pca_km_mi)))
+
+        np.savetxt('data/results/clustering/pca_km_s.csv', pca_km_s)
+        np.savetxt('data/results/clustering/pca_km_mi.csv', pca_km_mi)

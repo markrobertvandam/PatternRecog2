@@ -260,47 +260,31 @@ class Cats:
         Function to perform clustering of data.
         """
 
-        normal_km_s, normal_km_mi, normal_spec_s, normal_spec_mi, normal_opt_s, normal_opt_mi = \
-            [np.zeros(25) for _ in range(6)]
-
-        sift_km_s, sift_km_mi, sift_spec_s, sift_spec_mi, sift_opt_s, sift_opt_mi = \
-            [np.zeros((60, 25)) for _ in range(6)]
+        normal_spec_s, normal_spec_mi = [np.zeros((14, 25)), np.zeros((14, 25))]
+        sift_spec_s, sift_spec_mi = [np.zeros((60, 350)), np.zeros((60, 350))]
 
         print("Clustering: \n")
         print("Original performance: \n")
         self.block_print()
         normal_clustering = Clustering(self.flattened_original, self.labels, 4, 5, 5)
 
-        for i in range(1, 26):
-            self.enable_print()
-            print('orignal loop iteration ' + str(i))
-            self.block_print()
-
-            # normal_km_s[(i - 1)], normal_km_mi[(i - 1)] = normal_clustering.k_means(n_clusters=i)
-            # normal_spec_s[(i - 1)], normal_spec_mi[(i - 1)] = normal_clustering.spectral(n_clusters=i)
-            normal_opt_s[(i - 1)], normal_opt_mi[(i - 1)] = normal_clustering.optics(min_samples=(i))
+        for i in range(2, 16):
+            for j in range(1, 26):
+                self.enable_print()
+                print('orignal loop iteration ' + str(i))
+                self.block_print()
+                normal_spec_s[(i - 2)][(j-1)], normal_spec_mi[(i - 2)][(j-1)] = \
+                    normal_clustering.spectral(n_clusters=i, n_neighbors=j)
 
         self.enable_print()
         print("--------------\n")
-
-        print('Max sil score normal km = ' + str(np.max(normal_km_s)) + ', Max mi score normal km = ' +
-              str(np.max(normal_km_mi)))
         print('Max sil score normal spec = ' + str(np.max(normal_spec_s)) + ', Max mi score normal spec = ' +
               str(np.max(normal_spec_mi)))
-        print('Max sil score normal opt = ' + str(np.max(normal_opt_s)) + ', Max mi score normal opt = ' +
-              str(np.max(normal_opt_mi)))
 
-        # np.savetxt('data/results/clustering/normal_km_s.csv', normal_km_s)
-        # np.savetxt('data/results/clustering/normal_km_mi.csv', normal_km_mi)
-        #
-        # np.savetxt('data/results/clustering/normal_spec_s.csv', normal_spec_s)
-        # np.savetxt('data/results/clustering/normal_spec_mi.csv', normal_spec_mi)
-
-        np.savetxt('data/results/clustering/normal_opt_s.csv', normal_opt_s)
-        np.savetxt('data/results/clustering/normal_opt_mi.csv', normal_opt_mi)
+        np.savetxt('data/results/clustering/normal_spec_s.csv', normal_spec_s)
+        np.savetxt('data/results/clustering/normal_spec_mi.csv', normal_spec_mi)
 
         print("SIFT performance: \n")
-
         for i in range(60):
             key_points = i * 5
 
@@ -309,35 +293,19 @@ class Cats:
             print('Max keypoints = ' + str(((i*5) + 5)))
             self.block_print()
             sift_clustering = Clustering(reduced_sift, self.labels, 4, 5, 5)
-            for j in range(1, 26):
-                # sift_km_s[i][j-1], sift_km_mi[i][j-1] = sift_clustering.k_means(n_clusters=j)
-                # sift_spec_s[i][j-1], sift_spec_mi[i][j-1] = sift_clustering.spectral(n_clusters=j)
-                sift_opt_s[i][j-1], sift_opt_mi[i][j-1] = sift_clustering.optics(min_samples=(j))
+            for j in range(2, 16):
+                for k in range(1, 26):
+                    sift_spec_s[i][((j-2)*25) + (k-1)], sift_spec_mi[i][((j-2)*25) + (k-1)] = \
+                        sift_clustering.spectral(n_clusters=j, n_neighbors=k)
 
             self.enable_print()
-
         print("--------------\n")
 
-        print('Max sil score sift km = ' + str(np.max(sift_km_s)) + ', Max mi score sift km = ' +
-              str(np.max(sift_km_mi)))
         print('Max sil score sift spec = ' + str(np.max(sift_spec_s)) + ', Max mi score sift spec = ' +
               str(np.max(sift_spec_mi)))
-        print('Max sil score sift opt = ' + str(np.max(sift_opt_s)) + ', Max mi score sift opt = ' +
-              str(np.max(sift_opt_mi)))
 
-        # np.savetxt('data/results/clustering/sift_km_s.csv', sift_km_s)
-        # np.savetxt('data/results/clustering/sift_km_mi.csv', sift_km_mi)
-        #
-        # np.savetxt('data/results/clustering/sift_spec_s.csv', sift_spec_s)
-        # np.savetxt('data/results/clustering/sift_spec_mi.csv', sift_spec_mi)
-
-        np.savetxt('data/results/clustering/sift_opt_s.csv', sift_opt_s)
-        np.savetxt('data/results/clustering/sift_opt_mi.csv', sift_opt_mi)
-
-        # print("Fourier performance: \n")
-        # fourier_clustering = Clustering(self.fourier_data, self.labels, 4, 5)
-        # fourier_clustering.agglomerative_clustering()
-        # print("--------------\n")
+        np.savetxt('data/results/clustering/sift_spec_s.csv', sift_spec_s)
+        np.savetxt('data/results/clustering/sift_spec_mi.csv', sift_spec_mi)
 
     def save_clustering(self, cluster_labels, n_clusters) -> None:
         """
