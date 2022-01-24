@@ -68,11 +68,11 @@ class Tuning:
         """
 
         print("Original:")
-        self.original_cats_params()
+        self.original_cats_params(k_offset=3, rf_offset=17)
         print("Sift:")
-        self.sift_params(k_offset=20, c_offset=0, rf_offset=10, key_pts=[255, 170, 205])
+        self.sift_params(k_offset=20, rf_offset=10, key_pts=[255, 170, 205])
         print("Fourier:")
-        self.fourier_params(k_offset=16, deg_offset=0, rf_offset=7, masks=[0, 4, 4])
+        self.fourier_params(k_offset=16, rf_offset=7, masks=[0, 4, 4])
 
     # Disable
     def block_print(self):
@@ -279,7 +279,7 @@ class Tuning:
             dataset="genes",
         )
 
-    def original_cats_params(self) -> None:
+    def original_cats_params(self, k_offset: int, rf_offset: int) -> None:
         """
         Helper function to run grid-search for original data or fourier data
         """
@@ -299,7 +299,7 @@ class Tuning:
             (
                 results_f1_knn[(k)],
                 results_acc_knn[(k)],
-            ) = clf.knn_classify(k+3, command="tune")
+            ) = clf.knn_classify(k+k_offset, command="tune")
 
         kernels = ["linear", "poly", "rbf", "sigmoid"]
         c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
@@ -312,7 +312,7 @@ class Tuning:
 
         # n-trees loop
         for n in range(self.steps):
-            n_trees = 20 + (n + 17) * 20
+            n_trees = (n + rf_offset) * 20
             (
                 results_f1_rf[n],
                 results_acc_rf[n],
@@ -323,13 +323,13 @@ class Tuning:
             [results_acc_knn, results_acc_svm, results_acc_rf],
             ["knn", "svm", "rf"],
             "original",
-            rows=[("K-neighbors", list(range(3, 3+self.steps))),
-                  ("C", list(range(self.steps))),
-                  ("n_trees", list(range(17, 17+self.steps)))],
+            rows=[("K-neighbors", list(range(k_offset, k_offset+self.steps))),
+                  ("C", c),
+                  ("n_trees", list(range(rf_offset, rf_offset+self.steps)))],
             dataset="cats",
         )
 
-    def fourier_params(self, k_offset: int, deg_offset: int, rf_offset: int, masks: list) -> None:
+    def fourier_params(self, k_offset: int, rf_offset: int, masks: list) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -400,7 +400,7 @@ class Tuning:
                     kernel=kernels[1],
                     c=c[1],
                     gamma=gamma[0],
-                    degree=degree[n+deg_offset],
+                    degree=degree[n],
                     command="tune",
                 )
 
@@ -421,13 +421,13 @@ class Tuning:
                   ("Mask radius", [2 * i + masks[1] for i in range(self.steps)]),
                   ("Mask radius", [2 * i + masks[2] for i in range(self.steps)])],
             cols=[[i + k_offset for i in range(self.steps)],
-                  [i + deg_offset for i in range(self.steps)],
+                  degree[:self.steps],
                   [(i + rf_offset) * 20 for i in range(self.steps)]],
             col_names=["K-Neighbors", "Degree", "n_trees"],
             dataset="cats",
         )
 
-    def sift_params(self, k_offset: int, c_offset: int, rf_offset: int, key_pts: list) -> None:
+    def sift_params(self, k_offset: int, rf_offset: int, key_pts: list) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -477,7 +477,7 @@ class Tuning:
                     results_f1_svm[i][n],
                     results_acc_svm[i][n],
                 ) = svm_classifier.svm_classify(
-                    kernel=kernels[3], c=c[n + c_offset], gamma=gamma[0], degree=3, command="tune"
+                    kernel=kernels[3], c=c[n], gamma=gamma[0], degree=3, command="tune"
                 )
 
             # n-trees loop
@@ -497,7 +497,7 @@ class Tuning:
                   ("Max_Keypoints", [5*i + key_pts[1] for i in range(self.steps)]),
                   ("Max_Keypoints", [5*i + key_pts[2] for i in range(self.steps)])],
             cols=[[i+k_offset for i in range(self.steps)],
-                  [i+c_offset for i in range(self.steps)],
+                  c,
                   [(i+rf_offset)*20 for i in range(self.steps)]],
             col_names=["K-Neighbors", "C", "n_trees"],
             dataset="cats",
