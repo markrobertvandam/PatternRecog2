@@ -165,7 +165,7 @@ class Cats:
                 self.sift_data,
                 self.fourier_unmasked,
                 "cats",
-                20,
+                25.,
             )
             cats_tuner.tune_gene_params()
         else:

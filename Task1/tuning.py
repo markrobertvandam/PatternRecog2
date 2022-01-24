@@ -53,26 +53,48 @@ class Tuning:
         # small sweep
         if self.steps == 6:
             print("PCA:")
-            self.pca_mi_params("pca", k_offset=1, glvq_offset=0, lr_offset=12)
+            self.pca_mi_params("pca", k_offset=1, lr_offset=12)
             print("MI:")
-            self.pca_mi_params("mi", k_offset=0, glvq_offset=14, lr_offset=0)
+            self.pca_mi_params("mi", glvq_offset=14)
         # big sweep
         else:
-            self.pca_mi_params("pca", k_offset=0, glvq_offset=0, lr_offset=0)
+            self.pca_mi_params("pca")
             print("MI:")
-            self.pca_mi_params("mi", k_offset=0, glvq_offset=0, lr_offset=0)
+            self.pca_mi_params("mi")
 
     def tune_cats_params(self) -> None:
         """
         Function to run grid-search for all data
         """
+        if self.steps == 6:
+            sift_kernels = ["linear", "poly", "rbf", "sigmoid"]
+            sift_c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
+            sift_gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
-        print("Original:")
-        self.original_cats_params(k_offset=3, rf_offset=18)
-        print("Sift:")
-        self.sift_params(k_offset=20, rf_offset=10, key_pts=[255, 170, 205])
-        print("Fourier:")
-        self.fourier_params(k_offset=16, rf_offset=7, masks=[0, 4, 4])
+            fourier_kernels = ["poly"]
+            fourier_c = [1]
+            fourier_gamma = ["scale"]
+            fourier_degree = [2, 3, 4, 5, 6, 7]
+
+            print("Original:")
+            self.original_cats_params(k_offset=3, rf_offset=18)
+            print("Sift:")
+            self.sift_params(k_offset=20, rf_offset=10, key_pts=[255, 170, 205],
+                                kernels=sift_kernels, c=sift_c, gamma=sift_gamma)
+            print("Fourier:")
+            self.fourier_params(k_offset=16, rf_offset=7, masks=[0, 4, 4],
+                                kernels=fourier_kernels, c=fourier_c, gamma=fourier_gamma, degree=fourier_degree)
+        else:
+            kernels = ["linear", "poly", "rbf", "sigmoid"]
+            c = [0.1, 1, 10, 100]
+            gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
+
+            print("Original:")
+            self.original_cats_params()
+            print("Sift:")
+            self.sift_params(key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
+            print("Fourier:")
+            self.fourier_params(masks=[0, 0, 0], kernels=kernels, c=c, gamma=gamma, degree=[3])
 
     # Disable
     def block_print(self):
@@ -199,7 +221,7 @@ class Tuning:
         )
 
     def pca_mi_params(
-        self, name: str, k_offset: int, glvq_offset: int, lr_offset: int
+        self, name: str, k_offset=0, glvq_offset=0, lr_offset=0
     ) -> None:
         """
         Helper function to run grid-search for pca data
@@ -279,7 +301,7 @@ class Tuning:
             dataset="genes",
         )
 
-    def original_cats_params(self, k_offset: int, rf_offset: int) -> None:
+    def original_cats_params(self, k_offset=0, rf_offset=0) -> None:
         """
         Helper function to run grid-search for original data or fourier data
         """
@@ -305,9 +327,9 @@ class Tuning:
         c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
         gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
-        for i in range(self.steps):
+        for i in c:
             (results_f1_svm[i], results_acc_svm[i],) = clf.svm_classify(
-                kernel=kernels[0], c=c[i], gamma=gamma[0], degree=3, command="tune"
+                kernel=kernels[0], c=i, gamma=gamma[0], degree=3, command="tune"
             )
 
         # n-trees loop
@@ -329,7 +351,8 @@ class Tuning:
             dataset="cats",
         )
 
-    def fourier_params(self, k_offset: int, rf_offset: int, masks: list) -> None:
+    def fourier_params(self,  masks: list, kernels: list, c: list, gamma: list, degree: list,
+                       k_offset=0, rf_offset=0) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -387,22 +410,16 @@ class Tuning:
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
-            kernels = ["linear", "poly", "rbf", "sigmoid"]
-            c = [0.1, 1, 10, 100]
-            gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
-            degree = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-
-            for n in range(self.steps):
-                (
-                    results_f1_svm[i][n],
-                    results_acc_svm[i][n],
-                ) = svm_classifier.svm_classify(
-                    kernel=kernels[1],
-                    c=c[1],
-                    gamma=gamma[0],
-                    degree=degree[n],
-                    command="tune",
-                )
+            for i in range(len(kernels)):
+                for j in range(len(c)):
+                    for k in range(len(gamma)):
+                        for l in range(len(degree)):
+                            (
+                                results_f1_svm[(i * 24 + j * 6 + k)],
+                                results_acc_svm[(i * 24 + j * 6 + k)],
+                            ) = svm_classifier.svm_classify(
+                                kernel=kernels[i], c=c[j], gamma=gamma[k], degree=degree[l], command="tune"
+                            )
 
             # n-trees loop
             for n in range(self.steps):
@@ -427,7 +444,8 @@ class Tuning:
             dataset="cats",
         )
 
-    def sift_params(self, k_offset: int, rf_offset: int, key_pts: list) -> None:
+    def sift_params(self, key_pts: list, kernels: list, c: list, gamma: list,
+                    k_offset=0, rf_offset=0) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -468,17 +486,16 @@ class Tuning:
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
-            kernels = ["linear", "poly", "rbf", "sigmoid"]
-            c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
-            gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
-            for n in range(self.steps):
-                (
-                    results_f1_svm[i][n],
-                    results_acc_svm[i][n],
-                ) = svm_classifier.svm_classify(
-                    kernel=kernels[3], c=c[n], gamma=gamma[0], degree=3, command="tune"
-                )
+            for i in range(len(kernels)):
+                for j in range(len(c)):
+                    for k in range(len(gamma)):
+                        (
+                            results_f1_svm[(i * len(kernels) + j * len(c) + k)],
+                            results_acc_svm[(i * len(kernels) + j * len(c) + k)],
+                        ) = svm_classifier.svm_classify(
+                            kernel=kernels[i], c=c[j], gamma=gamma[k], degree=degree[l], command="tune"
+                        )
 
             # n-trees loop
             for n in range(self.steps):
