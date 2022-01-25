@@ -132,7 +132,6 @@ class FeatureExtraction:
             print(n_components, total_variance)
             if total_variance >= min_variance:
                 break
-        exit()
 
         pca_reduction = PCA(n_components=n_components)
         data_reduced = pca_reduction.fit_transform(self.data)
