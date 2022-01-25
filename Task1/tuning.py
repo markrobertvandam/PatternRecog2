@@ -90,7 +90,7 @@ class Tuning:
             gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
             print("Original:")
-            self.original_cats_params()
+            self.original_cats_params(k_offset=1, rf_offset=1)
             print("Sift:")
             self.sift_params(key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
             print("Fourier:")
