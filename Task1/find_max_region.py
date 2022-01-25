@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 # results_array = np.genfromtxt("data/results/clustering/sift_spec_mi.csv", delimiter=",")
-results_array = np.loadtxt("data/results/clustering/pca_km_s.csv")
+results_array = np.loadtxt("data/results/clustering/sift_spec_s.csv")
 
 # results_array = results_array[:, 78]
 # print(results_array.shape)
@@ -35,7 +35,7 @@ if data_dimension == 1:
 elif data_dimension == 2:
 
     n_cols = results_array.shape[1]
-    window_size_col = 1
+    window_size_col = 6
 
     for row in range(((n_rows + 1) - window_size_row)):
         for col in range(((n_cols + 1) - window_size_col)):
@@ -71,7 +71,7 @@ elif data_dimension == 3:
     print("max value is ", np.max(results_array))
 
     kernel_slice = 24
-    c_slice = 6
+    c_slice = 1
 
     for kernel in range(4):
         data_kernel = results_array[

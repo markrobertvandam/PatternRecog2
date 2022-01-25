@@ -13,8 +13,6 @@ class Clustering:
         self,
         x: np.ndarray,
         y: np.ndarray,
-        k_means_clusters: int,
-        spectral_clusters: int,
     ) -> None:
 
         """
@@ -32,8 +30,6 @@ class Clustering:
 
         self.x = x
         self.y = y
-        self.k_means_clusters = k_means_clusters
-        self.spectral_clusters = spectral_clusters
 
     def general_clustering(self, cluster):
         """
@@ -62,7 +58,7 @@ class Clustering:
         )
         return silhouette_score, mutual_info_score
 
-    def k_means(self, n_clusters=5) -> np.ndarray:
+    def k_means(self, n_clusters=4) -> np.ndarray:
         """
         Function to perform clustering using K-means.
 
@@ -74,7 +70,7 @@ class Clustering:
         cluster = KMeans(n_clusters=n_clusters, random_state=42)
         return self.general_clustering(cluster)
 
-    def spectral(self, n_clusters=5, n_neighbors=10):
+    def spectral(self, n_clusters=4, n_neighbors=10):
         """
         Function to perform Spectral clustering.
 
