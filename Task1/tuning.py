@@ -314,7 +314,7 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros(self.steps) for _ in range(self.steps)]
+        ) = [np.zeros(self.steps) for _ in range(6)]
 
         # k-value loop
         for k in range(self.steps):
@@ -370,7 +370,7 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros((self.steps, self.steps)) for _ in range(self.steps)]
+        ) = [np.zeros((self.steps, self.steps)) for _ in range(6)]
 
         # Fourier masking loop
         for i in range(self.steps):
@@ -465,7 +465,7 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros((self.steps, self.steps)) for _ in range(self.steps)]
+        ) = [np.zeros((self.steps, self.steps)) for _ in range(6)]
 
         # Max keypoints loop
         for i in range(self.steps):
