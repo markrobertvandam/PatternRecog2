@@ -165,7 +165,7 @@ class Cats:
                 self.sift_data,
                 self.fourier_unmasked,
                 "cats",
-                25.,
+                25,
             )
             cats_tuner.tune_cats_params()
         else:
