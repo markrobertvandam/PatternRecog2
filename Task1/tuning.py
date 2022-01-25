@@ -90,7 +90,7 @@ class Tuning:
             gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
             print("Original:")
-            self.original_cats_params()
+            self.original_cats_params(k_offset=1, rf_offset=1)
             print("Sift:")
             self.sift_params(key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
             print("Fourier:")
@@ -314,7 +314,7 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros(self.steps) for _ in range(self.steps)]
+        ) = [np.zeros(self.steps) for _ in range(6)]
 
         # k-value loop
         for k in range(self.steps):
@@ -370,7 +370,7 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros((self.steps, self.steps)) for _ in range(self.steps)]
+        ) = [np.zeros((self.steps, self.steps)) for _ in range(6)]
 
         # Fourier masking loop
         for i in range(self.steps):
@@ -465,7 +465,7 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros((self.steps, self.steps)) for _ in range(self.steps)]
+        ) = [np.zeros((self.steps, self.steps)) for _ in range(6)]
 
         # Max keypoints loop
         for i in range(self.steps):
