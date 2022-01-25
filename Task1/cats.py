@@ -167,7 +167,7 @@ class Cats:
                 "cats",
                 25.,
             )
-            cats_tuner.tune_gene_params()
+            cats_tuner.tune_cats_params()
         else:
             cats_tuner = Tuning(
                 self.flattened_original,
