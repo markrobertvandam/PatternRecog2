@@ -15,7 +15,7 @@ from tuning import Tuning
 
 
 class Genes:
-    def __init__(self, pca_min_variance=0.6, mi_min_information=0.55):
+    def __init__(self, pca_min_variance=0.53, mi_min_information=0.55):
         """
         Initialize dataset, feature extractorsa and clustering algorithms
         for gene dataset.
@@ -157,50 +157,13 @@ class Genes:
 
         self.normal_classifier = Classification(self.samples, self.labels)
         self.normal_classifier.knn_classify(k=5, command=command)
-        self.normal_classifier.glvq_classify(prototypes_per_class=1, command=command)
-        self.normal_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------")
 
         # Classify PCA dataset
         print(f"PCA performance (shape: {self.pca_data.shape}): \n")
         self.pca_classifier = Classification(self.pca_data, self.labels)
         self.pca_classifier.knn_classify(k=5, command=command)
-        self.pca_classifier.glvq_classify(prototypes_per_class=1, command=command)
-        self.pca_classifier.logistic_regression(max_iter=10000, command=command)
         print("--------------\n")
-
-        # Classify Mutual Information dataset
-
-        print(f"MI performance (shape: {self.mi_data.shape}): \n")
-
-        self.mi_classifier = Classification(self.mi_data, self.labels)
-        self.mi_classifier.knn_classify(k=5, command=command)
-        self.mi_classifier.glvq_classify(prototypes_per_class=1, command=command)
-        self.mi_classifier.logistic_regression(max_iter=10000, command=command)
-        print("--------------")
-
-    def cross_val(self) -> None:
-        """
-        function to run cross-val with full data with best pipelines
-        """
-
-        print(f"Original performance (shape: {self.samples.shape}): \n")
-
-        self.normal_classifier = Classification(self.samples, self.labels)
-        self.normal_classifier.knn_classify(k=5, command="cross-val")
-        self.normal_classifier.glvq_classify(
-            prototypes_per_class=1, command="cross-val"
-        )
-        self.normal_classifier.logistic_regression(max_iter=10000, command="cross-val")
-        print("--------------")
-
-        # Classify PCA dataset
-        print(f"PCA performance (shape: {self.pca_data.shape}): \n")
-        self.pca_classifier = Classification(self.pca_data, self.labels)
-        self.pca_classifier.knn_classify(k=5, command="cross-val")
-        self.pca_classifier.glvq_classify(prototypes_per_class=1, command="cross-val")
-        self.pca_classifier.logistic_regression(max_iter=10000, command="cross-val")
-        print("--------------")
 
     # Disable
     def block_print(self):
