@@ -2,6 +2,8 @@
 import csv
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+import sys
 
 from classification import Classification
 from clustering import Clustering
@@ -213,41 +215,93 @@ class Genes:
         """
         Function to perform clustering.
         """
+        small = 1
 
-        normal_km_s, normal_km_mi = [np.zeros(24), np.zeros(24)]
-        pca_km_s, pca_km_mi = [np.zeros((20, 24)), np.zeros((20, 24))]
+        if small:
+            normal_km_s, normal_km_mi = [np.zeros(6), np.zeros(6)]
+            pca_km_s_max_s, pca_km_mi_max_s, pca_km_s_max_mi, pca_km_mi_max_mi = [np.zeros((6, 6)) for _ in range(4)]
 
-        print("Clustering: \n")
-        print("Original performance: \n")
-        self.block_print()
-        normal_clustering = Clustering(
-            self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
-        )
-        for k in range(2, 26):
-            normal_km_s[(k-2)], normal_km_mi[(k-2)] = normal_clustering.k_means(n_clusters=k)
-        self.enable_print()
-        print("--------------\n")
-        print('Max sil score normal km = ' + str(np.max(normal_km_s)) + ', Max mi score normal km = ' +
-              str(np.max(normal_km_mi)))
+            pca_s = [pca_km_s_max_s, pca_km_s_max_mi]
+            pca_mi = [pca_km_mi_max_s, pca_km_mi_max_mi]
+            var_regions = [0.45, 0.59]
+            start_neighbors = [3, 4]
 
-        np.savetxt('data/results/clustering/normal_km_s.csv', normal_km_s)
-        np.savetxt('data/results/clustering/normal_km_mi.csv', normal_km_mi)
+            print("Clustering: \n")
+            print("Original performance: \n")
+            self.block_print()
+            normal_clustering = Clustering(
+                self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
+            )
+            for k in range(4, 10):
+                normal_km_s[(k - 4)], normal_km_mi[(k - 4)] = normal_clustering.k_means(n_clusters=k)
+            self.enable_print()
+            print("--------------\n")
+            print('Max sil score normal km = ' + str(np.max(normal_km_s)) + ', Max mi score normal km = ' +
+                  str(np.max(normal_km_mi)))
 
-        print("PCA performance: \n")
-        self.block_print()
-        for i in range(20):
-            current_pca_data, _ = self.feature_extractor.pca(
-                0.45 + 0.01 * i, self.pca)
-            pca_clustering = Clustering(
-                current_pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
+            np.savetxt('data/results/clustering/normal_km_s.csv', normal_km_s)
+            np.savetxt('data/results/clustering/normal_km_mi.csv', normal_km_mi)
+
+            print("PCA performance: \n")
+            self.block_print()
+            for region in range(2):
+                for i in range(6):
+                    current_pca_data, _ = self.feature_extractor.pca(
+                        var_regions[region] + 0.01 * i, self.pca)
+                    pca_clustering = Clustering(
+                        current_pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
+                    )
+                    for k in range(start_neighbors[region], start_neighbors[region] + 6):
+                        pca_s[region][i][(k - start_neighbors[region])], \
+                            pca_mi[region][i][(k - start_neighbors[region])] = pca_clustering.k_means(n_clusters=k)
+            self.enable_print()
+            print("--------------\n")
+
+            print('Max sil score pca km sil region = ' + str(np.max(pca_s[0])) + ', Max mi score pca km sil region = ' +
+                  str(np.max(pca_mi[0])))
+            print('Max sil score pca km mi region = ' + str(np.max(pca_s[1])) + ', Max mi score pca km mi region = ' +
+                  str(np.max(pca_mi[1])))
+
+            np.savetxt('data/results/clustering/pca_km_s_max_s.csv', pca_s[0])
+            np.savetxt('data/results/clustering/pca_km_mi_max_s.csv', pca_mi[0])
+
+            np.savetxt('data/results/clustering/pca_km_s_max_mi.csv', pca_s[1])
+            np.savetxt('data/results/clustering/pca_km_mi_max_mi.csv', pca_mi[1])
+        else:
+            normal_km_s, normal_km_mi = [np.zeros(24), np.zeros(24)]
+            pca_km_s, pca_km_mi = [np.zeros((20, 24)), np.zeros((20, 24))]
+
+            print("Clustering: \n")
+            print("Original performance: \n")
+            self.block_print()
+            normal_clustering = Clustering(
+                self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
             )
             for k in range(2, 26):
-                pca_km_s[i][(k-2)], pca_km_mi[i][(k-2)] = pca_clustering.k_means(n_clusters=k)
-        self.enable_print()
-        print("--------------\n")
+                normal_km_s[(k-2)], normal_km_mi[(k-2)] = normal_clustering.k_means(n_clusters=k)
+            self.enable_print()
+            print("--------------\n")
+            print('Max sil score normal km = ' + str(np.max(normal_km_s)) + ', Max mi score normal km = ' +
+                  str(np.max(normal_km_mi)))
 
-        print('Max sil score pca km = ' + str(np.max(pca_km_s)) + ', Max mi score pca km = ' +
-              str(np.max(pca_km_mi)))
+            np.savetxt('data/results/clustering/normal_km_s.csv', normal_km_s)
+            np.savetxt('data/results/clustering/normal_km_mi.csv', normal_km_mi)
 
-        np.savetxt('data/results/clustering/pca_km_s.csv', pca_km_s)
-        np.savetxt('data/results/clustering/pca_km_mi.csv', pca_km_mi)
+            print("PCA performance: \n")
+            self.block_print()
+            for i in range(20):
+                current_pca_data, _ = self.feature_extractor.pca(
+                    0.45 + 0.01 * i, self.pca)
+                pca_clustering = Clustering(
+                    current_pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
+                )
+                for k in range(2, 26):
+                    pca_km_s[i][(k-2)], pca_km_mi[i][(k-2)] = pca_clustering.k_means(n_clusters=k)
+            self.enable_print()
+            print("--------------\n")
+
+            print('Max sil score pca km = ' + str(np.max(pca_km_s)) + ', Max mi score pca km = ' +
+                  str(np.max(pca_km_mi)))
+
+            np.savetxt('data/results/clustering/pca_km_s.csv', pca_km_s)
+            np.savetxt('data/results/clustering/pca_km_mi.csv', pca_km_mi)
