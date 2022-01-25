@@ -323,7 +323,7 @@ class Tuning:
             results_f1_rf,
             results_acc_rf,
         ) = [np.zeros(self.steps) for _ in range(4)]
-        results_f1_svm, results_acc_svm = [np.zeros(total_size) for _ in range(4)]
+        results_f1_svm, results_acc_svm = [np.zeros(total_size) for _ in range(2)]
 
         # k-value loop
         for k in range(self.steps):
