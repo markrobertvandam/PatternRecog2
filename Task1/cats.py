@@ -271,9 +271,6 @@ class Cats:
             kernel="sigmoid", c=1.1, gamma="scale", degree=3, command="cross-val"
         )
 
-        self.sift_classifier.random_forest(n_trees=220, command="test")
-        self.sift_classifier.random_forest(n_trees=220, command="cross-val")
-
         print("\nEnsemble using SVM and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
