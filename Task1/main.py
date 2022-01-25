@@ -74,7 +74,7 @@ def cats_pipeline(args: argparse.Namespace) -> None:
         elif args.command == "tune":
             cats.tune_classification_params()
         elif args.command == "tune-big":
-            cats.tune_classification_params()
+            cats.tune_classification_params("big")
         elif args.command == "test":
             cats.classification(command="test")
         elif args.command == "ensemble":
