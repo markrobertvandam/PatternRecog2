@@ -262,14 +262,15 @@ class Cats:
         small = 1
 
         if small:
-            normal_spec_s, normal_spec_mi = [np.zeros(6), np.zeros(6)]
-            pca_spec_s_max_s, pca_spec_mi_max_s, pca_spec_s_max_mi, pca_spec_mi_max_mi = [np.zeros((6, 6)) for _ in range(4)]
+            normal_spec_s, normal_spec_mi, sift_spec_s_max_s, sift_spec_mi_max_s, \
+            sift_spec_s_max_mi, sift_spec_mi_max_mi = [np.zeros((6, 6)) for _ in range(6)]
+            # normal_spec_s, normal_spec_mi, sift_spec_s, sift_spec_mi = [np.zeros((6, 6)) for _ in range(4)]
 
-            pca_s = [pca_spec_s_max_s, pca_spec_s_max_mi]
-            pca_mi = [pca_spec_mi_max_s, pca_spec_mi_max_mi]
-            key_regions = [9, 1]
-            n_clusters = [4, 2]
-            start_neighbors = [11, 5]
+            # sift_s = [sift_spec_s_max_s, sift_spec_s_max_mi]
+            # sift_mi = [sift_spec_mi_max_s, sift_spec_mi_max_mi]
+            # key_regions = [1, 9]
+            # n_clusters = [2, 2]
+            # n_neighbors = [5, 12]
 
             print("Clustering: \n")
             print("Original performance: \n")
@@ -277,9 +278,87 @@ class Cats:
             normal_clustering = Clustering(self.flattened_original, self.labels)
 
             for i in range(10, 16):
-                for j in range(2, 8):
-                    normal_spec_s[(i - 2)][(j-1)], normal_spec_mi[(i - 2)][(j-1)] = \
+                for j in range(3, 9):
+                    normal_spec_s[(i - 10)][(j-3)], normal_spec_mi[(i - 10)][(j-3)] = \
                         normal_clustering.spectral(n_clusters=i, n_neighbors=j)
+
+            self.enable_print()
+            print("--------------\n")
+            print('Max sil score normal spec = ' + str(np.max(normal_spec_s)) + ', Max mi score normal spec = ' +
+                  str(np.max(normal_spec_mi)))
+
+            np.savetxt('data/results/clustering/normal_spec_s.csv', normal_spec_s)
+            np.savetxt('data/results/clustering/normal_spec_mi.csv', normal_spec_mi)
+
+            for i in range(8, 14):
+                key_points = i * 5
+
+                reduced_sift = self.sift_data[:, 0: key_points*5 + 5]
+
+                # print('Max keypoints = ' + str(((i*5) + 5)))
+                self.block_print()
+                sift_clustering = Clustering(reduced_sift, self.labels)
+                k = 12
+                for j in range(2, 8):
+                    sift_spec_s_max_mi[i-8][(j-2)], sift_spec_mi_max_mi[i-8][(j-2)] = \
+                        sift_clustering.spectral(n_clusters=j, n_neighbors=k)
+
+                self.enable_print()
+            print("--------------\n")
+
+            print('Max sil score sift spec = ' + str(np.max(sift_spec_s_max_mi)) + ', Max mi score sift spec = ' +
+                  str(np.max(sift_spec_mi_max_mi)))
+
+            np.savetxt('data/results/clustering/sift_spec_s_max_mi.csv', sift_spec_s_max_mi)
+            np.savetxt('data/results/clustering/sift_spec_mi_max_mi.csv', sift_spec_mi_max_mi)
+
+            for i in range(0, 6):
+                key_points = i * 5
+
+                reduced_sift = self.sift_data[:, 0: key_points*5 + 5]
+
+                # print('Max keypoints = ' + str(((i*5) + 5)))
+                self.block_print()
+                sift_clustering = Clustering(reduced_sift, self.labels)
+                k = 9
+                for j in range(2, 8):
+                    sift_spec_s_max_s[i][(j-2)], sift_spec_mi_max_s[i][(j-2)] = \
+                        sift_clustering.spectral(n_clusters=j, n_neighbors=k)
+
+                self.enable_print()
+            print("--------------\n")
+
+            print('Max sil score sift spec s = ' + str(np.max(sift_spec_s_max_s)) + ', Max mi score sift spec s = ' +
+                  str(np.max(sift_spec_mi_max_s)))
+
+            np.savetxt('data/results/clustering/sift_spec_s_max_s.csv', sift_spec_s_max_s)
+            np.savetxt('data/results/clustering/sift_spec_mi_max_s.csv', sift_spec_mi_max_s)
+
+            # print("SIFT performance: \n")
+            # self.block_print()
+            # for region in range(2):
+            #     for i in range(key_regions[region], key_regions[region] + 6):
+            #         reduced_sift = self.sift_data[:, 0: i * 5]
+            #         sift_clustering = Clustering(reduced_sift, self.labels)
+            #         for j in range(n_clusters[region], n_clusters[region] + 6):
+            #
+            #             sift_s[region][i-key_regions[region]][j-n_clusters[region]], \
+            #                 sift_mi[region][i-key_regions[region]][j-n_clusters[region]] = \
+            #                 sift_clustering.spectral(n_clusters=j, n_neighbors=n_neighbors[region])
+            #
+            # self.enable_print()
+            # print("--------------\n")
+            #
+            # print('Max sil score sift spec sil region = ' + str(np.max(sift_s[0])) +
+            #       ', Max mi score sift spec sil region = ' + str(np.max(sift_mi[0])))
+            # print('Max sil score sift spec mi region = ' + str(np.max(sift_s[1])) +
+            #       ', Max mi score sift spec mi region = ' + str(np.max(sift_mi[1])))
+            #
+            # np.savetxt('data/results/clustering/sift_spec_s_max_s.csv', sift_s[0])
+            # np.savetxt('data/results/clustering/sift_spec_mi_max_s.csv', sift_mi[0])
+            #
+            # np.savetxt('data/results/clustering/sift_spec_s_max_mi.csv', sift_s[1])
+            # np.savetxt('data/results/clustering/sift_spec_mi_max_mi.csv', sift_mi[1])
 
         else:
             normal_spec_s, normal_spec_mi = [np.zeros((14, 25)), np.zeros((14, 25))]
@@ -288,7 +367,7 @@ class Cats:
             print("Clustering: \n")
             print("Original performance: \n")
             self.block_print()
-            normal_clustering = Clustering(self.flattened_original, self.labels, 4, 5, 5)
+            normal_clustering = Clustering(self.flattened_original, self.labels)
 
             for i in range(2, 16):
                 for j in range(1, 26):
@@ -314,7 +393,7 @@ class Cats:
 
                 print('Max keypoints = ' + str(((i*5) + 5)))
                 self.block_print()
-                sift_clustering = Clustering(reduced_sift, self.labels, 4, 5, 5)
+                sift_clustering = Clustering(reduced_sift, self.labels)
                 for j in range(2, 16):
                     for k in range(1, 26):
                         sift_spec_s[i][((j-2)*25) + (k-1)], sift_spec_mi[i][((j-2)*25) + (k-1)] = \

@@ -229,9 +229,7 @@ class Genes:
             print("Clustering: \n")
             print("Original performance: \n")
             self.block_print()
-            normal_clustering = Clustering(
-                self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
-            )
+            normal_clustering = Clustering(self.samples, y=self.labels)
             for k in range(4, 10):
                 normal_km_s[(k - 4)], normal_km_mi[(k - 4)] = normal_clustering.k_means(n_clusters=k)
             self.enable_print()
@@ -248,9 +246,7 @@ class Genes:
                 for i in range(6):
                     current_pca_data, _ = self.feature_extractor.pca(
                         var_regions[region] + 0.01 * i, self.pca)
-                    pca_clustering = Clustering(
-                        current_pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
-                    )
+                    pca_clustering = Clustering(current_pca_data, y=self.labels)
                     for k in range(start_neighbors[region], start_neighbors[region] + 6):
                         pca_s[region][i][(k - start_neighbors[region])], \
                             pca_mi[region][i][(k - start_neighbors[region])] = pca_clustering.k_means(n_clusters=k)
@@ -274,9 +270,7 @@ class Genes:
             print("Clustering: \n")
             print("Original performance: \n")
             self.block_print()
-            normal_clustering = Clustering(
-                self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
-            )
+            normal_clustering = Clustering(self.samples, y=self.labels)
             for k in range(2, 26):
                 normal_km_s[(k-2)], normal_km_mi[(k-2)] = normal_clustering.k_means(n_clusters=k)
             self.enable_print()
@@ -292,9 +286,7 @@ class Genes:
             for i in range(20):
                 current_pca_data, _ = self.feature_extractor.pca(
                     0.45 + 0.01 * i, self.pca)
-                pca_clustering = Clustering(
-                    current_pca_data, y=self.labels, k_means_clusters=4, spectral_clusters=5
-                )
+                pca_clustering = Clustering(current_pca_data, y=self.labels)
                 for k in range(2, 26):
                     pca_km_s[i][(k-2)], pca_km_mi[i][(k-2)] = pca_clustering.k_means(n_clusters=k)
             self.enable_print()
