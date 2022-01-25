@@ -362,6 +362,7 @@ class Tuning:
         Returns:
         None
         """
+        outer_loop = 6 if self.steps == 6 else 13
         self.block_print()
         (
             results_f1_knn,
@@ -370,10 +371,10 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros((self.steps, self.steps)) for _ in range(6)]
+        ) = [np.zeros((outer_loop, self.steps)) for _ in range(6)]
 
         # Fourier masking loop
-        for i in range(self.steps):
+        for i in range(outer_loop):
             knn_fourier_data, _ = self.feature_extractor.fourier_transform(
                 i * 2 + masks[0], self.fourier
             )
@@ -457,6 +458,7 @@ class Tuning:
         Returns:
         None
         """
+        outer_loop = 6 if self.steps == 6 else 60
         self.block_print()
         (
             results_f1_knn,
@@ -465,10 +467,11 @@ class Tuning:
             results_acc_rf,
             results_f1_svm,
             results_acc_svm,
-        ) = [np.zeros((self.steps, self.steps)) for _ in range(6)]
+        ) = [np.zeros((outer_loop, self.steps)) for _ in range(6)]
 
         # Max keypoints loop
-        for i in range(self.steps):
+
+        for i in range(outer_loop):
             key_points = i * 5
 
             knn_reduced_sift = self.sift_data[:, 0 : key_points + key_pts[0]]
