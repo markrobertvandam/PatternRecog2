@@ -53,9 +53,9 @@ class Tuning:
         # small sweep
         if self.steps == 6:
             print("PCA:")
-            self.pca_mi_params("pca", k_offset=1, lr_offset=12)
+            self.pca_mi_params("pca", pca_offset=5, k_offset=1, lr_offset=12)
             print("MI:")
-            self.pca_mi_params("mi", glvq_offset=14)
+            self.pca_mi_params("mi", k_offset=1, glvq_offset=14)
         # big sweep
         else:
             self.pca_mi_params("pca")
@@ -81,13 +81,13 @@ class Tuning:
             gamma = ["scale"]
 
             print("Original:")
-            self.original_cats_params(k_offset=3, rf_offset=18,
+            self.original_cats_params(k_offset=2, rf_offset=18,
                                       kernels=kernels, c=c, gamma=gamma)
             print("Sift:")
-            self.sift_params(k_offset=20, rf_offset=10, key_pts=[255, 170, 205],
+            self.sift_params(k_offset=19, rf_offset=10, key_pts=[255, 170, 205],
                                 kernels=sift_kernels, c=sift_c, gamma=sift_gamma)
             print("Fourier:")
-            self.fourier_params(k_offset=16, rf_offset=7, masks=[0, 4, 4],
+            self.fourier_params(k_offset=15, rf_offset=7, masks=[0, 4, 4],
                                 kernels=fourier_kernels, c=fourier_c, gamma=fourier_gamma, degree=fourier_degree)
         else:
             kernels = ["linear", "poly", "rbf", "sigmoid"]
@@ -226,7 +226,7 @@ class Tuning:
         )
 
     def pca_mi_params(
-        self, name: str, k_offset=0, glvq_offset=0, lr_offset=0
+        self, name: str, pca_offset=0, k_offset=0, glvq_offset=0, lr_offset=0
     ) -> None:
         """
         Helper function to run grid-search for pca data
@@ -249,12 +249,12 @@ class Tuning:
 
         # min-variance loop
         min_values = [0.45 + 0.01 * i for i in range(0, self.steps)]
+        min_variance = [i + 0.01 * pca_offset for i in min_values]
         for i in range(0, self.steps):
             if name == "pca":
-                min_variance = min_values[i]
-                data, _ = self.feature_extractor.pca(min_variance, self.pca)
+                data, _ = self.feature_extractor.pca(min_variance[i], self.pca)
                 lr_data, _ = self.feature_extractor.pca(
-                    min_variance + 0.01 * lr_offset, self.pca
+                    min_values[i] + 0.01 * lr_offset, self.pca
                 )
             elif name == "mi":
                 min_info = min_values[i]
@@ -284,6 +284,7 @@ class Tuning:
             )
         if name == "pca":
             row_name = "Min-variance"
+            min_values = min_variance
         else:
             row_name = "Min-info"
 
@@ -326,7 +327,7 @@ class Tuning:
         results_f1_svm, results_acc_svm = [np.zeros(total_size) for _ in range(2)]
 
         # k-value loop
-        for k in range(self.steps):
+        for k in range(1, 1+self.steps):
             (
                 results_f1_knn[(k)],
                 results_acc_knn[(k)],
@@ -420,7 +421,7 @@ class Tuning:
             rf_classifier = Classification(rf_fourier_data, self.labels)
 
             # k-value loop knn
-            for k in range(self.steps):
+            for k in range(1, 1+self.steps):
                 (
                     results_f1_knn[i][(k)],
                     results_acc_knn[i][(k)],
@@ -503,7 +504,7 @@ class Tuning:
             rf_classifier = Classification(rf_reduced_sift, self.labels)
 
             # k-value loop knn
-            for k in range(self.steps):
+            for k in range(1, 1+self.steps):
                 (
                     results_f1_knn[i][(k)],
                     results_acc_knn[i][(k)],
