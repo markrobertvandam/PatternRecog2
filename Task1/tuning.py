@@ -416,8 +416,8 @@ class Tuning:
                     for l in range(len(gamma)):
                         for m in range(len(degree)):
                             (
-                                results_f1_svm[count],
-                                results_acc_svm[count],
+                                results_f1_svm[i][count],
+                                results_acc_svm[i][count],
                             ) = svm_classifier.svm_classify(
                                 kernel=kernels[j], c=c[k], gamma=gamma[l], degree=degree[m], command="tune"
                             )
@@ -493,8 +493,8 @@ class Tuning:
                 for k in range(len(c)):
                     for l in range(len(gamma)):
                         (
-                            results_f1_svm[count],
-                            results_acc_svm[count],
+                            results_f1_svm[i][count],
+                            results_acc_svm[i][count],
                         ) = svm_classifier.svm_classify(
                             kernel=kernels[j], c=c[k], gamma=gamma[l], degree=3, command="tune"
                         )
