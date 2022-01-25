@@ -200,6 +200,15 @@ class Genes:
         self.pca_classifier.logistic_regression(max_iter=10000, command="cross-val")
         print("--------------")
 
+    # Disable
+    def block_print(self):
+        sys.stdout = open(os.devnull, "w")
+        sys.stdout = open(os.devnull, "w")
+
+    # Restore
+    def enable_print(self):
+        sys.stdout = sys.__stdout__
+
     def clustering(self) -> None:
         """
         Function to perform clustering.
@@ -210,11 +219,13 @@ class Genes:
 
         print("Clustering: \n")
         print("Original performance: \n")
+        self.block_print()
         normal_clustering = Clustering(
             self.samples, y=self.labels, k_means_clusters=4, spectral_clusters=5
         )
         for k in range(2, 26):
             normal_km_s[(k-2)], normal_km_mi[(k-2)] = normal_clustering.k_means(n_clusters=k)
+        self.enable_print()
         print("--------------\n")
         print('Max sil score normal km = ' + str(np.max(normal_km_s)) + ', Max mi score normal km = ' +
               str(np.max(normal_km_mi)))
@@ -223,6 +234,7 @@ class Genes:
         np.savetxt('data/results/clustering/normal_km_mi.csv', normal_km_mi)
 
         print("PCA performance: \n")
+        self.block_print()
         for i in range(20):
             current_pca_data, _ = self.feature_extractor.pca(
                 0.45 + 0.01 * i, self.pca)
@@ -231,6 +243,7 @@ class Genes:
             )
             for k in range(2, 26):
                 pca_km_s[i][(k-2)], pca_km_mi[i][(k-2)] = pca_clustering.k_means(n_clusters=k)
+        self.enable_print()
         print("--------------\n")
 
         print('Max sil score pca km = ' + str(np.max(pca_km_s)) + ', Max mi score pca km = ' +
