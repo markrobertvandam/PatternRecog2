@@ -259,40 +259,48 @@ class Cats:
         """
 
         # Classify sift dataset
-        print(f"Sift performance (shape: {self.sift_data.shape}): \n")
-        self.sift_classifier = Classification(self.sift_data, self.labels)
-        self.sift_classifier.knn_classify(k=5, command="test")
+        print(f"Sift performance (shape: {self.sift_data[:, 0:210].shape}): \n")
+        self.sift_classifier = Classification(self.sift_data[:, 0:210], self.labels)
+        self.sift_classifier.knn_classify(k=25, command="test")
+        self.sift_classifier.knn_classify(k=25, command="cross-val")
+
         self.sift_classifier.svm_classify(
-            kernel="linear", c=1, gamma="scale", command="test"
+            kernel="sigmoid", c=1.1, gamma="scale", degree=3, command="test"
         )
-        self.sift_classifier.random_forest(n_trees=200, command="test")
+        self.sift_classifier.svm_classify(
+            kernel="sigmoid", c=1.1, gamma="scale", degree=3, command="cross-val"
+        )
+
+        self.sift_classifier.random_forest(n_trees=220, command="test")
+        self.sift_classifier.random_forest(n_trees=220, command="cross-val")
 
         print("\nEnsemble using SVM and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
-            SVC(kernel="linear", C=1, gamma="scale"), RandomForestClassifier()
+            SVC(kernel="sigmoid", C=1.1, gamma="scale", degree=3, probability=True, random_state=42),
+            RandomForestClassifier(n_estimators=220, random_state=42)
         )
 
         print("\nEnsemble using SVC and KNN:")
         print("--------------")
         self.sift_classifier.ensemble(
-            SVC(kernel="linear", C=1, gamma="scale"),
-            KNeighborsClassifier(n_neighbors=5),
+            SVC(kernel="sigmoid", C=1.1, gamma="scale", degree=3, probability=True, random_state=42),
+            KNeighborsClassifier(n_neighbors=25),
         )
 
         print("\nEnsemble using KNN and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
-            KNeighborsClassifier(n_neighbors=5),
-            RandomForestClassifier(),
+            KNeighborsClassifier(n_neighbors=25),
+            RandomForestClassifier(n_estimators=220, random_state=42),
         )
 
         print("\nEnsemble using KNN, SVC and Random Forest:")
         print("--------------")
         self.sift_classifier.ensemble(
-            KNeighborsClassifier(n_neighbors=5),
-            SVC(kernel="linear", C=1, gamma="scale"),
-            RandomForestClassifier(),
+            KNeighborsClassifier(n_neighbors=25),
+            SVC(kernel="sigmoid", C=1.1, degree=3, gamma="scale", probability=True, random_state=42),
+            RandomForestClassifier(n_estimators=220, random_state=42),
         )
 
         print("--------------")

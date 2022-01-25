@@ -275,4 +275,6 @@ class Classification:
         if model3 is not None:
             estimators.append(("model3", model3))
         ensemble_model = VotingClassifier(estimators=estimators, voting="soft")
+        copy_model = ensemble_model
         self.test_run(ensemble_model)
+        self.cross_val_run(copy_model)
