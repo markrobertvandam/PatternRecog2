@@ -76,8 +76,13 @@ class Tuning:
             fourier_gamma = ["scale"]
             fourier_degree = [2, 3, 4, 5, 6, 7]
 
+            kernels = ["linear"]
+            c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
+            gamma = ["scale"]
+
             print("Original:")
-            self.original_cats_params(k_offset=3, rf_offset=18)
+            self.original_cats_params(k_offset=3, rf_offset=18,
+                                      kernels=kernels, c=c, gamma=gamma)
             print("Sift:")
             self.sift_params(k_offset=20, rf_offset=10, key_pts=[255, 170, 205],
                                 kernels=sift_kernels, c=sift_c, gamma=sift_gamma)
@@ -90,7 +95,7 @@ class Tuning:
             gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
             print("Original:")
-            self.original_cats_params(k_offset=1, rf_offset=1)
+            self.original_cats_params(k_offset=1, rf_offset=1, kernels=kernels, c=c, gamma=gamma)
             print("Sift:")
             self.sift_params(key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
             print("Fourier:")
@@ -301,20 +306,24 @@ class Tuning:
             dataset="genes",
         )
 
-    def original_cats_params(self, k_offset=0, rf_offset=0) -> None:
+    def original_cats_params(self, kernels: list, c: list, gamma: list,
+                             k_offset=0, rf_offset=0) -> None:
         """
         Helper function to run grid-search for original data or fourier data
         """
         clf = Classification(self.data, self.labels)
+        kernel_size = len(kernels)
+        c_size = len(c)
+        gamma_size = len(gamma)
+        total_size = kernel_size * c_size * gamma_size
         self.block_print()
         (
             results_f1_knn,
             results_acc_knn,
             results_f1_rf,
             results_acc_rf,
-            results_f1_svm,
-            results_acc_svm,
-        ) = [np.zeros(self.steps) for _ in range(6)]
+        ) = [np.zeros(self.steps) for _ in range(4)]
+        results_f1_svm, results_acc_svm = [np.zeros(total_size) for _ in range(4)]
 
         # k-value loop
         for k in range(self.steps):
@@ -323,15 +332,18 @@ class Tuning:
                 results_acc_knn[(k)],
             ) = clf.knn_classify(k+k_offset, command="tune")
 
-        kernels = ["linear", "poly", "rbf", "sigmoid"]
-        c = [0.8, 0.9, 1, 1.1, 1.2, 1.3]
-        gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
-
-        for i in range(len(c)):
-            (results_f1_svm[i], results_acc_svm[i],) = clf.svm_classify(
-                kernel=kernels[0], c=c[i], gamma=gamma[0], degree=3, command="tune"
-            )
-
+            # SVM
+            count = 0
+            for j in range(len(kernels)):
+                for k in range(len(c)):
+                    for l in range(len(gamma)):
+                        (
+                            results_f1_svm[count],
+                            results_acc_svm[count],
+                        ) = clf.svm_classify(
+                            kernel=kernels[j], c=c[k], gamma=gamma[l], degree=3, command="tune"
+                        )
+                        count += 1
         # n-trees loop
         for n in range(self.steps):
             n_trees = (n + rf_offset) * 20
@@ -346,7 +358,7 @@ class Tuning:
             ["knn", "svm", "rf"],
             "original",
             rows=[("K-neighbors", list(range(k_offset, k_offset+self.steps))),
-                  ("C", c),
+                  None,
                   ("n_trees", [(i + rf_offset) * 20 for i in range(self.steps)])],
             dataset="cats",
         )
@@ -363,15 +375,19 @@ class Tuning:
         None
         """
         outer_loop = 6 if self.steps == 6 else 13
+        kernel_size = len(kernels)
+        c_size = len(c)
+        gamma_size = len(gamma)
+        deg_size = len(degree)
+        total_size = kernel_size * c_size * gamma_size * deg_size
         self.block_print()
         (
             results_f1_knn,
             results_acc_knn,
             results_f1_rf,
             results_acc_rf,
-            results_f1_svm,
-            results_acc_svm,
-        ) = [np.zeros((outer_loop, self.steps)) for _ in range(6)]
+        ) = [np.zeros((outer_loop, self.steps)) for _ in range(4)]
+        results_f1_svm, results_acc_svm = [np.zeros((outer_loop, total_size)) for _ in range(2)]
 
         # Fourier masking loop
         for i in range(outer_loop):
@@ -459,15 +475,18 @@ class Tuning:
         None
         """
         outer_loop = 6 if self.steps == 6 else 60
+        kernel_size = len(kernels)
+        c_size = len(c)
+        gamma_size = len(gamma)
+        total_size = kernel_size * c_size * gamma_size
         self.block_print()
         (
             results_f1_knn,
             results_acc_knn,
             results_f1_rf,
             results_acc_rf,
-            results_f1_svm,
-            results_acc_svm,
-        ) = [np.zeros((outer_loop, self.steps)) for _ in range(6)]
+        ) = [np.zeros((outer_loop, self.steps)) for _ in range(4)]
+        results_f1_svm, results_acc_svm = [np.zeros((outer_loop, total_size)) for _ in range(2)]
 
         # Max keypoints loop
 
