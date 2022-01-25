@@ -14,7 +14,7 @@ from clustering import Clustering
 from feature_extraction import FeatureExtraction
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -85,24 +85,69 @@ class Cats:
             random_state=42,
             stratify=self.labels,
         )
+
+        test_len = len(x_test)
+
+        sift_classifier_rf_original = RandomForestClassifier(220, random_state=42)
+        sift_classifier_rf_original_cross, sift_classifier_rf_augmented, sift_classifier_rf_augmented_cross = \
+            [sift_classifier_rf_original for _ in range(3)]
+
+        print("Running SIFT on original images")
+        full_x_original = np.concatenate((x_train, x_test))
+        full_y_original = np.concatenate((y_train, y_test))
+
+        feature_extractor = FeatureExtraction(full_x_original, full_y_original, "cats")
+        sift_data_original, _ = feature_extractor.sift(210)
+
+        cross_val_scores = cross_validate(
+            sift_classifier_rf_original_cross, sift_data_original[:-test_len], y_train, scoring=["f1_macro", "accuracy"]
+        )
+        print(
+            "cross-val F1-scores: ",
+            cross_val_scores["test_f1_macro"],
+            f" (Avg: {np.average(cross_val_scores['test_f1_macro'])})",
+        )
+        print(
+            "cross-val Accuracy scores: ",
+            cross_val_scores["test_accuracy"],
+            f" (Avg: {np.average(cross_val_scores['test_accuracy'])})",
+        )
+
+        sift_classifier_rf_original.fit(sift_data_original[:-test_len], y_train)
+        y_pred = sift_classifier_rf_original.predict(sift_data_original[-test_len:])
+        Classification.evaluate(y_test, y_pred)
+
         print("Augmenting images...")
         for i in range(len(x_train)):
             image = x_train[i]
             augmented_gray += Cats.augment_image(image)
-        test_len = len(x_test)
         augmented_labels = np.repeat(y_train, 3, axis=0)
         full_x = np.concatenate((augmented_gray, x_test))
         full_y = np.concatenate((augmented_labels, y_test))
 
         print("Running SIFT Feature Extraction...")
         feature_extractor = FeatureExtraction(full_x, full_y, "cats")
-        sift_data, bad_imgs = feature_extractor.sift(225)
+        sift_data, bad_imgs = feature_extractor.sift(210)
         augmented_labels = np.delete(augmented_labels, bad_imgs)
 
         print(f"Sift performance (shape: {sift_data.shape}): \n")
-        sift_classifier_rf = RandomForestClassifier(280, random_state=42)
-        sift_classifier_rf.fit(sift_data[:-test_len], augmented_labels)
-        y_pred = sift_classifier_rf.predict(sift_data[-test_len:])
+
+        cross_val_scores = cross_validate(
+            sift_classifier_rf_augmented_cross, sift_data[:-test_len], augmented_labels, scoring=["f1_macro", "accuracy"]
+        )
+        print(
+            "cross-val F1-scores: ",
+            cross_val_scores["test_f1_macro"],
+            f" (Avg: {np.average(cross_val_scores['test_f1_macro'])})",
+        )
+        print(
+            "cross-val Accuracy scores: ",
+            cross_val_scores["test_accuracy"],
+            f" (Avg: {np.average(cross_val_scores['test_accuracy'])})",
+        )
+
+        sift_classifier_rf_augmented.fit(sift_data[:-test_len], augmented_labels)
+        y_pred = sift_classifier_rf_augmented.predict(sift_data[-test_len:])
         Classification.evaluate(y_test, y_pred)
 
     @staticmethod
@@ -192,14 +237,20 @@ class Cats:
 
         print(f"Original performance (shape: {self.flattened_original.shape}): \n")
 
-        self.normal_classifier = Classification(self.flattened_original, self.labels)
-        self.normal_classifier.random_forest(n_trees=160, command=command)
+        normal_classifier = Classification(self.flattened_original, self.labels)
+        print("Best number of trees for original data")
+        normal_classifier.random_forest(n_trees=460, command=command)
+        print("\nBest number of trees for SIFT data")
+        normal_classifier.random_forest(n_trees=220, command=command)
         print("--------------")
 
         # Classify sift dataset
         print(f"Sift performance (shape: {self.sift_data.shape}): \n")
-        sift_classifier_rf = Classification(self.sift_data[:, 0:225], self.labels)
-        sift_classifier_rf.random_forest(n_trees=280, command=command)
+        sift_classifier_rf = Classification(self.sift_data[:, 0:210], self.labels)
+        print("Best number of trees for original data")
+        sift_classifier_rf.random_forest(n_trees=460, command=command)
+        print("\nBest number of trees for SIFT data")
+        sift_classifier_rf.random_forest(n_trees=220, command=command)
         print("--------------\n")
 
     def ensemble(self) -> None:
