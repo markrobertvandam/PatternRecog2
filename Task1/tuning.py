@@ -113,10 +113,17 @@ class Tuning:
                 k_offset=1, rf_offset=1, kernels=kernels, c=c, gamma=gamma
             )
             print("Sift:")
-            self.sift_params(rf_offset=1, key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
+            self.sift_params(
+                rf_offset=1, key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma
+            )
             print("Fourier:")
-            self.fourier_params(rf_offset=1,
-                masks=[0, 0, 0], kernels=kernels, c=c, gamma=gamma, degree=[3]
+            self.fourier_params(
+                rf_offset=1,
+                masks=[0, 0, 0],
+                kernels=kernels,
+                c=c,
+                gamma=gamma,
+                degree=[3],
             )
 
     # Disable

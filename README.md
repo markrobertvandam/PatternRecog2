@@ -22,12 +22,18 @@ To run Task 1 of the assigment you can simply run the main.py inside the Task1 f
 * for genes/number classification: ```python3 main.py genes command```
 
 The command options for both pipelines are as follows (will use cats as example):
-* ```python3 main.py cats tune``` # To run grid-search to find best params
+* ```python3 main.py cats tune``` # To run small grid-search to find best params
+* ```python3 main.py cats tune``` # To run big grid-search to find best params (not recommended)
 * ```python3 main.py cats test``` # Test run with 80% training and 20% test 
 * ```python3 main.py cats cross-val``` # Basically 5 test-runs with different splits of 80% training and 20% test
-* ```python3 main.py cats ensemble``` # Test-run followed by runs with all possible ensemble combinations and their test performance.
+* ```python3 main.py cats cluster``` # Runs the clustering algorithm and outputs clustering scores
 * ```python3 main.py cats full-run``` # command to run test, cross-val and ensemble all at once. (Saves time because data and 
 feature selection/extraction only has to be done once)
+
+The following 2 commands only work for cats
+* ```python3 main.py cats augment```  # cross-val run with augmented images
+* ```python3 main.py cats ensemble``` # cross-val runs with all possible ensemble combinations and their test performance.
+
 
 ## Running Task 2
 ```python3 main.py``` inside the Task2 folder
