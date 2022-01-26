@@ -134,9 +134,9 @@ class FeatureExtraction:
 
         pca_reduction = PCA(n_components=n_components)
         data_reduced = pca_reduction.fit_transform(self.data)
-        self.scree_plot(
-            pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100
-        )
+        # self.scree_plot(
+        #     pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100
+        # )
 
         return np.array(data_reduced, dtype="object"), pca
 
