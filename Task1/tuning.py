@@ -81,25 +81,43 @@ class Tuning:
             gamma = ["scale"]
 
             print("Original:")
-            self.original_cats_params(k_offset=2, rf_offset=18,
-                                      kernels=kernels, c=c, gamma=gamma)
+            self.original_cats_params(
+                k_offset=2, rf_offset=18, kernels=kernels, c=c, gamma=gamma
+            )
             print("Sift:")
-            self.sift_params(k_offset=19, rf_offset=10, key_pts=[255, 170, 205],
-                             kernels=sift_kernels, c=sift_c, gamma=sift_gamma)
+            self.sift_params(
+                k_offset=19,
+                rf_offset=10,
+                key_pts=[255, 170, 205],
+                kernels=sift_kernels,
+                c=sift_c,
+                gamma=sift_gamma,
+            )
             print("Fourier:")
-            self.fourier_params(k_offset=15, rf_offset=7, masks=[0, 4, 4],
-                                kernels=fourier_kernels, c=fourier_c, gamma=fourier_gamma, degree=fourier_degree)
+            self.fourier_params(
+                k_offset=15,
+                rf_offset=7,
+                masks=[0, 4, 4],
+                kernels=fourier_kernels,
+                c=fourier_c,
+                gamma=fourier_gamma,
+                degree=fourier_degree,
+            )
         else:
             kernels = ["linear", "poly", "rbf", "sigmoid"]
             c = [0.1, 1, 10, 100]
             gamma = ["scale", "auto", 0.0001, 0.001, 0.1, 1]
 
             print("Original:")
-            self.original_cats_params(k_offset=1, rf_offset=1, kernels=kernels, c=c, gamma=gamma)
+            self.original_cats_params(
+                k_offset=1, rf_offset=1, kernels=kernels, c=c, gamma=gamma
+            )
             print("Sift:")
             self.sift_params(key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
             print("Fourier:")
-            self.fourier_params(masks=[0, 0, 0], kernels=kernels, c=c, gamma=gamma, degree=[3])
+            self.fourier_params(
+                masks=[0, 0, 0], kernels=kernels, c=c, gamma=gamma, degree=[3]
+            )
 
     # Disable
     def block_print(self):
@@ -219,10 +237,11 @@ class Tuning:
             ["knn", "glvq", "lr"],
             name,
             rows=[
-                ("K-neighbors", list(range(1, 1+self.steps))),
-                ("Prototypes", list(range(1, 1+self.steps))),
+                ("K-neighbors", list(range(1, 1 + self.steps))),
+                ("Prototypes", list(range(1, 1 + self.steps))),
                 None,
-            ], dataset="genes",
+            ],
+            dataset="genes",
         )
 
     def pca_mi_params(
@@ -307,8 +326,9 @@ class Tuning:
             dataset="genes",
         )
 
-    def original_cats_params(self, kernels: list, c: list, gamma: list,
-                             k_offset=0, rf_offset=0) -> None:
+    def original_cats_params(
+        self, kernels: list, c: list, gamma: list, k_offset=0, rf_offset=0
+    ) -> None:
         """
         Helper function to run grid-search for original data or fourier data
         """
@@ -327,22 +347,23 @@ class Tuning:
         results_f1_svm, results_acc_svm = [np.zeros(total_size) for _ in range(2)]
 
         # k-value loop
-        for k in range(1, 1+self.steps):
+        for k in range(1, 1 + self.steps):
             (
-                results_f1_knn[(k-1)],
-                results_acc_knn[(k-1)],
-            ) = clf.knn_classify(k+k_offset, command="tune")
+                results_f1_knn[(k - 1)],
+                results_acc_knn[(k - 1)],
+            ) = clf.knn_classify(k + k_offset, command="tune")
 
         # SVM
         count = 0
         for j in range(len(kernels)):
             for k in range(len(c)):
                 for l in range(len(gamma)):
-                    (
-                        results_f1_svm[count],
-                        results_acc_svm[count],
-                    ) = clf.svm_classify(
-                        kernel=kernels[j], c=c[k], gamma=gamma[l], degree=3, command="tune"
+                    (results_f1_svm[count], results_acc_svm[count],) = clf.svm_classify(
+                        kernel=kernels[j],
+                        c=c[k],
+                        gamma=gamma[l],
+                        degree=3,
+                        command="tune",
                     )
                     count += 1
         # n-trees loop
@@ -358,14 +379,24 @@ class Tuning:
             [results_acc_knn, results_acc_svm, results_acc_rf],
             ["knn", "svm", "rf"],
             "original",
-            rows=[("K-neighbors", list(range(k_offset, k_offset+self.steps))),
-                  None,
-                  ("n_trees", [(i + rf_offset) * 20 for i in range(self.steps)])],
+            rows=[
+                ("K-neighbors", list(range(k_offset, k_offset + self.steps))),
+                None,
+                ("n_trees", [(i + rf_offset) * 20 for i in range(self.steps)]),
+            ],
             dataset="cats",
         )
 
-    def fourier_params(self,  masks: list, kernels: list, c: list, gamma: list, degree: list,
-                       k_offset=0, rf_offset=0) -> None:
+    def fourier_params(
+        self,
+        masks: list,
+        kernels: list,
+        c: list,
+        gamma: list,
+        degree: list,
+        k_offset=0,
+        rf_offset=0,
+    ) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -388,7 +419,9 @@ class Tuning:
             results_f1_rf,
             results_acc_rf,
         ) = [np.zeros((outer_loop, self.steps)) for _ in range(4)]
-        results_f1_svm, results_acc_svm = [np.zeros((outer_loop, total_size)) for _ in range(2)]
+        results_f1_svm, results_acc_svm = [
+            np.zeros((outer_loop, total_size)) for _ in range(2)
+        ]
 
         # Fourier masking loop
         for i in range(outer_loop):
@@ -421,10 +454,10 @@ class Tuning:
             rf_classifier = Classification(rf_fourier_data, self.labels)
 
             # k-value loop knn
-            for k in range(1, 1+self.steps):
+            for k in range(1, 1 + self.steps):
                 (
-                    results_f1_knn[i][(k-1)],
-                    results_acc_knn[i][(k-1)],
+                    results_f1_knn[i][(k - 1)],
+                    results_acc_knn[i][(k - 1)],
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
@@ -437,13 +470,17 @@ class Tuning:
                                 results_f1_svm[i][count],
                                 results_acc_svm[i][count],
                             ) = svm_classifier.svm_classify(
-                                kernel=kernels[j], c=c[k], gamma=gamma[l], degree=degree[m], command="tune"
+                                kernel=kernels[j],
+                                c=c[k],
+                                gamma=gamma[l],
+                                degree=degree[m],
+                                command="tune",
                             )
                             count += 1
 
             # n-trees loop
             for n in range(self.steps):
-                n_trees = (n+rf_offset) * 20
+                n_trees = (n + rf_offset) * 20
                 (
                     results_f1_rf[i][n],
                     results_acc_rf[i][n],
@@ -454,18 +491,29 @@ class Tuning:
             [results_acc_knn, results_acc_svm, results_acc_rf],
             ["knn", "svm", "rf"],
             "fourier",
-            rows=[("Mask radius", [2 * i + masks[0] for i in range(self.steps)]),
-                  ("Mask radius", [2 * i + masks[1] for i in range(self.steps)]),
-                  ("Mask radius", [2 * i + masks[2] for i in range(self.steps)])],
-            cols=[[i + k_offset for i in range(self.steps)],
-                  None,
-                  [(i + rf_offset) * 20 for i in range(self.steps)]],
+            rows=[
+                ("Mask radius", [2 * i + masks[0] for i in range(self.steps)]),
+                ("Mask radius", [2 * i + masks[1] for i in range(self.steps)]),
+                ("Mask radius", [2 * i + masks[2] for i in range(self.steps)]),
+            ],
+            cols=[
+                [i + k_offset for i in range(self.steps)],
+                None,
+                [(i + rf_offset) * 20 for i in range(self.steps)],
+            ],
             col_names=["K-Neighbors", "Degree", "n_trees"],
             dataset="cats",
         )
 
-    def sift_params(self, key_pts: list, kernels: list, c: list, gamma: list,
-                    k_offset=0, rf_offset=0) -> None:
+    def sift_params(
+        self,
+        key_pts: list,
+        kernels: list,
+        c: list,
+        gamma: list,
+        k_offset=0,
+        rf_offset=0,
+    ) -> None:
         """
         Helper function to run grid-search for sift data
 
@@ -487,7 +535,9 @@ class Tuning:
             results_f1_rf,
             results_acc_rf,
         ) = [np.zeros((outer_loop, self.steps)) for _ in range(4)]
-        results_f1_svm, results_acc_svm = [np.zeros((outer_loop, total_size)) for _ in range(2)]
+        results_f1_svm, results_acc_svm = [
+            np.zeros((outer_loop, total_size)) for _ in range(2)
+        ]
 
         # Max keypoints loop
 
@@ -504,10 +554,10 @@ class Tuning:
             rf_classifier = Classification(rf_reduced_sift, self.labels)
 
             # k-value loop knn
-            for k in range(1, 1+self.steps):
+            for k in range(1, 1 + self.steps):
                 (
-                    results_f1_knn[i][(k-1)],
-                    results_acc_knn[i][(k-1)],
+                    results_f1_knn[i][(k - 1)],
+                    results_acc_knn[i][(k - 1)],
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
@@ -519,13 +569,17 @@ class Tuning:
                             results_f1_svm[i][count],
                             results_acc_svm[i][count],
                         ) = svm_classifier.svm_classify(
-                            kernel=kernels[j], c=c[k], gamma=gamma[l], degree=3, command="tune"
+                            kernel=kernels[j],
+                            c=c[k],
+                            gamma=gamma[l],
+                            degree=3,
+                            command="tune",
                         )
-                        count+=1
+                        count += 1
 
             # n-trees loop
             for n in range(self.steps):
-                n_trees = (n+rf_offset) * 20
+                n_trees = (n + rf_offset) * 20
                 (
                     results_f1_rf[i][n],
                     results_acc_rf[i][n],
@@ -536,12 +590,16 @@ class Tuning:
             [results_acc_knn, results_acc_svm, results_acc_rf],
             ["knn", "svm", "rf"],
             "sift",
-            rows=[("Max_Keypoints", [5*i + key_pts[0] for i in range(self.steps)]),
-                  ("Max_Keypoints", [5*i + key_pts[1] for i in range(self.steps)]),
-                  ("Max_Keypoints", [5*i + key_pts[2] for i in range(self.steps)])],
-            cols=[[i+k_offset for i in range(self.steps)],
-                  None,
-                  [(i+rf_offset)*20 for i in range(self.steps)]],
+            rows=[
+                ("Max_Keypoints", [5 * i + key_pts[0] for i in range(self.steps)]),
+                ("Max_Keypoints", [5 * i + key_pts[1] for i in range(self.steps)]),
+                ("Max_Keypoints", [5 * i + key_pts[2] for i in range(self.steps)]),
+            ],
+            cols=[
+                [i + k_offset for i in range(self.steps)],
+                None,
+                [(i + rf_offset) * 20 for i in range(self.steps)],
+            ],
             col_names=["K-Neighbors", "C", "n_trees"],
             dataset="cats",
         )

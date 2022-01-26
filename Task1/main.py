@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import numpy as np
 
 from cats import Cats
 from genes import Genes

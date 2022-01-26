@@ -79,8 +79,12 @@ class Clustering:
         """
 
         print("\nSpectral clustering:\n -----------------")
-        cluster = SpectralClustering(affinity='nearest_neighbors', n_clusters=n_clusters, n_neighbors=n_neighbors,
-                                     random_state=42)
+        cluster = SpectralClustering(
+            affinity="nearest_neighbors",
+            n_clusters=n_clusters,
+            n_neighbors=n_neighbors,
+            random_state=42,
+        )
         return self.general_clustering(cluster)
 
     def cluster_with_plots(self, algorithm="kmeans") -> None:

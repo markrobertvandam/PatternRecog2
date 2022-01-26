@@ -134,9 +134,9 @@ class FeatureExtraction:
 
         pca_reduction = PCA(n_components=n_components)
         data_reduced = pca_reduction.fit_transform(self.data)
-        # self.scree_plot(
-        #     pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100
-        # )
+        self.scree_plot(
+            pca_reduction.n_components, pca_reduction.explained_variance_ratio_ * 100
+        )
 
         return np.array(data_reduced, dtype="object"), pca
 
@@ -189,7 +189,7 @@ class FeatureExtraction:
         plt.close()
 
         pc_values = np.arange(n_components) + 1
-        plt.plot(pc_values[-3:], explain_var[-3:], "o-")
+        plt.plot(pc_values[3:-5], explain_var[3:-5], "o-")
         plt.title("Scree Plot")
         plt.xlabel("Principal Component (n)")
         plt.ylabel("Variance Explained (%)")
