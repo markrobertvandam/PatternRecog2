@@ -492,9 +492,9 @@ class Tuning:
             ["knn", "svm", "rf"],
             "fourier",
             rows=[
-                ("Mask radius", [2 * i + masks[0] for i in range(self.steps)]),
-                ("Mask radius", [2 * i + masks[1] for i in range(self.steps)]),
-                ("Mask radius", [2 * i + masks[2] for i in range(self.steps)]),
+                ("Mask radius", [2 * i + masks[0] for i in range(outer_loop)]),
+                ("Mask radius", [2 * i + masks[1] for i in range(outer_loop)]),
+                ("Mask radius", [2 * i + masks[2] for i in range(outer_loop)]),
             ],
             cols=[
                 [i + k_offset for i in range(self.steps)],
@@ -591,9 +591,9 @@ class Tuning:
             ["knn", "svm", "rf"],
             "sift",
             rows=[
-                ("Max_Keypoints", [5 * i + key_pts[0] for i in range(self.steps)]),
-                ("Max_Keypoints", [5 * i + key_pts[1] for i in range(self.steps)]),
-                ("Max_Keypoints", [5 * i + key_pts[2] for i in range(self.steps)]),
+                ("Max_Keypoints", [5 * i + key_pts[0] for i in range(outer_loop)]),
+                ("Max_Keypoints", [5 * i + key_pts[1] for i in range(outer_loop)]),
+                ("Max_Keypoints", [5 * i + key_pts[2] for i in range(outer_loop)]),
             ],
             cols=[
                 [i + k_offset for i in range(self.steps)],
