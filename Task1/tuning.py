@@ -45,10 +45,10 @@ class Tuning:
         Function to run grid-search for all data
         """
 
-        self.normal_classifier = Classification(self.data, self.labels)
+        normal_classifier = Classification(self.data, self.labels)
 
         print("Original:")
-        self.original_gene_params(self.normal_classifier, "original")
+        self.original_gene_params(normal_classifier, "original")
 
         # small sweep
         if self.steps == 6:
@@ -85,7 +85,7 @@ class Tuning:
                                       kernels=kernels, c=c, gamma=gamma)
             print("Sift:")
             self.sift_params(k_offset=19, rf_offset=10, key_pts=[255, 170, 205],
-                                kernels=sift_kernels, c=sift_c, gamma=sift_gamma)
+                             kernels=sift_kernels, c=sift_c, gamma=sift_gamma)
             print("Fourier:")
             self.fourier_params(k_offset=15, rf_offset=7, masks=[0, 4, 4],
                                 kernels=fourier_kernels, c=fourier_c, gamma=fourier_gamma, degree=fourier_degree)
@@ -329,22 +329,22 @@ class Tuning:
         # k-value loop
         for k in range(1, 1+self.steps):
             (
-                results_f1_knn[(k)],
-                results_acc_knn[(k)],
+                results_f1_knn[(k-1)],
+                results_acc_knn[(k-1)],
             ) = clf.knn_classify(k+k_offset, command="tune")
 
-            # SVM
-            count = 0
-            for j in range(len(kernels)):
-                for k in range(len(c)):
-                    for l in range(len(gamma)):
-                        (
-                            results_f1_svm[count],
-                            results_acc_svm[count],
-                        ) = clf.svm_classify(
-                            kernel=kernels[j], c=c[k], gamma=gamma[l], degree=3, command="tune"
-                        )
-                        count += 1
+        # SVM
+        count = 0
+        for j in range(len(kernels)):
+            for k in range(len(c)):
+                for l in range(len(gamma)):
+                    (
+                        results_f1_svm[count],
+                        results_acc_svm[count],
+                    ) = clf.svm_classify(
+                        kernel=kernels[j], c=c[k], gamma=gamma[l], degree=3, command="tune"
+                    )
+                    count += 1
         # n-trees loop
         for n in range(self.steps):
             n_trees = (n + rf_offset) * 20
@@ -423,12 +423,12 @@ class Tuning:
             # k-value loop knn
             for k in range(1, 1+self.steps):
                 (
-                    results_f1_knn[i][(k)],
-                    results_acc_knn[i][(k)],
+                    results_f1_knn[i][(k-1)],
+                    results_acc_knn[i][(k-1)],
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
-            count=0
+            count = 0
             for j in range(len(kernels)):
                 for k in range(len(c)):
                     for l in range(len(gamma)):
@@ -439,7 +439,7 @@ class Tuning:
                             ) = svm_classifier.svm_classify(
                                 kernel=kernels[j], c=c[k], gamma=gamma[l], degree=degree[m], command="tune"
                             )
-                            count+=1
+                            count += 1
 
             # n-trees loop
             for n in range(self.steps):
@@ -506,8 +506,8 @@ class Tuning:
             # k-value loop knn
             for k in range(1, 1+self.steps):
                 (
-                    results_f1_knn[i][(k)],
-                    results_acc_knn[i][(k)],
+                    results_f1_knn[i][(k-1)],
+                    results_acc_knn[i][(k-1)],
                 ) = knn_classifier.knn_classify(k + k_offset, command="tune")
 
             # SVM
