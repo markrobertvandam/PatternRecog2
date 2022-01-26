@@ -129,7 +129,6 @@ class FeatureExtraction:
         for var in pca.explained_variance_ratio_:
             total_variance += var
             n_components += 1
-            print(n_components, total_variance)
             if total_variance >= min_variance:
                 break
 
