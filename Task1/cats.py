@@ -186,7 +186,6 @@ class Cats:
     def visualize_data(self):
         print("Visualizing data...")
         unique, counts = np.unique(self.labels, return_counts=True)
-        print(counts)
         plt.bar(unique, counts, 0.4)
         plt.title("Class Frequency")
         plt.xlabel("Class")

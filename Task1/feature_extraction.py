@@ -79,8 +79,6 @@ class FeatureExtraction:
         Returns:
         fourier_data: Fourier transformed data.
         """
-
-        print("filter radius: ", filter_radius)
         if fourier_data is None:
             # Apply DFT and shift the zero frequency component to center
             fourier_data = []
