@@ -89,7 +89,10 @@ class Cats:
         k = 1
         for train_index, test_index in skf.split(self.gray_images, self.labels):
             print(f"K-fold {k}...")
-            x_train, x_test = self.gray_images[train_index], self.gray_images[test_index]
+            x_train, x_test = (
+                self.gray_images[train_index],
+                self.gray_images[test_index],
+            )
             y_train, y_test = self.labels[train_index], self.labels[test_index]
 
             f1, acc = self.augmented_fold(x_train, x_test, y_train, y_test)
@@ -105,12 +108,14 @@ class Cats:
                 image = x_train[i]
                 augmented_gray += Cats.augment_image(image)
             augmented_labels = np.repeat(y_train, 3, axis=0)
-            f1, acc = self.augmented_fold(augmented_gray, x_test, augmented_labels, y_test, "augmented")
+            f1, acc = self.augmented_fold(
+                augmented_gray, x_test, augmented_labels, y_test, "augmented"
+            )
 
             f1_arr_aug.append(f1)
-            f1_avg_aug += f1/5
+            f1_avg_aug += f1 / 5
             acc_arr_aug.append(acc)
-            acc_avg_aug += acc/5
+            acc_avg_aug += acc / 5
             k += 1
 
         print(f"F1-scores: {f1_arr}, Average: {f1_avg}")
@@ -134,7 +139,7 @@ class Cats:
         classifier_rf.fit(sift_data[:-test_len], y_train)
 
         y_pred = classifier_rf.predict(sift_data[-test_len:])
-        f1 = f1_score(y_test, y_pred, average='macro')
+        f1 = f1_score(y_test, y_pred, average="macro")
         acc = accuracy_score(y_test, y_pred)
 
         return f1, acc
