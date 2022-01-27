@@ -14,7 +14,8 @@ from clustering import Clustering
 from feature_extraction import FeatureExtraction
 
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split, cross_validate
+from sklearn.metrics import accuracy_score, f1_score
+from sklearn.model_selection import StratifiedKFold
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -76,88 +77,67 @@ class Cats:
         """
         Test run with augmentation
         """
+        skf = StratifiedKFold(n_splits=5)
+        f1_arr = []
+        acc_arr = []
+        f1_avg = 0
+        acc_avg = 0
+        f1_arr_aug = []
+        acc_arr_aug = []
+        f1_avg_aug = 0
+        acc_avg_aug = 0
+        k = 1
+        for train_index, test_index in skf.split(self.gray_images, self.labels):
+            print(f"K-fold {k}...")
+            x_train, x_test = self.gray_images[train_index], self.gray_images[test_index]
+            y_train, y_test = self.labels[train_index], self.labels[test_index]
 
-        augmented_gray = []
-        (x_train, x_test, y_train, y_test,) = train_test_split(
-            self.gray_images,
-            self.labels,
-            test_size=0.2,
-            random_state=42,
-            stratify=self.labels,
-        )
+            f1, acc = self.augmented_fold(x_train, x_test, y_train, y_test)
 
-        test_len = len(x_test)
+            f1_arr.append(f1)
+            f1_avg += f1 / 5
+            acc_arr.append(acc)
+            acc_avg += acc / 5
 
-        sift_classifier_rf_original = RandomForestClassifier(220, random_state=42)
-        (
-            sift_classifier_rf_original_cross,
-            sift_classifier_rf_augmented,
-            sift_classifier_rf_augmented_cross,
-        ) = [sift_classifier_rf_original for _ in range(3)]
+            augmented_gray = []
+            print(f"Augmenting images...")
+            for i in range(len(x_train)):
+                image = x_train[i]
+                augmented_gray += Cats.augment_image(image)
+            augmented_labels = np.repeat(y_train, 3, axis=0)
+            f1, acc = self.augmented_fold(augmented_gray, x_test, augmented_labels, y_test, "augmented")
 
-        print("Running SIFT on original images")
-        full_x_original = np.concatenate((x_train, x_test))
-        full_y_original = np.concatenate((y_train, y_test))
+            f1_arr_aug.append(f1)
+            f1_avg_aug += f1/5
+            acc_arr_aug.append(acc)
+            acc_avg_aug += acc/5
+            k += 1
 
-        feature_extractor = FeatureExtraction(full_x_original, full_y_original, "cats")
-        sift_data_original, _ = feature_extractor.sift(210)
+        print(f"F1-scores: {f1_arr}, Average: {f1_avg}")
+        print(f"Accuracy scores: {acc_arr}, Average: {acc_avg}")
+        print(f"F1-scores augmented: {f1_arr_aug}, Average: {f1_avg_aug}")
+        print(f"Accuracy scores augmented: {acc_arr_aug}, Average: {acc_avg_aug}")
 
-        cross_val_scores = cross_validate(
-            sift_classifier_rf_original_cross,
-            sift_data_original[:-test_len],
-            y_train,
-            scoring=["f1_macro", "accuracy"],
-        )
-        print(
-            "cross-val F1-scores: ",
-            cross_val_scores["test_f1_macro"],
-            f" (Avg: {np.average(cross_val_scores['test_f1_macro'])})",
-        )
-        print(
-            "cross-val Accuracy scores: ",
-            cross_val_scores["test_accuracy"],
-            f" (Avg: {np.average(cross_val_scores['test_accuracy'])})",
-        )
+    def augmented_fold(self, x_train, x_test, y_train, y_test, fold="un-agumented"):
+        full_x = np.concatenate((x_train, x_test))
+        full_y = np.concatenate((y_train, y_test))
+        test_len = len(y_test)
 
-        sift_classifier_rf_original.fit(sift_data_original[:-test_len], y_train)
-        y_pred = sift_classifier_rf_original.predict(sift_data_original[-test_len:])
-        Classification.evaluate(y_test, y_pred)
-
-        print("Augmenting images...")
-        for i in range(len(x_train)):
-            image = x_train[i]
-            augmented_gray += Cats.augment_image(image)
-        augmented_labels = np.repeat(y_train, 3, axis=0)
-        full_x = np.concatenate((augmented_gray, x_test))
-        full_y = np.concatenate((augmented_labels, y_test))
-
-        print("Running SIFT Feature Extraction...")
+        print(f"Running SIFT Feature Extraction for {fold} data...")
         feature_extractor = FeatureExtraction(full_x, full_y, "cats")
-        sift_data, bad_imgs = feature_extractor.sift(210)
-        augmented_labels = np.delete(augmented_labels, bad_imgs)
+        sift_data, bad_imgs = feature_extractor.sift(225)
+        if fold == "augmented":
+            print("\n")
+            y_train = np.delete(y_train, bad_imgs)
 
-        print(f"Sift performance (shape: {sift_data.shape}): \n")
+        classifier_rf = RandomForestClassifier(280, random_state=42)
+        classifier_rf.fit(sift_data[:-test_len], y_train)
 
-        cross_val_scores = cross_validate(
-            sift_classifier_rf_augmented_cross,
-            sift_data[:-test_len],
-            augmented_labels,
-            scoring=["f1_macro", "accuracy"],
-        )
-        print(
-            "cross-val F1-scores: ",
-            cross_val_scores["test_f1_macro"],
-            f" (Avg: {np.average(cross_val_scores['test_f1_macro'])})",
-        )
-        print(
-            "cross-val Accuracy scores: ",
-            cross_val_scores["test_accuracy"],
-            f" (Avg: {np.average(cross_val_scores['test_accuracy'])})",
-        )
+        y_pred = classifier_rf.predict(sift_data[-test_len:])
+        f1 = f1_score(y_test, y_pred, average='macro')
+        acc = accuracy_score(y_test, y_pred)
 
-        sift_classifier_rf_augmented.fit(sift_data[:-test_len], augmented_labels)
-        y_pred = sift_classifier_rf_augmented.predict(sift_data[-test_len:])
-        Classification.evaluate(y_test, y_pred)
+        return f1, acc
 
     @staticmethod
     def augment_image(image) -> list:
