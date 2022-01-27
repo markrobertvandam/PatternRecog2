@@ -42,12 +42,13 @@ class Genes:
         """
 
         print("Loading data...")
-        filename_samples = f"data/Genes/data.csv"
+        genes_path = os.path.join("data", "Genes")
+        filename_samples = os.path.join(genes_path, "data.csv")
         self.samples = np.loadtxt(
             filename_samples, delimiter=",", skiprows=1, usecols=range(1, 1024)
         )
 
-        filename_labels = f"data/Genes/labels.csv"
+        filename_labels = os.path.join(genes_path, "labels.csv")
 
         labels = []
         with open(filename_labels) as labels_csv:
@@ -86,7 +87,7 @@ class Genes:
         # we replace that with the target names:
         elems[1] = self.label_names
         fig.legend(*elems)
-        plt.savefig(f"plots/biplots_{name}")
+        plt.savefig(os.path.join("plots", f"biplots_{name}"))
         plt.close(fig)
 
     def visualize_data(self) -> None:
@@ -106,7 +107,7 @@ class Genes:
         plt.xlabel("Class")
         plt.ylabel("Frequency")
 
-        plt.savefig("plots/genes_histo.png")
+        plt.savefig(os.path.join("plots", "genes_histo.png"))
         plt.close()
 
         # Biplots using most informaive PCA-components
@@ -177,6 +178,9 @@ class Genes:
         Function to perform clustering.
         """
         small = 1
+        result_path = os.path.join("data", "results", "clustering")
+        if not os.path.exists(result_path):
+            os.makedirs(result_path)
 
         if small:
             normal_km_s, normal_km_mi = [np.zeros(6), np.zeros(6)]
@@ -206,8 +210,8 @@ class Genes:
                 + str(np.max(normal_km_mi))
             )
 
-            np.savetxt("data/results/clustering/normal_km_s.csv", normal_km_s)
-            np.savetxt("data/results/clustering/normal_km_mi.csv", normal_km_mi)
+            np.savetxt(os.path.join(result_path, "normal_km_s.csv"), normal_km_s)
+            np.savetxt(os.path.join(result_path, "normal_km_mi.csv"), normal_km_mi)
 
             print("PCA performance: \n")
             self.block_print()
@@ -240,11 +244,11 @@ class Genes:
                 + str(np.max(pca_mi[1]))
             )
 
-            np.savetxt("data/results/clustering/pca_km_s_max_s.csv", pca_s[0])
-            np.savetxt("data/results/clustering/pca_km_mi_max_s.csv", pca_mi[0])
+            np.savetxt(os.path.join(result_path, "pca_km_s_max_s.csv"), pca_s[0])
+            np.savetxt(os.path.join(result_path, "pca_km_mi_max_s.csv"), pca_mi[0])
 
-            np.savetxt("data/results/clustering/pca_km_s_max_mi.csv", pca_s[1])
-            np.savetxt("data/results/clustering/pca_km_mi_max_mi.csv", pca_mi[1])
+            np.savetxt(os.path.join(result_path, "pca_km_s_max_mi.csv"), pca_s[1])
+            np.savetxt(os.path.join(result_path, "pca_km_mi_max_mi.csv"), pca_mi[1])
         else:
             normal_km_s, normal_km_mi = [np.zeros(24), np.zeros(24)]
             pca_km_s, pca_km_mi = [np.zeros((20, 24)), np.zeros((20, 24))]
@@ -266,8 +270,8 @@ class Genes:
                 + str(np.max(normal_km_mi))
             )
 
-            np.savetxt("data/results/clustering/normal_km_s.csv", normal_km_s)
-            np.savetxt("data/results/clustering/normal_km_mi.csv", normal_km_mi)
+            np.savetxt(os.path.join(result_path, "normal_km_s.csv"), normal_km_s)
+            np.savetxt(os.path.join(result_path, "normal_km_mi.csv"), normal_km_mi)
 
             print("PCA performance: \n")
             self.block_print()
@@ -291,5 +295,5 @@ class Genes:
                 + str(np.max(pca_km_mi))
             )
 
-            np.savetxt("data/results/clustering/pca_km_s.csv", pca_km_s)
-            np.savetxt("data/results/clustering/pca_km_mi.csv", pca_km_mi)
+            np.savetxt(os.path.join(result_path, "pca_km_s.csv"), pca_km_s)
+            np.savetxt(os.path.join(result_path, "pca_km_mi.csv"), pca_km_mi)

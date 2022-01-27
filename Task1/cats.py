@@ -353,6 +353,9 @@ class Cats:
         """
         Function to perform clustering of data.
         """
+        result_path = os.path.join("data", "results", "clustering")
+        if not os.path.exists(result_path):
+            os.makedirs(result_path)
         small = 1
 
         if small:
@@ -386,8 +389,8 @@ class Cats:
                 + str(np.max(normal_spec_mi))
             )
 
-            np.savetxt("data/results/clustering/normal_spec_s.csv", normal_spec_s)
-            np.savetxt("data/results/clustering/normal_spec_mi.csv", normal_spec_mi)
+            np.savetxt(os.path.join(result_path, "normal_spec_s.csv"), normal_spec_s)
+            np.savetxt(os.path.join(result_path, "normal_spec_mi.csv"), normal_spec_mi)
 
             for i in range(8, 14):
                 key_points = i * 5
@@ -414,10 +417,10 @@ class Cats:
             )
 
             np.savetxt(
-                "data/results/clustering/sift_spec_s_max_mi.csv", sift_spec_s_max_mi
+                os.path.join(result_path, "sift_spec_s_max_mi.csv"), sift_spec_s_max_mi
             )
             np.savetxt(
-                "data/results/clustering/sift_spec_mi_max_mi.csv", sift_spec_mi_max_mi
+                os.path.join(result_path, "sift_spec_mi_max_mi.csv"), sift_spec_mi_max_mi
             )
 
             for i in range(0, 6):
@@ -445,10 +448,10 @@ class Cats:
             )
 
             np.savetxt(
-                "data/results/clustering/sift_spec_s_max_s.csv", sift_spec_s_max_s
+                os.path.join(result_path, "sift_spec_s_max_s.csv"), sift_spec_s_max_s
             )
             np.savetxt(
-                "data/results/clustering/sift_spec_mi_max_s.csv", sift_spec_mi_max_s
+                os.path.join(result_path, "sift_spec_mi_max_s.csv"), sift_spec_mi_max_s
             )
 
         else:
@@ -479,8 +482,8 @@ class Cats:
                 + str(np.max(normal_spec_mi))
             )
 
-            np.savetxt("data/results/clustering/normal_spec_s.csv", normal_spec_s)
-            np.savetxt("data/results/clustering/normal_spec_mi.csv", normal_spec_mi)
+            np.savetxt(os.path.join(result_path, "normal_spec_s.csv"), normal_spec_s)
+            np.savetxt(os.path.join(result_path, "normal_spec_mi.csv"), normal_spec_mi)
 
             print("SIFT performance: \n")
             for i in range(60):
@@ -508,8 +511,8 @@ class Cats:
                 + str(np.max(sift_spec_mi))
             )
 
-            np.savetxt("data/results/clustering/sift_spec_s.csv", sift_spec_s)
-            np.savetxt("data/results/clustering/sift_spec_mi.csv", sift_spec_mi)
+            np.savetxt(os.path.join(result_path, "sift_spec_s.csv"), sift_spec_s)
+            np.savetxt(os.path.join(result_path, "sift_spec_mi.csv"), sift_spec_mi)
 
     def save_clustering(self, cluster_labels, n_clusters) -> None:
         """
@@ -517,7 +520,7 @@ class Cats:
 
         Arguments:
         cluster_labels: List containing strings of clustering names.
-        n_clusters: Interger specifying number of clusters.
+        n_clusters: Integer specifying number of clusters.
 
         Returns:
         None

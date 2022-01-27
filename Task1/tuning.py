@@ -93,7 +93,7 @@ class Tuning:
                 c=sift_c,
                 gamma=sift_gamma,
             )
-            print("Fourier (note: this part can take a while):")
+            print("Fourier:")
             self.fourier_params(
                 k_offset=15,
                 rf_offset=7,
@@ -116,7 +116,7 @@ class Tuning:
             self.sift_params(
                 rf_offset=1, key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma
             )
-            print("Fourier (note: this part can take a while):")
+            print("Fourier:")
             self.fourier_params(
                 rf_offset=1,
                 masks=[0, 0, 0],
