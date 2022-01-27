@@ -125,12 +125,12 @@ class Cats:
 
         print(f"Running SIFT Feature Extraction for {fold} data...")
         feature_extractor = FeatureExtraction(full_x, full_y, "cats")
-        sift_data, bad_imgs = feature_extractor.sift(225)
+        sift_data, bad_imgs = feature_extractor.sift(210)
         if fold == "augmented":
             print("\n")
             y_train = np.delete(y_train, bad_imgs)
 
-        classifier_rf = RandomForestClassifier(280, random_state=42)
+        classifier_rf = RandomForestClassifier(220, random_state=42)
         classifier_rf.fit(sift_data[:-test_len], y_train)
 
         y_pred = classifier_rf.predict(sift_data[-test_len:])
