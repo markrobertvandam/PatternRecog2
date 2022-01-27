@@ -1,6 +1,7 @@
 .vscode
 venv
 .idea
+pr
 
 # Task 1
 Task1/data
