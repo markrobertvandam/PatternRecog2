@@ -72,6 +72,9 @@ def plot(args, scores: list, type: str) -> None:
 
 
 def main():
+    """
+    Main function to run the pipeline.
+    """
     args = parse_args()
     df = pd.read_csv(f"{args.data}/creditcard.csv")
     df = df.drop(["Time", "Amount"], axis=1)
