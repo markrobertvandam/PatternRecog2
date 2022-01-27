@@ -53,7 +53,7 @@ class SemiSupervised:
 
         return X1, y1
 
-    def balanceData(self, X, y, plot = False, f1 = 10, f2 = 10):
+    def balanceData(self, X, y, plot=False, f1=10, f2=10):
         """
         Function to balance the data with data sampling.
 
@@ -77,7 +77,7 @@ class SemiSupervised:
 
             f1 = 10
             f2 = 20
-            fig, ax = plt.subplots(1, 2, figsize = (19, 9))
+            fig, ax = plt.subplots(1, 2, figsize=(19, 9))
             for label, _ in counter1.items():
                 row_ix = np.where(y == label)[0]
                 ax[0].scatter(X[row_ix, f1], X[row_ix, f2], label=f"Class {str(label)}")
@@ -89,14 +89,16 @@ class SemiSupervised:
 
             for label, _ in counter2.items():
                 row_ix = np.where(y_bal == label)[0]
-                ax[1].scatter(X_bal[row_ix, f1], X_bal[row_ix, f2], label=f"Class {str(label)}")
+                ax[1].scatter(
+                    X_bal[row_ix, f1], X_bal[row_ix, f2], label=f"Class {str(label)}"
+                )
 
             ax[1].legend()
             ax[1].set_title("After Sampling")
             ax[0].set_xlabel(f"Feature {f1}")
             ax[0].set_ylabel(f"Feature {f2}")
             plt.legend()
-            fig.savefig(f"{self.resdir}/sampling.png", bbox_inches = "tight")
+            fig.savefig(f"{self.resdir}/sampling.png", bbox_inches="tight")
 
         return X_scale, y_bal
 
@@ -227,8 +229,8 @@ class SemiSupervised:
             X, y = self.processData()
 
             if i == 0:
-                X_bal, y_bal = self.balanceData(X, y, plot = True)
-            
+                X_bal, y_bal = self.balanceData(X, y, plot=True)
+
             else:
                 X_bal, y_bal = self.balanceData(X, y)
 

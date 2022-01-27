@@ -79,7 +79,7 @@ def main():
     df = pd.read_csv(f"{args.data}/creditcard.csv")
     df = df.drop(["Time", "Amount"], axis=1)
 
-    ss = SemiSupervised(df, neighbors=3, resdir = args.res)
+    ss = SemiSupervised(df, neighbors=3, resdir=args.res)
 
     s1, s2, s3 = ss.run()
 
