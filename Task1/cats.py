@@ -15,7 +15,7 @@ from feature_extraction import FeatureExtraction
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
-from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import StratifiedKFold, train_test_split
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -102,15 +102,7 @@ class Cats:
             acc_arr.append(acc)
             acc_avg += acc / 5
 
-            augmented_gray = []
-            print(f"Augmenting images...")
-            for i in range(len(x_train)):
-                image = x_train[i]
-                augmented_gray += Cats.augment_image(image)
-            augmented_labels = np.repeat(y_train, 3, axis=0)
-            f1, acc = self.augmented_fold(
-                augmented_gray, x_test, augmented_labels, y_test, "augmented"
-            )
+            f1, acc = self.augmentation(x_train, x_test, y_train, y_test)
 
             f1_arr_aug.append(f1)
             f1_avg_aug += f1 / 5
@@ -123,7 +115,38 @@ class Cats:
         print(f"F1-scores augmented: {f1_arr_aug}, Average: {f1_avg_aug}")
         print(f"Accuracy scores augmented: {acc_arr_aug}, Average: {acc_avg_aug}")
 
+        print("\n Single test runs: \n")
+        x_train, x_test, y_train, y_test = train_test_split(
+            self.gray_images,
+            self.labels,
+            test_size=0.2,
+            random_state=42,
+            stratify=self.labels,
+        )
+        f1, acc = self.augmented_fold(x_train, x_test, y_train, y_test)
+        print(f"Normal run F1: {f1}, Acc: {acc}")
+        f1, acc = self.augmentation(x_train, x_test, y_train, y_test)
+        print(f"Augmented run F1: {f1}, Acc: {acc}")
+
+    def augmentation(self, x_train, x_test, y_train, y_test):
+        """
+        Helper function for augment_run
+        """
+        augmented_gray = []
+        print(f"Augmenting images...")
+        for i in range(len(x_train)):
+            image = x_train[i]
+            augmented_gray += Cats.augment_image(image)
+        augmented_labels = np.repeat(y_train, 3, axis=0)
+        f1, acc = self.augmented_fold(
+            augmented_gray, x_test, augmented_labels, y_test, "augmented"
+        )
+        return f1, acc
+
     def augmented_fold(self, x_train, x_test, y_train, y_test, fold="un-agumented"):
+        """
+        Helper function for augment_run
+        """
         full_x = np.concatenate((x_train, x_test))
         full_y = np.concatenate((y_train, y_test))
         test_len = len(y_test)
