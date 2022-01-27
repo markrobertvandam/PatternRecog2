@@ -65,7 +65,7 @@ def plot(args, scores: list, type: str) -> None:
         ax.set_xlabel("Models")
         ax.grid(False)
 
-        fig.savefig(f"{args.res}/plot.png", bbox_inches="tight")
+        fig.savefig(f"{args.res}/boxplot.png", bbox_inches="tight")
 
 
 def main():
