@@ -153,12 +153,12 @@ class Cats:
 
         print(f"Running SIFT Feature Extraction for {fold} data...")
         feature_extractor = FeatureExtraction(full_x, full_y, "cats")
-        sift_data, bad_imgs = feature_extractor.sift(225)
+        sift_data, bad_imgs = feature_extractor.sift(210)
         if fold == "augmented":
             print("\n")
             y_train = np.delete(y_train, bad_imgs)
 
-        classifier_rf = RandomForestClassifier(280, random_state=42)
+        classifier_rf = RandomForestClassifier(220, random_state=42)
         classifier_rf.fit(sift_data[:-test_len], y_train)
 
         y_pred = classifier_rf.predict(sift_data[-test_len:])
@@ -365,13 +365,6 @@ class Cats:
                 sift_spec_s_max_mi,
                 sift_spec_mi_max_mi,
             ) = [np.zeros((6, 6)) for _ in range(6)]
-            # normal_spec_s, normal_spec_mi, sift_spec_s, sift_spec_mi = [np.zeros((6, 6)) for _ in range(4)]
-
-            # sift_s = [sift_spec_s_max_s, sift_spec_s_max_mi]
-            # sift_mi = [sift_spec_mi_max_s, sift_spec_mi_max_mi]
-            # key_regions = [1, 9]
-            # n_clusters = [2, 2]
-            # n_neighbors = [5, 12]
 
             print("Clustering: \n")
             print("Original performance: \n")
@@ -402,7 +395,6 @@ class Cats:
 
                 reduced_sift = self.sift_data[:, 0 : key_points * 5 + 5]
 
-                # print('Max keypoints = ' + str(((i*5) + 5)))
                 self.block_print()
                 sift_clustering = Clustering(reduced_sift, self.labels)
                 k = 12
@@ -434,7 +426,6 @@ class Cats:
 
                 reduced_sift = self.sift_data[:, 0 : key_points * 5 + 5]
 
-                # print('Max keypoints = ' + str(((i*5) + 5)))
                 self.block_print()
                 sift_clustering = Clustering(reduced_sift, self.labels)
                 k = 9
@@ -460,32 +451,6 @@ class Cats:
             np.savetxt(
                 "data/results/clustering/sift_spec_mi_max_s.csv", sift_spec_mi_max_s
             )
-
-            # print("SIFT performance: \n")
-            # self.block_print()
-            # for region in range(2):
-            #     for i in range(key_regions[region], key_regions[region] + 6):
-            #         reduced_sift = self.sift_data[:, 0: i * 5]
-            #         sift_clustering = Clustering(reduced_sift, self.labels)
-            #         for j in range(n_clusters[region], n_clusters[region] + 6):
-            #
-            #             sift_s[region][i-key_regions[region]][j-n_clusters[region]], \
-            #                 sift_mi[region][i-key_regions[region]][j-n_clusters[region]] = \
-            #                 sift_clustering.spectral(n_clusters=j, n_neighbors=n_neighbors[region])
-            #
-            # self.enable_print()
-            # print("--------------\n")
-            #
-            # print('Max sil score sift spec sil region = ' + str(np.max(sift_s[0])) +
-            #       ', Max mi score sift spec sil region = ' + str(np.max(sift_mi[0])))
-            # print('Max sil score sift spec mi region = ' + str(np.max(sift_s[1])) +
-            #       ', Max mi score sift spec mi region = ' + str(np.max(sift_mi[1])))
-            #
-            # np.savetxt('data/results/clustering/sift_spec_s_max_s.csv', sift_s[0])
-            # np.savetxt('data/results/clustering/sift_spec_mi_max_s.csv', sift_mi[0])
-            #
-            # np.savetxt('data/results/clustering/sift_spec_s_max_mi.csv', sift_s[1])
-            # np.savetxt('data/results/clustering/sift_spec_mi_max_mi.csv', sift_mi[1])
 
         else:
             normal_spec_s, normal_spec_mi = [np.zeros((14, 25)), np.zeros((14, 25))]
