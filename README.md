@@ -11,8 +11,14 @@ pip3 install -r requirements.txt
 ## Data
 
 To set-up the data either 
-* Save the ready-made zip-file called cats_projekat_filtered in Task1/data/
-* Save the provided BigCats and cats_projekat folders in Task1/data/ and run data_filter.py which will create cats_projekat_filtered automatically
+* Save the ready-made zip-file containing the git and all data for both Tasks
+
+OR
+
+* Save the provided BigCats and cats_projekat (https://www.kaggle.com/enisahovi/cats-projekat-4/version/1) folders in 
+Task1/data/ and run data_filter.py which will create cats_projekat_filtered automatically
+* Save the provided Genes data in Task1/data/
+* Download `creditcard.csv` in the Task2/data/ folder
 
 
 ## Running Task 1
@@ -36,7 +42,4 @@ The following 2 commands only work for cats
 
 
 ## Running Task 2
-
-* Download `creditcard.csv`.
-* Place it in `data` folder.
 * Run ```python3 main.py data results``` inside the Task2 folder
