@@ -9,6 +9,9 @@ from ss import SemiSupervised
 def parse_args() -> argparse.Namespace:
     """
     Argument parser
+
+    Returns:
+    parser: Parser with input arguments.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("data", help="Folder of creditcard.csv")
@@ -73,7 +76,7 @@ def main():
     df = pd.read_csv(f"{args.data}/creditcard.csv")
     df = df.drop(["Time", "Amount"], axis=1)
 
-    ss = SemiSupervised(df, neighbors=3)
+    ss = SemiSupervised(df, neighbors=3, resdir = args.res)
 
     s1, s2, s3 = ss.run()
 

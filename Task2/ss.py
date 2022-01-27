@@ -1,6 +1,7 @@
 from platform import processor
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from collections import Counter
 
 from imblearn.over_sampling import SMOTE
@@ -17,15 +18,17 @@ RANDOM_STATE = 42
 
 
 class SemiSupervised:
-    def __init__(self, df: pd.DataFrame, neighbors: int) -> None:
+    def __init__(self, df: pd.DataFrame, neighbors: int, resdir: str) -> None:
         """
         Initialize baseline and semisupervised learning models for training.
 
         Arguments:
         df: Dataset containing input features and class labels.
         neighbors: Number of neighbors for Baseline model.
+        resdir: Directory for saving plots
         """
         self.df = df
+        self.resdir = resdir
 
         over = SMOTE(sampling_strategy=0.1)
         under = RandomUnderSampler(sampling_strategy=0.5)
@@ -41,22 +44,60 @@ class SemiSupervised:
     def processData(self):
         """
         Function to preprocess the data.
+
+        Returns:
+        X1: Input features.
+        y1: Class labels.
         """
         X1 = self.df.iloc[:, 0:-1].values
         y1 = self.df.iloc[:, -1].values
 
         return X1, y1
 
-    def balanceData(self, X, y):
+    def balanceData(self, X, y, plot = False, f1 = 10, f2 = 10):
         """
         Function to balance the data with data sampling.
 
         Arguments:
         X: Input features.
         y: Class labels.
+        plot: Visualize balanced data.
+        f1: First feature for plot.
+        f2: Second feature for plot.
+
+        Returns:
+        X_scale: Balanced and scaled input features.
+        y_bal: Balanced class labels.
         """
         X_bal, y_bal = self.pipeline.fit_resample(X, y)
         X_scale = self.scalar.fit_transform(X_bal)
+
+        if plot:
+            counter1 = Counter(y)
+            counter2 = Counter(y_bal)
+
+            f1 = 10
+            f2 = 20
+            fig, ax = plt.subplots(1, 2, figsize = (19, 9))
+            for label, _ in counter1.items():
+                row_ix = np.where(y == label)[0]
+                ax[0].scatter(X[row_ix, f1], X[row_ix, f2], label=f"Class {str(label)}")
+
+            ax[0].set_title("Original data")
+            ax[0].set_xlabel(f"Feature {f1}")
+            ax[0].set_ylabel(f"Feature {f2}")
+            ax[0].legend()
+
+            for label, _ in counter2.items():
+                row_ix = np.where(y_bal == label)[0]
+                ax[1].scatter(X_bal[row_ix, f1], X_bal[row_ix, f2], label=f"Class {str(label)}")
+
+            ax[1].legend()
+            ax[1].set_title("After Sampling")
+            ax[0].set_xlabel(f"Feature {f1}")
+            ax[0].set_ylabel(f"Feature {f2}")
+            plt.legend()
+            fig.savefig(f"{self.resdir}/sampling.png", bbox_inches = "tight")
 
         return X_scale, y_bal
 
@@ -67,6 +108,11 @@ class SemiSupervised:
         Arguments:
         X: Input features.
         y: Class labels.
+
+        Returns:
+        baseline_data: Train and test data from initial split.
+        semi_supervised_data: Labelled and unlabelled data
+                              for semi-supervised learning.
         """
         X_TRAIN, X_TEST, Y_TRAIN, Y_TEST = train_test_split(
             X, y, test_size=0.2, stratify=y
@@ -89,6 +135,9 @@ class SemiSupervised:
         y: Train class labels.
         X_test: Input test features.
         y_test: Test class labels.
+
+        Returns:
+        score: F-score of baseline model
         """
         self.baseline_model.fit(X, y)
         pred = self.baseline_model.predict(X_test)
@@ -104,6 +153,11 @@ class SemiSupervised:
         train_data: list containing unlabelled and labelled train data.
         X_test: Input test features.
         y_test: Test class labels.
+
+        Returns:
+        score: F-score of semi-supervised model.
+        X: Labeled and unlabeled input features.
+        y_transduction: Class labels obtained using transduction.
         """
         X_TRAIN_UNLAB, X_TRAIN_LAB, Y_TRAIN_UNLAB, Y_TRAIN_LAB = train_data
 
@@ -128,6 +182,9 @@ class SemiSupervised:
         y: Train class labels.
         X_test: Input test data.
         y_test: Test class labels.
+
+        Returns:
+        score: F-score of baseline model with semi-supervised labels.
         """
         self.baseline_2.fit(X, y)
         pred = self.baseline_2.predict(X_test)
@@ -156,6 +213,9 @@ class SemiSupervised:
 
         Arguments:
         epochs: Number of runs for performing experiment.
+
+        Returns:
+        s1, s2, s3: F-scores of Task 2, 3 & 4 over number of experiments.
         """
         s1 = []
         s2 = []
@@ -166,7 +226,12 @@ class SemiSupervised:
             print(f"Run: {i + 1}")
 
             X, y = self.processData()
-            X_bal, y_bal = self.balanceData(X, y)
+
+            if i == 0:
+                X_bal, y_bal = self.balanceData(X, y, plot = True)
+            
+            else:
+                X_bal, y_bal = self.balanceData(X, y)
 
             baseline_data, semi_supervised_data = self.splitData(X_bal, y_bal)
             (X_TRAIN, X_TEST, Y_TRAIN, Y_TEST) = baseline_data
