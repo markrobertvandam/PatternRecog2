@@ -255,7 +255,7 @@ class Tuning:
         self, name: str, pca_offset=0, k_offset=0, glvq_offset=0, lr_offset=0
     ) -> None:
         """
-        Helper function to run grid-search for pca data
+        Helper function to run grid-search for pca/mi data
 
         Arguments:
         name: Name of feature extractor (Options: "pca", "mi")
@@ -337,7 +337,7 @@ class Tuning:
         self, kernels: list, c: list, gamma: list, k_offset=0, rf_offset=0
     ) -> None:
         """
-        Helper function to run grid-search for original data or fourier data
+        Helper function to run grid-search for original data
         """
         clf = Classification(self.data, self.labels)
         kernel_size = len(kernels)
@@ -405,13 +405,7 @@ class Tuning:
         rf_offset=0,
     ) -> None:
         """
-        Helper function to run grid-search for sift data
-
-        Arguments:
-        name: Name of preprocessing. (Options: "sift", "fourier")
-
-        Returns:
-        None
+        Helper function to run grid-search for fourier data
         """
         outer_loop = 6 if self.steps == 6 else 13
         kernel_size = len(kernels)
@@ -523,12 +517,6 @@ class Tuning:
     ) -> None:
         """
         Helper function to run grid-search for sift data
-
-        Arguments:
-        name: Name of preprocessing. (Options: "sift", "fourier")
-
-        Returns:
-        None
         """
         outer_loop = 6 if self.steps == 6 else 60
         kernel_size = len(kernels)

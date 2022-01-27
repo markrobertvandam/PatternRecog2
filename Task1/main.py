@@ -18,7 +18,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("pipeline", help="options are cats and genes")
     parser.add_argument(
         "command",
-        help="options are tune, test, cross-val, ensemble (for classification) and cluster (for clustering)",
+        help="options are tune, tune-big, test, cross-val, cluster, \
+        full-run (both clustering and classification), augment (for cats only) and ensemble (for cat only)",
     )
 
     return parser.parse_args()
@@ -26,7 +27,7 @@ def parse_args() -> argparse.Namespace:
 
 def genes_pipeline(args: argparse.Namespace) -> None:
     """
-    Pipline for performing clustering/classification on
+    Pipeline for performing clustering/classification on
     gene dataset based on specified model operation.
 
     Arguments:
@@ -54,7 +55,7 @@ def genes_pipeline(args: argparse.Namespace) -> None:
 
 def cats_pipeline(args: argparse.Namespace) -> None:
     """
-    Pipline for performing clustering/classification on
+    Pipeline for performing clustering/classification on
     cats dataset based on specified model operation.
 
     Arguments:
