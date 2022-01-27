@@ -113,10 +113,17 @@ class Tuning:
                 k_offset=1, rf_offset=1, kernels=kernels, c=c, gamma=gamma
             )
             print("Sift:")
-            self.sift_params(rf_offset=1, key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma)
+            self.sift_params(
+                rf_offset=1, key_pts=[5, 5, 5], kernels=kernels, c=c, gamma=gamma
+            )
             print("Fourier:")
-            self.fourier_params(rf_offset=1,
-                masks=[0, 0, 0], kernels=kernels, c=c, gamma=gamma, degree=[3]
+            self.fourier_params(
+                rf_offset=1,
+                masks=[0, 0, 0],
+                kernels=kernels,
+                c=c,
+                gamma=gamma,
+                degree=[3],
             )
 
     # Disable
@@ -492,9 +499,9 @@ class Tuning:
             ["knn", "svm", "rf"],
             "fourier",
             rows=[
-                ("Mask radius", [2 * i + masks[0] for i in range(self.steps)]),
-                ("Mask radius", [2 * i + masks[1] for i in range(self.steps)]),
-                ("Mask radius", [2 * i + masks[2] for i in range(self.steps)]),
+                ("Mask radius", [2 * i + masks[0] for i in range(outer_loop)]),
+                ("Mask radius", [2 * i + masks[1] for i in range(outer_loop)]),
+                ("Mask radius", [2 * i + masks[2] for i in range(outer_loop)]),
             ],
             cols=[
                 [i + k_offset for i in range(self.steps)],
@@ -591,9 +598,9 @@ class Tuning:
             ["knn", "svm", "rf"],
             "sift",
             rows=[
-                ("Max_Keypoints", [5 * i + key_pts[0] for i in range(self.steps)]),
-                ("Max_Keypoints", [5 * i + key_pts[1] for i in range(self.steps)]),
-                ("Max_Keypoints", [5 * i + key_pts[2] for i in range(self.steps)]),
+                ("Max_Keypoints", [5 * i + key_pts[0] for i in range(outer_loop)]),
+                ("Max_Keypoints", [5 * i + key_pts[1] for i in range(outer_loop)]),
+                ("Max_Keypoints", [5 * i + key_pts[2] for i in range(outer_loop)]),
             ],
             cols=[
                 [i + k_offset for i in range(self.steps)],
