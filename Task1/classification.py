@@ -82,7 +82,7 @@ class Classification:
 
     def grid_search(self, clf):
         """
-        Function to train model with splitted data.
+        Function to train model on 70% and test on 10% validation data.
 
         Arguments:
         clf: Classifier model.
@@ -263,7 +263,7 @@ class Classification:
 
     def ensemble(self, model1, model2, model3=None) -> None:
         """
-        Function to perform classification using Ensemble classifier.
+        Function to perform classification using Ensemble classifiers.
 
         Arguments:
         model1: First classification model.

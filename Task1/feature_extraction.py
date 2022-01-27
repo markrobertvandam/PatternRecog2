@@ -73,7 +73,7 @@ class FeatureExtraction:
         Function to perform feature extraction using fourier transform.
 
         Arguments:
-        filter_radius: Radius of specified filter.
+        filter_radius: Inner radius of specified filter.
         fourier_data: Fourier data containing spectral information.
 
         Returns:

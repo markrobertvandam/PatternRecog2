@@ -75,7 +75,7 @@ class Cats:
 
     def augmented_run(self):
         """
-        Test run with augmentation
+        Test + cross-val run with augmentation
         """
         skf = StratifiedKFold(n_splits=5)
         f1_arr = []
@@ -176,7 +176,7 @@ class Cats:
         image: Numpy array containing image data.
 
         Returns:
-        list: [the original image, flipped image, contrast adjusted image]
+        list: [the original image, flipped image, brightness adjusted image]
         """
 
         flipped_x = image[:, ::-1]
