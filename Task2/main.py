@@ -9,6 +9,9 @@ from ss import SemiSupervised
 def parse_args() -> argparse.Namespace:
     """
     Argument parser
+
+    Returns:
+    parser: Parser with input arguments.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("data", help="Folder of creditcard.csv")
@@ -65,15 +68,18 @@ def plot(args, scores: list, type: str) -> None:
         ax.set_xlabel("Models")
         ax.grid(False)
 
-        fig.savefig(f"{args.res}/plot.png", bbox_inches="tight")
+        fig.savefig(f"{args.res}/boxplot.png", bbox_inches="tight")
 
 
 def main():
+    """
+    Main function to run the pipeline.
+    """
     args = parse_args()
     df = pd.read_csv(f"{args.data}/creditcard.csv")
     df = df.drop(["Time", "Amount"], axis=1)
 
-    ss = SemiSupervised(df, neighbors=3)
+    ss = SemiSupervised(df, neighbors=3, resdir = args.res)
 
     s1, s2, s3 = ss.run()
 

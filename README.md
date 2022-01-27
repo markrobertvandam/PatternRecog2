@@ -36,4 +36,7 @@ The following 2 commands only work for cats
 
 
 ## Running Task 2
-```python3 main.py``` inside the Task2 folder
+
+* Download `creditcard.csv`.
+* Place it in `data` folder.
+* Run ```python3 main.py data results``` inside the Task2 folder
